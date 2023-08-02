@@ -1,0 +1,9 @@
+{
+    "settings": {
+        "aggregate": true
+    },
+    "database":{
+        "URI": "postgresql://user_sandbox:Hovno123-@127.0.0.1:5432/CanLogData",
+        "machine_name": "TestMachine2000"
+    }
+}
