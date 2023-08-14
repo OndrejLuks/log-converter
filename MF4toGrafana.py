@@ -3,6 +3,7 @@ from sqlalchemy import create_engine, schema
 from sqlalchemy.sql import text
 import pandas as pd
 import os
+import sys
 import json
 
 # ===========================================================================================================
@@ -100,24 +101,31 @@ def open_config():
     except FileNotFoundError:
         print()
         print("ERROR while reading config.json file. Check for file existance.")
-        return
+        sys.exit(1)
     
     return data
 
 
 def create_dbc_set() -> set:
     """Creates a dictionary of all DBC files in format {"CAN":[dbc-file, can-channel]}"""
+
+    #TODO might have to use cantools to extract the messages manually
+
     converter_db = {
         "CAN": []
     }
     try:
-        for dbc_file in os.listdir("DBCfiles"):
+        dir = os.listdir("DBCfiles")
+        if len(dir) == 0:
+            raise OSError
+
+        for dbc_file in dir:
             converter_db["CAN"].append((os.path.join("DBCfiles", dbc_file), 0))     # 0 means "apply the database to every BUS"
 
     except OSError:
         print()
-        print("ERROR while loading DBC files. Check for folder existance.")
-        return
+        print("ERROR while loading DBC files. Check for file existance.")
+        sys.exit(1)
 
     return converter_db
 
@@ -139,15 +147,21 @@ def aggregate(df_set) -> set:
     result_list = []
     for df in df_set:
         if df.shape[0] > 0:
-            # remove repeating values, leave only 1st and last in repeating series
-            mask = ((df[df.columns.values[0]] != df[df.columns.values[0]].shift()) |(df[df.columns.values[0]] != df[df.columns.values[0]].shift(-1)))
-            # leave data every 30 minutes, if previous operation deletes too much
-            # time_diffs = df.index.to_series().diff()
-            # mask |= time_diffs >= pd.Timedelta(minutes=30)
-            # apply mask
-            result_df = df[mask]
-            result_list.append(result_df)
-        
+            # create an array of indexes to use as a mask for the dataframe
+            idx_array = []
+            # insert first index into the array
+            previous = 0
+            idx_array.append(previous)
+            
+            for idx in range(df.shape[0]):
+                if df.iloc[previous, 0] != df.iloc[idx, 0]:
+                    idx_array.append(idx-1)
+                    idx_array.append(idx)
+                    previous = idx
+                    
+            # remove duplicates and create a new dataframe
+            result_list.append(df.iloc[list(dict.fromkeys(idx_array))])
+                
     return result_list
 
 
