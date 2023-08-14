@@ -1,6 +1,8 @@
 {
     "settings": {
-        "aggregate": true
+        "aggregate": true,
+        "_comment": "clean_upload means data will not append, OLD SCHEMA WILL BE DELETED",
+        "clean_upload": true
     },
     "database":{
         "host": "127.0.0.1",

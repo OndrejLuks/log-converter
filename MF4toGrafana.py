@@ -16,6 +16,7 @@ class DatabaseHandle:
         self.database = config["database"]["database"]
         self.user = config["database"]["user"]
         self.password = config["database"]["password"]
+        self.clean = config["settings"]["clean_upload"]
 
         self.conn_string = "postgresql://" + self.user + ":" + self.password + "@" + self.host + "/" + self.database
 
@@ -35,16 +36,19 @@ class DatabaseHandle:
 
     def create_schema(self) -> bool:
         try:
-            if self.connection.dialect.has_schema(self.connection, self.schema_name):
-                print(f"Dropping schema {self.schema_name}")
-                drop_schema_sql = text(f"DROP SCHEMA {self.schema_name} CASCADE")
-                self.connection.execute(drop_schema_sql)
-                self.connection.commit()
-                
-            print(f"Creating schema {self.schema_name}")
-            self.connection.execute(schema.CreateSchema(self.schema_name))
-            self.connection.commit()
+            if self.clean:
+                if self.connection.dialect.has_schema(self.connection, self.schema_name):
+                    print(f"Dropping schema {self.schema_name}")
+                    drop_schema_sql = text(f"DROP SCHEMA {self.schema_name} CASCADE")
+                    self.connection.execute(drop_schema_sql)
+                    self.connection.commit()
 
+            if not self.connection.dialect.has_schema(self.connection, self.schema_name):
+                print(f"Creating schema {self.schema_name}")
+                self.connection.execute(schema.CreateSchema(self.schema_name))
+                self.connection.commit()
+
+                
         except Exception as e:
             print()
             print(f"ERROR: {e}")
@@ -108,8 +112,7 @@ def create_dbc_set() -> set:
     }
     try:
         for dbc_file in os.listdir("DBCfiles"):
-            # TODO - WHAT ABOUT BUS?
-            converter_db["CAN"].append((os.path.join("DBCfiles", dbc_file), 1))
+            converter_db["CAN"].append((os.path.join("DBCfiles", dbc_file), 0))     # 0 means "apply the database to every BUS"
 
     except OSError:
         print()
@@ -124,7 +127,7 @@ def convert_mf4(mf4_file: os.path, dbc_set: set) -> pd.DataFrame:
     # convert MF4 to MDF
     mdf = MDF(mf4_file)
     # extract CAN messages
-    extracted_mdf = mdf.extract_bus_logging(dbc_set)
+    extracted_mdf = mdf.extract_bus_logging(database_files=dbc_set)
     # return MDF converted to dataframe
     mdf_df = extracted_mdf.to_dataframe(time_from_zero=False, time_as_date=True)
     mdf_df.index = pd.to_datetime(mdf_df.index)
