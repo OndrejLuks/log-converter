@@ -3,7 +3,11 @@
         "aggregate": true
     },
     "database":{
-        "URI": "postgresql://user_sandbox:Hovno123-@127.0.0.1:5432/CanLogData",
-        "machine_name": "TestMachine2000"
+        "host": "127.0.0.1",
+        "port": "5432",
+        "database": "TestDB",
+        "user": "user_sandbox",
+        "password": "Hovno123-",
+        "schema_name": "mex_test"
     }
 }
