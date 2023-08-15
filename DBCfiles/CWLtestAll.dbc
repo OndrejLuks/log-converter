@@ -33,55 +33,69 @@ NS_ :
 
 BS_:
 
-BU_: WorkGrp ECU Drive Display Primary PTOLKeypad ServiceTool Joystick1 Catalyst Shuttle Attachment CABKeypad ACDKeypad Joystick2 Joystick3
+BU_: WorkGrp ECU Drive Display Primary PTOLKeypad ServiceTool Joystick1 Catalyst Shuttle Attachment CABKeypad ACDKeypad Joystick2 Joystick3 
 
 
-BO_ 3221225472 VECTOR__INDEPENDENT_SIG_MSG: 0 Vector__XXX
- SG_ engineRPM : 0|16@1+ (1,0) [0|65535] "-" Vector__XXX
- SG_ hydromotorSpeed : 0|16@1+ (1,0) [0|65535] "-" Vector__XXX
- SG_ travelCommand : 0|16@1+ (0.01,0) [0|655.35] "-" Vector__XXX
- SG_ inchingPedal : 0|16@1+ (0.01,0) [0|655.35] "-" Vector__XXX
- SG_ currentFwd : 0|16@1+ (0.01,0) [0|655.35] "-" Vector__XXX
- SG_ currentRev : 0|16@1+ (0.01,0) [0|655.35] "-" Vector__XXX
- SG_ reserveBrakePressure : 0|16@1+ (0.01,0) [0|655.35] "-" Vector__XXX
- SG_ hydraulicTemp : 0|16@1+ (0.01,0) [0|655.35] "-" Vector__XXX
- SG_ motorCurrent : 0|16@1+ (0.01,0) [0|655.35] "-" Vector__XXX
- SG_ fNR : 0|8@1+ (1,0) [0|255] "-" Vector__XXX
- SG_ hydraulicPressureSwitch : 0|8@1+ (1,0) [0|255] "-" Vector__XXX
- SG_ pressureFwd : 0|16@1+ (0.01,0) [0|655.35] "-" Vector__XXX
- SG_ pressureRev : 0|16@1+ (0.01,0) [0|655.35] "-" Vector__XXX
- SG_ brakePedal : 0|16@1+ (0.01,0) [0|655.35] "-" Vector__XXX
- SG_ steeringPressure : 0|16@1+ (0.01,0) [0|655.35] "-" Vector__XXX
- SG_ serviceBrakePressure : 0|16@1+ (0.01,0) [0|655.35] "-" Vector__XXX
- SG_ parkBrakePressure : 0|16@1+ (0.01,0) [0|655.35] "-" Vector__XXX
- SG_ quadCounts : 0|32@1+ (1,-2147483648) [-2147483648|21474] "-" Vector__XXX
- SG_ velocity : 0|16@1+ (0.01,-60) [-60|60] "-" Vector__XXX
- SG_ velocityValid : 0|16@1+ (0.01,0) [0|655.35] "-" Vector__XXX
- SG_ quadErrorCounts : 0|32@1+ (1,-2147483648) [-2147483648|21474] "-" Vector__XXX
- SG_ encoderACount : 0|32@1+ (1,-2147483648) [-2147483648|21474] "-" Vector__XXX
- SG_ calEnable : 0|8@1+ (1,0) [0|255] "-" Vector__XXX
- SG_ liftLength : 0|16@1+ (1,0) [0|65535] "-" Vector__XXX
- SG_ tiltLength : 0|16@1+ (1,0) [0|65535] "-" Vector__XXX
- SG_ unused : 0|16@1+ (0.01,0) [0|655.35] "-" Vector__XXX
- SG_ speedTilt : 0|8@1+ (1,0) [0|255] "-" Vector__XXX
- SG_ speedTiltScaled : 0|16@1+ (0.1,0) [0|6553.5] "-" Vector__XXX
- SG_ speedLift : 0|16@1+ (0.1,0) [0|6553.5] "-" Vector__XXX
- SG_ unused : 0|16@1+ (0.01,0) [0|655.35] "-" Vector__XXX
+BO_ 2565820425 testDrvMsg1: 8 Drive
+ SG_ engineRPM : 0|16@1+ (1,0.00) [0.00|65535.0] "-" ServiceTool 
+ SG_ hydromotorSpeed : 16|16@1+ (1,0.00) [0.00|65535.0] "-" ServiceTool 
+ SG_ travelCommand : 32|16@1+ (0.01,0.00) [0.00|655.35] "-" ServiceTool 
+ SG_ inchingPedal : 48|16@1+ (0.01,0.00) [0.00|655.35] "-" ServiceTool 
+
+BO_ 2565820681 testDrvMsg2: 8 Drive
+ SG_ currentFwd : 0|16@1+ (0.01,0.00) [0.00|655.35] "-" ServiceTool 
+ SG_ currentRev : 16|16@1+ (0.01,0.00) [0.00|655.35] "-" ServiceTool 
+ SG_ reserveBrakePressure : 32|16@1+ (0.01,0.00) [0.00|655.35] "-" ServiceTool 
+ SG_ hydraulicTemp : 48|16@1+ (0.01,0.00) [0.00|655.35] "-" ServiceTool 
+
+BO_ 2565820937 testDrvMsg3: 8 Drive
+ SG_ motorCurrent : 0|16@1+ (0.01,0.00) [0.00|655.35] "-" ServiceTool 
+ SG_ fNR : 16|8@1+ (1,0.00) [0.00|255.0] "-" ServiceTool 
+ SG_ hydraulicPressureSwitch : 24|8@1+ (1,0.00) [0.00|255.0] "-" ServiceTool 
+ SG_ pressureFwd : 32|16@1+ (0.01,0.00) [0.00|655.35] "-" ServiceTool 
+ SG_ pressureRev : 48|16@1+ (0.01,0.00) [0.00|655.35] "-" ServiceTool 
+
+BO_ 2565821193 testDrvMsg4: 8 Drive
+ SG_ brakePedal : 0|16@1+ (0.01,0.00) [0.00|655.35] "-" ServiceTool 
+ SG_ steeringPressure : 16|16@1+ (0.01,0.00) [0.00|655.35] "-" ServiceTool 
+ SG_ serviceBrakePressure : 32|16@1+ (0.01,0.00) [0.00|655.35] "-" ServiceTool 
+ SG_ parkBrakePressure : 48|16@1+ (0.01,0.00) [0.00|655.35] "-" ServiceTool 
+
+BO_ 2565821449 testDrvMsg5: 8 Drive
+ SG_ quadCounts : 0|32@1+ (1.0,-2147483648) [-2147483648|21474] "-" ServiceTool 
+ SG_ velocity : 32|16@1+ (0.01,-60.00) [-60.00|60.00] "-" ServiceTool 
+ SG_ velocityValid : 48|16@1+ (0.01,0.00) [0.00|655.35] "-" ServiceTool 
+
+BO_ 2565821705 testDrvMsg6: 8 Drive
+ SG_ quadErrorCounts : 0|32@1+ (1.0,-2147483648) [-2147483648|21474] "-" ServiceTool 
+ SG_ encoderACount : 32|32@1+ (1.0,-2147483648) [-2147483648|21474] "-" ServiceTool 
 
 BO_ 2364539904 EEC1: 8 ECU
- SG_ trqMode : 0|4@1+ (1,0) [0|0] "-"  Primary
- SG_ actMod_trqInr : 4|4@1- (0.125,0) [0|0.875] ""  Primary
- SG_ trqDrvDemEng : 8|8@1+ (1,-125) [-125|125] "%"  Primary
- SG_ trqActualEng : 16|8@1+ (10,-1250) [-1250|1250] "Nm"  Primary
- SG_ speedEng : 24|16@1+ (0.125,0) [0|8031.88] ""  Primary
- SG_ sourceAdrOfCtlDev : 40|8@1+ (1,0) [0|0] "-"  Primary
- SG_ stEngStarterMode : 48|4@1+ (1,0) [0|0] "-"  Primary
- SG_ trqEngDem : 56|8@1+ (1,0) [0|125] "%"  Primary
+ SG_ trqMode : 0|4@1+ (1,0) [0|0] "-" Primary 
+ SG_ actMod_trqInr : 4|4@1- (0.125,0.0) [0.0|0.875] "" Primary 
+ SG_ trqDrvDemEng : 8|8@1+ (1,-125.0) [-125.0|125.0] "%" Primary 
+ SG_ trqActualEng : 16|8@1+ (10.0,-1250.0) [-1250.0|1250.0] "Nm" Primary 
+ SG_ speedEng : 24|16@1+ (0.125,0.0) [0.0|8031.88] "" Primary 
+ SG_ sourceAdrOfCtlDev : 40|8@1+ (1,0) [0|0] "-" Primary 
+ SG_ stEngStarterMode : 48|4@1+ (1,0) [0|0] "-" Primary 
+ SG_ trqEngDem : 56|8@1+ (1,0.0) [0.0|125.0] "%" Primary 
+
+BO_ 2565824764 testWgpMsg1: 8 WorkGrp
+ SG_ calEnable : 0|8@1+ (1,0.00) [0.00|255.0] "-" ServiceTool 
+ SG_ liftLength : 16|16@1+ (1,0.00) [0.00|65535.0] "-" ServiceTool 
+ SG_ tiltLength : 32|16@1+ (1,0.00) [0.00|65535.0] "-" ServiceTool 
+ SG_ unused : 48|16@1+ (0.01,0.00) [0.00|655.35] "-" ServiceTool 
+
+BO_ 2565825020 testWgpMsg2: 8 WorkGrp
+ SG_ speedTilt : 0|8@1+ (1,0.00) [0.00|255.0] "-" ServiceTool 
+ SG_ speedTiltScaled : 16|16@1+ (0.1,0.00) [0.00|6553.5] "-" ServiceTool 
+ SG_ speedLift : 32|16@1+ (0.1,0.00) [0.00|6553.5] "-" ServiceTool 
+ SG_ unused : 48|16@1+ (0.01,0.00) [0.00|655.35] "-" ServiceTool 
 
 
 
-CM_ BO_ 3221225472 "This is a message for not used signals, created by Vector CANdb++ DBC OLE DB Provider.";
 CM_ BO_ 2364539904 "Electronic Engine Control";
+
 CM_ SG_ 2364539904 trqMode "Engine Torque Mode";
 CM_ SG_ 2364539904 actMod_trqInr "Actual Engine : Percent Torque High Resolution";
 CM_ SG_ 2364539904 trqDrvDemEng "Driver's Demand Engine : Percent Torque";
@@ -90,6 +104,7 @@ CM_ SG_ 2364539904 speedEng "Engine Speed";
 CM_ SG_ 2364539904 sourceAdrOfCtlDev "Source Address of Controlling Device for Engine Control";
 CM_ SG_ 2364539904 stEngStarterMode "Engine Starter mode";
 CM_ SG_ 2364539904 trqEngDem "Engine Demand : Percent Torque";
+
 BA_DEF_ SG_  "SigType" ENUM  "Default","Range","RangeSigned","ASCII","Discrete","Control","ReferencePGN","DTC","StringDelimiter","StringLength","StringLengthControl";
 BA_DEF_ SG_  "GenSigEVName" STRING ;
 BA_DEF_ SG_  "GenSigILSupport" ENUM  "No","Yes";
@@ -120,6 +135,7 @@ BA_DEF_ BO_  "Port_ServiceTool" ENUM  "CAN_PORT_1","CAN_PORT_2","CAN_PORT_3","CA
 BA_DEF_ BO_  "Port_ECU" ENUM  "CAN_PORT_1","CAN_PORT_2","CAN_PORT_3","CAN_PORT_4","CAN_PORT_5","CAN_PORT_6","CAN_PORT_7","CAN_PORT_8","None";
 BA_DEF_ BO_  "Port_Primary" ENUM  "CAN_PORT_1","CAN_PORT_2","CAN_PORT_3","CAN_PORT_4","CAN_PORT_5","CAN_PORT_6","CAN_PORT_7","CAN_PORT_8","None";
 BA_DEF_ BO_  "Port_WorkGrp" ENUM  "CAN_PORT_1","CAN_PORT_2","CAN_PORT_3","CAN_PORT_4","CAN_PORT_5","CAN_PORT_6","CAN_PORT_7","CAN_PORT_8","None";
+
 BA_DEF_ BO_  "GenMsgRequestable" INT 0 1;
 BA_DEF_ BO_  "GenMsgCycleTime" INT 0 3600000;
 BA_DEF_ SG_  "SPN" INT 0 524287;
@@ -131,6 +147,12 @@ BA_DEF_DEF_  "SigType" "Default";
 BA_DEF_DEF_  "GenSigEVName" "Env@Nodename_@Signame";
 BA_DEF_DEF_  "GenSigILSupport" "Yes";
 BA_DEF_DEF_  "GenSigSendType" "NoSigSendType";
+BA_DEF_DEF_  "Port_Drive" "None";
+BA_DEF_DEF_  "Port_ServiceTool" "None";
+BA_DEF_DEF_  "Port_ECU" "None";
+BA_DEF_DEF_  "Port_Primary" "None";
+BA_DEF_DEF_  "Port_WorkGrp" "None";
+
 BA_DEF_DEF_  "GenMsgFastOnStart" 0;
 BA_DEF_DEF_  "GenSigInactiveValue" 0;
 BA_DEF_DEF_  "GenMsgCycleTimeFast" 0;
@@ -152,11 +174,6 @@ BA_DEF_DEF_  "NmJ1939ECUInstance" 0;
 BA_DEF_DEF_  "NmJ1939AAC" 0;
 BA_DEF_DEF_  "NmStationAddress" 254;
 BA_DEF_DEF_  "GenMsgSendType" "noMsgSendType";
-BA_DEF_DEF_  "Port_Drive" "None";
-BA_DEF_DEF_  "Port_ServiceTool" "None";
-BA_DEF_DEF_  "Port_ECU" "None";
-BA_DEF_DEF_  "Port_Primary" "None";
-BA_DEF_DEF_  "Port_WorkGrp" "None";
 BA_DEF_DEF_  "GenMsgRequestable" 1;
 BA_DEF_DEF_  "GenMsgCycleTime" 0;
 BA_DEF_DEF_  "SPN" 0;
@@ -180,12 +197,55 @@ BA_ "NmStationAddress" BU_ CABKeypad 194;
 BA_ "NmStationAddress" BU_ ACDKeypad 195;
 BA_ "NmStationAddress" BU_ Joystick2 51;
 BA_ "NmStationAddress" BU_ Joystick3 237;
-BA_ "GenMsgCycleTime" BO_ 2364539904 100;
-BA_ "GenMsgSendType" BO_ 2364539904 0;
-BA_ "Port_Primary" BO_ 2364539904 0;
-BA_ "Port_ECU" BO_ 2364539904 0;
+
+BA_ "VFrameFormat" BO_ 2565820425 3;
+BA_ "VFrameFormat" BO_ 2565820681 3;
+BA_ "VFrameFormat" BO_ 2565820937 3;
+BA_ "VFrameFormat" BO_ 2565821193 3;
+BA_ "VFrameFormat" BO_ 2565821449 3;
+BA_ "VFrameFormat" BO_ 2565821705 3;
 BA_ "VFrameFormat" BO_ 2364539904 3;
+BA_ "VFrameFormat" BO_ 2565824764 3;
+BA_ "VFrameFormat" BO_ 2565825020 3;
+
+BA_ "Port_Drive" BO_ 2565820425 0;
+BA_ "Port_ServiceTool" BO_ 2565820425 0;
+BA_ "Port_Drive" BO_ 2565820681 0;
+BA_ "Port_ServiceTool" BO_ 2565820681 0;
+BA_ "Port_Drive" BO_ 2565820937 0;
+BA_ "Port_ServiceTool" BO_ 2565820937 0;
+BA_ "Port_Drive" BO_ 2565821193 0;
+BA_ "Port_ServiceTool" BO_ 2565821193 0;
+BA_ "Port_Drive" BO_ 2565821449 0;
+BA_ "Port_ServiceTool" BO_ 2565821449 0;
+BA_ "Port_Drive" BO_ 2565821705 0;
+BA_ "Port_ServiceTool" BO_ 2565821705 0;
+BA_ "Port_ECU" BO_ 2364539904 0;
+BA_ "Port_Primary" BO_ 2364539904 0;
+BA_ "Port_WorkGrp" BO_ 2565824764 0;
+BA_ "Port_ServiceTool" BO_ 2565824764 0;
+BA_ "Port_WorkGrp" BO_ 2565825020 0;
+BA_ "Port_ServiceTool" BO_ 2565825020 0;
+
+BA_ "GenMsgSendType" BO_ 2565820425 0;
+BA_ "GenMsgCycleTime" BO_ 2565820425 100;
+BA_ "GenMsgSendType" BO_ 2565820681 0;
+BA_ "GenMsgCycleTime" BO_ 2565820681 100;
+BA_ "GenMsgSendType" BO_ 2565820937 0;
+BA_ "GenMsgCycleTime" BO_ 2565820937 100;
+BA_ "GenMsgSendType" BO_ 2565821193 0;
+BA_ "GenMsgCycleTime" BO_ 2565821193 100;
+BA_ "GenMsgSendType" BO_ 2565821449 0;
+BA_ "GenMsgCycleTime" BO_ 2565821449 100;
+BA_ "GenMsgSendType" BO_ 2565821705 0;
+BA_ "GenMsgCycleTime" BO_ 2565821705 10;
+BA_ "GenMsgSendType" BO_ 2364539904 0;
+BA_ "GenMsgCycleTime" BO_ 2364539904 100;
+BA_ "GenMsgSendType" BO_ 2565824764 0;
+BA_ "GenMsgCycleTime" BO_ 2565824764 50;
+BA_ "GenMsgSendType" BO_ 2565825020 0;
+BA_ "GenMsgCycleTime" BO_ 2565825020 50;
+
 VAL_ 2364539904 trqMode 0 "Idling" 1 "AccPedalGovernorActive" 2 "CruiseControl" 3 "PowerTakeOffGovernor" 4 "RoadSpeedLimiter" 5 "ASR_Control" 6 "TransmissionControl" 7 "ABS_control" 8 "TorqueLimiter" 9 "HighSpeedGovernor" 10 "EngineRetarderControl" 12 "Fuel_Limitation" 13 "VCU_PTO_trq_ctl_lim_active" 14 "VCU_PTO_spd_ctl_lim_active" 15 "NotAvailiable" ;
 VAL_ 2364539904 sourceAdrOfCtlDev 0 "EDC_is_controlling_torque" 3 "TSC1TE_or_TSC1TR" 11 "TSC1AE_or_TSC1AR" 16 "TSC1DE_or_TSC1DR" 33 "TSC1VE_or_TSC1VR" 36 "TSC1PE" ;
 VAL_ 2364539904 stEngStarterMode 0 "Start_not_requested" 1 "Starter_active_gear_not_engaged" 2 "Starter_active_gear_engaged" 3 "Starter_finished" 4 "Engine_already_running" 5 "Engine_not_ready_for_start" 6 "Driveline_engaged" 7 "Starter_inhibit_due_to_IMMO" 13 "Starter_inhibit_reason_unknown" 14 "Error" 15 "Not_available" ;
-

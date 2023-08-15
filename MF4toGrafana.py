@@ -22,6 +22,10 @@ class DatabaseHandle:
         self.conn_string = "postgresql://" + self.user + ":" + self.password + "@" + self.host + "/" + self.database
 
 
+    def __del__(self):
+        self.finish()
+
+
     def connect(self) -> bool:
         try:
             self.engine = create_engine(self.conn_string)
@@ -39,13 +43,13 @@ class DatabaseHandle:
         try:
             if self.clean:
                 if self.connection.dialect.has_schema(self.connection, self.schema_name):
-                    print(f"Dropping schema {self.schema_name}")
+                    print(f" - Dropping schema {self.schema_name}")
                     drop_schema_sql = text(f"DROP SCHEMA {self.schema_name} CASCADE")
                     self.connection.execute(drop_schema_sql)
                     self.connection.commit()
 
             if not self.connection.dialect.has_schema(self.connection, self.schema_name):
-                print(f"Creating schema {self.schema_name}")
+                print(f" - Creating schema {self.schema_name}")
                 self.connection.execute(schema.CreateSchema(self.schema_name))
                 self.connection.commit()
 
@@ -80,8 +84,10 @@ class DatabaseHandle:
 
     def finish(self) -> bool:
         try:
-            # self.cursor.close()
+            print("Closing database connection ...  ", end="")
             self.connection.close()
+            print("done!")
+            
         except Exception as e:
             print()
             print(f"ERROR: {e}")
@@ -139,6 +145,7 @@ def convert_mf4(mf4_file: os.path, dbc_set: set) -> pd.DataFrame:
     # return MDF converted to dataframe
     mdf_df = extracted_mdf.to_dataframe(time_from_zero=False, time_as_date=True)
     mdf_df.index = pd.to_datetime(mdf_df.index)
+
     return mdf_df
 
 
@@ -158,7 +165,8 @@ def aggregate(df_set) -> set:
                     idx_array.append(idx-1)
                     idx_array.append(idx)
                     previous = idx
-                    
+            # add last item into the mask
+            idx_array.append(df.shape[0] - 1)
             # remove duplicates and create a new dataframe
             result_list.append(df.iloc[list(dict.fromkeys(idx_array))])
                 
@@ -169,7 +177,25 @@ def split_df_by_cols(df) -> set:
     column_df = []
     for col in df.columns:
         column_df.append(pd.DataFrame(df[col]))
+
     return column_df
+
+
+def count_files_in_dir(dir: str, end: str) -> int:
+    count = 0
+    try:
+        for root, dirs, files in os.walk(dir):
+            for file in files:
+                if file.endswith(end):
+                    count += 1
+        if count == 0:
+            raise OSError
+
+    except OSError:
+        print(f"ERROR while loading MF4 files. Check for {dir} or {end} file existance.")
+        sys.exit(1)
+
+    return count
 
 
 def process_handle(dbc_set: set, config) -> bool:
@@ -182,6 +208,9 @@ def process_handle(dbc_set: set, config) -> bool:
             return False
         if not db.create_schema():
             return False
+        
+        num_of_files = count_files_in_dir("SourceMF4", ".MF4")
+        num_of_done_files = 0
         
         # search for MF4 files
         for root, dirs, files in os.walk("SourceMF4"):
@@ -208,8 +237,11 @@ def process_handle(dbc_set: set, config) -> bool:
                     print("uploading... ", end="")
                     if not db.upload_data(column_dataframes):
                         return False
+                    
+                    num_of_done_files += 1
 
-                    print(" done!")
+                    print(" done!", end="")
+                    print(f"   {round((num_of_done_files / num_of_files) * 100, 2)} %")
                     print()
 
         # close database connection
@@ -217,7 +249,7 @@ def process_handle(dbc_set: set, config) -> bool:
             return False
 
     except OSError:
-        print("ERROR while loading MF4 files. Check for DBC and MF4 existance.")
+        print("ERROR while loading MF4 files. Check for SourceMF4 folder existance.")
         return False
     
     return True
