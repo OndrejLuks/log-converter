@@ -16,10 +16,12 @@
 from asammdf import MDF
 from sqlalchemy import create_engine, schema
 from sqlalchemy.sql import text
+from datetime import timedelta
 import pandas as pd
 import os
 import sys
 import json
+import shutil
 
 # ===========================================================================================================
 # ===========================================================================================================
@@ -198,7 +200,7 @@ def convert_mf4(mf4_file: os.path, dbc_set: set) -> pd.DataFrame:
     return mdf_df
 
 
-def aggregate(df_set) -> list:
+def aggregate(df_set, time_max: int) -> list:
     """Aggregates input set of dataframes by removing redundant values"""
     result_list = []
     for df in df_set:
@@ -210,10 +212,12 @@ def aggregate(df_set) -> list:
             idx_array.append(previous)
             
             for idx in range(df.shape[0]):
-                if df.iloc[previous, 0] != df.iloc[idx, 0]:
+                time_diff = df.index[idx] - df.index[previous]
+                if (df.iloc[previous, 0] != df.iloc[idx, 0]) or (time_diff > timedelta(seconds=time_max)):
                     idx_array.append(idx-1)
                     idx_array.append(idx)
                     previous = idx
+
             # add last item into the mask
             idx_array.append(df.shape[0] - 1)
             # remove duplicates and create a new dataframe
@@ -245,6 +249,13 @@ def count_files_in_dir(dir: str, end: str) -> int:
         sys.exit(1)
 
     return count
+
+
+def move_files() -> None:
+    for item in os.listdir("SourceMF4"):
+        source_item = os.path.join("SourceMF4", item)
+        destination_item = os.path.join("DoneMF4", item)
+        shutil.move(source_item, destination_item)
 
 
 def process_handle(dbc_set: set, config) -> bool:
@@ -280,7 +291,7 @@ def process_handle(dbc_set: set, config) -> bool:
                     # aggregate if neccessary
                     if config["settings"]["aggregate"]:
                         print("aggregating... ", end="")
-                        column_dataframes = aggregate(column_dataframes)
+                        column_dataframes = aggregate(column_dataframes, config["settings"]["agg_max_skip_seconds"])
                     
                     # upload to the db
                     print("uploading... ", end="")
@@ -296,10 +307,22 @@ def process_handle(dbc_set: set, config) -> bool:
                     print(" done!", end="")
                     print(f"   {round((num_of_done_files / num_of_files) * 100, 2)} %")
                     print()
+        
+        # move files to DoneMF4 folder
+        print(" - Moving files ...  ", end="")
+        move_files()
+        print("done!")
+        print()
 
 
     except OSError:
+        print()
         print("ERROR while loading MF4 files. Check for SourceMF4 folder existance.")
+        return False
+    
+    except Exception as e:
+        print()
+        print(f"ERROR: {e}")
         return False
     
     return True
