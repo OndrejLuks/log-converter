@@ -1,3 +1,18 @@
+# This script takes all the MF4 files from SourceMF4 folder, extracts CAN message using DBC files from DBCfiles
+# folder and uploads these extracted data into specified database.
+# For database settings change according lines in config.json file.
+# It is also possible to aggregate extracted data by adjusting the setting "aggregate" inside config.json to true.
+#
+# Made by Ondrej Luks, 2023
+# ondrej.luks@doosan.com
+
+
+# INTRUSIVE CAN MESSAGE:
+# BA_DEF_ BO_  "VFrameFormat" ENUM  "StandardCAN","ExtendedCAN","reserved","J1939PG"
+
+# ==========================================================================================================================
+# ==========================================================================================================================
+
 from asammdf import MDF
 from sqlalchemy import create_engine, schema
 from sqlalchemy.sql import text
@@ -112,10 +127,25 @@ def open_config():
     return data
 
 
+def check_dbc_file(dbc_file: os.path) -> None:
+    """Ugly hotfix function. Deletes a specific line in DBC files if the line is present.
+    Presence of this line forbids proper can signal extraction."""
+    
+    # read all the lines
+    with open(dbc_file, 'r') as file:
+        lines = file.readlines()
+
+    # write only correct ones
+    with open(dbc_file, 'w') as file:
+        for line in lines:
+            if 'BA_DEF_ BO_  "VFrameFormat" ENUM  "StandardCAN","ExtendedCAN","reserved","J1939PG"' not in line:
+                file.write(line)
+            else:
+                print("(Deleting intrusive line in DBC file)  ", end="")
+
+
 def create_dbc_set() -> set:
     """Creates a dictionary of all DBC files in format {"CAN":[dbc-file, can-channel]}"""
-
-    #TODO might have to use cantools to extract the messages manually
 
     converter_db = {
         "CAN": []
@@ -126,6 +156,7 @@ def create_dbc_set() -> set:
             raise OSError
 
         for dbc_file in dir:
+            check_dbc_file(os.path.join("DBCfiles", dbc_file))
             converter_db["CAN"].append((os.path.join("DBCfiles", dbc_file), 0))     # 0 means "apply the database to every BUS"
 
     except OSError:
@@ -244,10 +275,6 @@ def process_handle(dbc_set: set, config) -> bool:
                     print(f"   {round((num_of_done_files / num_of_files) * 100, 2)} %")
                     print()
 
-        # close database connection
-        if not db.finish():
-            return False
-
     except OSError:
         print("ERROR while loading MF4 files. Check for SourceMF4 folder existance.")
         return False
@@ -273,6 +300,7 @@ def main():
     if not process_handle(dbc_set, config):
         return
     
+    print()
     print("                                      ~ ")           
     print("Everything completed successfully!  c[_]")
     print()
