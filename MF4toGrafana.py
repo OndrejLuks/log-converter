@@ -101,6 +101,7 @@ class DatabaseHandle:
         try:
             for df in data:
                 table_name = f"{df.columns.values[0]}"
+                print(f"                 > uploading signal: {table_name}")
                 df.to_sql(name=table_name,
                           con=self.engine,
                           schema=self.schema_name,
@@ -205,6 +206,8 @@ def aggregate(df_set, time_max: int) -> list:
     result_list = []
     for df in df_set:
         if df.shape[0] > 0:
+            print(f"                 > aggregating signal: {df.columns.values[0]}  ", end="")
+            step_size = df.shape[0] // 9
             # create an array of indexes to use as a mask for the dataframe
             idx_array = []
             # insert first index into the array
@@ -218,6 +221,10 @@ def aggregate(df_set, time_max: int) -> list:
                     idx_array.append(idx)
                     previous = idx
 
+                if idx % step_size == 0:
+                    print(".", end="")
+
+            print()
             # add last item into the mask
             idx_array.append(df.shape[0] - 1)
             # remove duplicates and create a new dataframe
@@ -282,7 +289,7 @@ def process_handle(dbc_set: set, config) -> bool:
                     print(f" - Working on: {mf4_file}")
 
                     # decode and convert MF4 file
-                    print("               decoding... ", end="")
+                    print("               - decoding... ")
                     mf4_df = convert_mf4(mf4_file, dbc_set)
 
                     # split dataframe by different signals
@@ -290,11 +297,11 @@ def process_handle(dbc_set: set, config) -> bool:
 
                     # aggregate if neccessary
                     if config["settings"]["aggregate"]:
-                        print("aggregating... ", end="")
+                        print("               - aggregating... ")
                         column_dataframes = aggregate(column_dataframes, config["settings"]["agg_max_skip_seconds"])
                     
                     # upload to the db
-                    print("uploading... ", end="")
+                    print("               - uploading... ")
                     if not db.upload_data(column_dataframes):
                         return False
                     
@@ -304,7 +311,7 @@ def process_handle(dbc_set: set, config) -> bool:
                     
                     num_of_done_files += 1
 
-                    print(" done!", end="")
+                    print("               - DONE! ", end="")
                     print(f"   {round((num_of_done_files / num_of_files) * 100, 2)} %")
                     print()
         
