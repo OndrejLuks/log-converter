@@ -33,12 +33,32 @@ class DatabaseHandle:
         self.user = config["database"]["user"]
         self.password = config["database"]["password"]
         self.clean = config["settings"]["clean_upload"]
+        self.hasPkey = False
 
         self.conn_string = "postgresql://" + self.user + ":" + self.password + "@" + self.host + "/" + self.database
 
 
     def __del__(self):
         self.finish()
+
+    
+    def _querry(self, message: str) -> None:
+        try:
+            msg = text(message)
+            self.connection.execute(msg)
+            self.connection.commit()
+
+        except Exception as e:
+            print()
+            print(f"WARNING: {e}")
+
+    
+    def setPkey(self, data: list) -> None:
+        for df in data:
+                table_name = f"{df.columns.values[0]}"
+                self._querry(f'ALTER TABLE {self.schema_name}."{table_name}" ADD PRIMARY KEY (time_stamp)')
+        
+        self.hasPkey = True
 
 
     def connect(self) -> bool:
@@ -59,9 +79,7 @@ class DatabaseHandle:
             if self.clean:
                 if self.connection.dialect.has_schema(self.connection, self.schema_name):
                     print(f" - Dropping schema {self.schema_name}")
-                    drop_schema_sql = text(f"DROP SCHEMA {self.schema_name} CASCADE")
-                    self.connection.execute(drop_schema_sql)
-                    self.connection.commit()
+                    self._querry(f"DROP SCHEMA {self.schema_name} CASCADE")
 
             if not self.connection.dialect.has_schema(self.connection, self.schema_name):
                 print(f" - Creating schema {self.schema_name}")
@@ -79,7 +97,7 @@ class DatabaseHandle:
 
     def upload_data(self, data: list) -> bool:
         try:
-            for idx, df in enumerate(data):
+            for df in data:
                 table_name = f"{df.columns.values[0]}"
                 df.to_sql(name=table_name,
                           con=self.engine,
@@ -144,7 +162,7 @@ def check_dbc_file(dbc_file: os.path) -> None:
                 print("(Deleting intrusive line in DBC file)  ", end="")
 
 
-def create_dbc_set() -> set:
+def create_dbc_set() -> dict:
     """Creates a dictionary of all DBC files in format {"CAN":[dbc-file, can-channel]}"""
 
     converter_db = {
@@ -180,7 +198,7 @@ def convert_mf4(mf4_file: os.path, dbc_set: set) -> pd.DataFrame:
     return mdf_df
 
 
-def aggregate(df_set) -> set:
+def aggregate(df_set) -> list:
     """Aggregates input set of dataframes by removing redundant values"""
     result_list = []
     for df in df_set:
@@ -204,7 +222,7 @@ def aggregate(df_set) -> set:
     return result_list
 
 
-def split_df_by_cols(df) -> set:
+def split_df_by_cols(df) -> list:
     column_df = []
     for col in df.columns:
         column_df.append(pd.DataFrame(df[col]))
@@ -269,11 +287,16 @@ def process_handle(dbc_set: set, config) -> bool:
                     if not db.upload_data(column_dataframes):
                         return False
                     
+                    # set primary keys
+                    if not db.hasPkey:
+                        db.setPkey(column_dataframes)
+                    
                     num_of_done_files += 1
 
                     print(" done!", end="")
                     print(f"   {round((num_of_done_files / num_of_files) * 100, 2)} %")
                     print()
+
 
     except OSError:
         print("ERROR while loading MF4 files. Check for SourceMF4 folder existance.")
