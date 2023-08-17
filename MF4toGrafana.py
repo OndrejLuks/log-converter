@@ -22,6 +22,8 @@ import os
 import sys
 import json
 import shutil
+import pyarrow
+import threading
 
 # ===========================================================================================================
 # ===========================================================================================================
@@ -101,7 +103,7 @@ class DatabaseHandle:
         try:
             for df in data:
                 table_name = f"{df.columns.values[0]}"
-                print(f"                 > uploading signal: {table_name}")
+                print(f"     > uploading signal: {table_name}")
                 df.to_sql(name=table_name,
                           con=self.engine,
                           schema=self.schema_name,
@@ -165,6 +167,40 @@ def check_dbc_file(dbc_file: os.path) -> None:
                 print("(Deleting intrusive line in DBC file)  ", end="")
 
 
+def get_converted_files() -> list:
+    out = []
+    dir = os.listdir(os.path.join("Temp", "converted"))
+
+    if len(dir) == 0:
+        raise OSError
+    
+    for file in dir:
+        if file.endswith(".parquet"):
+            out.append(os.path.join("Temp", "converted", file))
+    
+    return out
+
+
+def get_aggregated_dfs() -> pd.DataFrame:
+    files = []
+    out = []
+    # get all .parquet files
+    dir = os.listdir(os.path.join("Temp", "aggregated"))
+
+    for file in dir:
+        if file.endswith(".parquet"):
+            files.append(os.path.join("Temp", "aggregated", file))
+
+    files.sort()
+
+    for file in files:
+        agg_signal_df = pd.read_parquet(file, engine="pyarrow")
+        agg_signal_df.index = pd.to_datetime(agg_signal_df.index)
+        out.append(agg_signal_df)
+
+    return out
+
+
 def create_dbc_set() -> dict:
     """Creates a dictionary of all DBC files in format {"CAN":[dbc-file, can-channel]}"""
 
@@ -188,7 +224,18 @@ def create_dbc_set() -> dict:
     return converter_db
 
 
-def convert_mf4(mf4_file: os.path, dbc_set: set) -> pd.DataFrame:
+def store_multisignal_df(big_df: pd.DataFrame, name: str):
+    target_dir = os.path.join("Temp", "converted")
+    if not os.path.exists(target_dir):
+        os.makedirs(target_dir)
+
+    columns_dfs = split_df_by_cols(big_df)
+
+    for df in columns_dfs:
+        df.to_parquet(f'{os.path.join(target_dir, name)}-{df.columns.values[0]}.parquet', engine="pyarrow", index=True)
+
+
+def convert_mf4(mf4_file: os.path, dbc_set: set, name: str) -> None:
     """Converts and decodes MF4 files to a dataframe using DBC files."""
     # convert MF4 to MDF
     mdf = MDF(mf4_file)
@@ -197,40 +244,42 @@ def convert_mf4(mf4_file: os.path, dbc_set: set) -> pd.DataFrame:
     # return MDF converted to dataframe
     mdf_df = extracted_mdf.to_dataframe(time_from_zero=False, time_as_date=True)
     mdf_df.index = pd.to_datetime(mdf_df.index)
+    mdf_df.index = mdf_df.index.round('1us')
 
-    return mdf_df
+    store_multisignal_df(mdf_df, name)
 
 
-def aggregate(df_set, time_max: int) -> list:
-    """Aggregates input set of dataframes by removing redundant values"""
-    result_list = []
-    for df in df_set:
-        if df.shape[0] > 0:
-            print(f"                 > aggregating signal: {df.columns.values[0]}  ", end="")
-            step_size = df.shape[0] // 9
-            # create an array of indexes to use as a mask for the dataframe
-            idx_array = []
-            # insert first index into the array
-            previous = 0
-            idx_array.append(previous)
-            
-            for idx in range(df.shape[0]):
-                time_diff = df.index[idx] - df.index[previous]
-                if (df.iloc[previous, 0] != df.iloc[idx, 0]) or (time_diff > timedelta(seconds=time_max)):
-                    idx_array.append(idx-1)
-                    idx_array.append(idx)
-                    previous = idx
+def aggregate(df, time_max: int, name: str) -> None:
+    """Aggregates input signal dataframe by removing redundant values"""
+    # iterate signals
 
-                if idx % step_size == 0:
-                    print(".", end="")
+    if df.shape[0] > 0:
+        sig_name = df.columns.values[0]
+        print(f"     > aggregating signal: {sig_name}")
+        # create an array of indexes to use as a mask for the dataframe
+        idx_array = []
+        # insert first index into the array
+        previous = 0
+        idx_array.append(previous)
+        
+        for idx in range(df.shape[0]):
+            time_diff = df.index[idx] - df.index[previous]
+            if (df.iloc[previous, 0] != df.iloc[idx, 0]) or (time_diff > timedelta(seconds=time_max)):
+                idx_array.append(idx-1)
+                idx_array.append(idx)
+                previous = idx
 
-            print()
-            # add last item into the mask
-            idx_array.append(df.shape[0] - 1)
-            # remove duplicates and create a new dataframe
-            result_list.append(df.iloc[list(dict.fromkeys(idx_array))])
+        # add last item into the mask
+        idx_array.append(df.shape[0] - 1)
+        # remove duplicates and create a new dataframe
+        result_df = df.iloc[list(dict.fromkeys(idx_array))]
+
+        target_dir = os.path.join("Temp", "aggregated")
+        if not os.path.exists(target_dir):
+            os.makedirs(target_dir)
+        result_df.to_parquet(f'{os.path.join(target_dir, name)}-{sig_name}.parquet', engine="pyarrow", index=True)
+        print(f"     = signal {sig_name} done!")
                 
-    return result_list
 
 
 def split_df_by_cols(df) -> list:
@@ -265,6 +314,20 @@ def move_files() -> None:
         shutil.move(source_item, destination_item)
 
 
+def rename_done_files(msg: str) -> None:
+    try:
+        if os.path.exists("DoneMF4"):
+            files = os.listdir("DoneMF4")
+            for idx, file in enumerate(files):
+                curr_name = os.path.join("DoneMF4", file)
+                new_name = os.path.join("DoneMF4", f"{msg}-{idx}.MF4")
+                os.rename(curr_name, new_name)
+
+    except Exception as e:
+        print("ERROR while renaming done files:")
+        print(e)
+
+
 def process_handle(dbc_set: set, config) -> bool:
     """Function that handles MF4 files process from conversion to upload"""
     try:
@@ -276,8 +339,10 @@ def process_handle(dbc_set: set, config) -> bool:
         if not db.create_schema():
             return False
         
-        num_of_files = count_files_in_dir("SourceMF4", ".MF4")
-        num_of_done_files = 0
+        if os.path.exists("Temp"):
+            shutil.rmtree("Temp")
+        
+        mf4_file_list = []
         
         # search for MF4 files
         for root, dirs, files in os.walk("SourceMF4"):
@@ -286,45 +351,67 @@ def process_handle(dbc_set: set, config) -> bool:
                 if file.endswith(".MF4"):
                     # found MF4 file
                     mf4_file = os.path.join(root, file)
-                    print(f" - Working on: {mf4_file}")
-
-                    # decode and convert MF4 file
-                    print("               - decoding... ")
-                    mf4_df = convert_mf4(mf4_file, dbc_set)
-
-                    # split dataframe by different signals
-                    column_dataframes = split_df_by_cols(mf4_df)
-
-                    # aggregate if neccessary
-                    if config["settings"]["aggregate"]:
-                        print("               - aggregating... ")
-                        column_dataframes = aggregate(column_dataframes, config["settings"]["agg_max_skip_seconds"])
-                    
-                    # upload to the db
-                    print("               - uploading... ")
-                    if not db.upload_data(column_dataframes):
-                        return False
-                    
-                    # set primary keys
-                    if not db.hasPkey:
-                        db.setPkey(column_dataframes)
-                    
-                    num_of_done_files += 1
-
-                    print("               - DONE! ", end="")
-                    print(f"   {round((num_of_done_files / num_of_files) * 100, 2)} %")
-                    print()
+                    mf4_file_list.append(mf4_file)
         
-        # move files to DoneMF4 folder
-        print(" - Moving files ...  ", end="")
-        move_files()
-        print("done!")
-        print()
+        num_of_mf4_files = len(mf4_file_list)
+        num_of_done_mf4_files = 0
+        
+        if num_of_mf4_files == 0:
+            print("WARNING: No MF4 files found!")
+
+        for idx, file in enumerate(mf4_file_list):
+            # CONVERT FILE into Signal files
+            print(f" - Converting: {file}")
+            convert_mf4(file, dbc_set, str(idx))
+
+            dfs_to_upload = []
+            converted_files = get_converted_files()
+
+            if config["settings"]["aggregate"]:
+                threads = []
+                print("   - aggregating... ")
+
+                for signal_file in converted_files:
+                    signal_df = pd.read_parquet(signal_file, engine="pyarrow")
+                    signal_df.index = pd.to_datetime(signal_df.index)
+                    thread = threading.Thread(target=aggregate, args=(signal_df, config["settings"]["agg_max_skip_seconds"], str(signal_file.split("-")[0].split("\\")[2])))
+                    threads.append(thread)
+                    thread.start()
+                
+                # wait for threads to finish
+                for thr in threads:
+                    thr.join()
+
+                # get dataframes to upload
+                dfs_to_upload = get_aggregated_dfs()
+            
+            else:
+                for idx, file in enumerate(converted_files):
+                    converted_df = pd.read_parquet(file, engine="pyarrow")
+                    converted_df.index = pd.to_datetime(converted_df.index)
+
+                # assign signal dataframes to upload
+                dfs_to_upload = converted_df
+
+            print("   - uploading... ")
+            if not db.upload_data(dfs_to_upload):
+                return False  
+
+            print("   - moving the file... ")
+            new_file_name = str(idx) + "-" + str(file.split("\\")[-1])
+
+            shutil.move(file, os.path.join("DoneMF4", new_file_name))
+            shutil.rmtree(os.path.join("Temp", "aggregated"))
+            shutil.rmtree(os.path.join("Temp", "converted"))
+
+            num_of_done_mf4_files += 1
+            print(f"   - DONE!     Overall progress:  {round((num_of_done_mf4_files / num_of_mf4_files)*100, 2)} %")
+            print()
 
 
     except OSError:
         print()
-        print("ERROR while loading MF4 files. Check for SourceMF4 folder existance.")
+        print("ERROR in process_handle function while dealing with files")
         return False
     
     except Exception as e:
@@ -337,6 +424,9 @@ def process_handle(dbc_set: set, config) -> bool:
 # ===========================================================================================================
 
 def main():
+    # rename done files to avoid future colision
+    rename_done_files("tempName")
+
     print()
     # read configuration
     print("Reading config file ...  ", end="")
@@ -353,6 +443,9 @@ def main():
     if not process_handle(dbc_set, config):
         return
     
+    # rename done files to avoid future colision
+    rename_done_files("doneFile")
+
     print()
     print("                                      ~ ")           
     print("Everything completed successfully!  c[_]")

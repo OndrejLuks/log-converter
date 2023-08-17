@@ -9,6 +9,7 @@ pip install pandas
 pip install psycopg2
 pip install sqlalchemy
 pip install asammdf
+pip install pyarrow
 
 echo:
 echo =======================
