@@ -15,8 +15,10 @@
 
 from asammdf import MDF
 from sqlalchemy import create_engine, schema
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import text
 from datetime import timedelta
+from threading import Lock
 import pandas as pd
 import os
 import sys
@@ -99,28 +101,30 @@ class DatabaseHandle:
         return True
     
 
-    def upload_data(self, data: list) -> bool:
-        try:
-            for df in data:
+    def upload_data(self, data: list) -> None:
+        for df in data:
+            try:
                 table_name = f"{df.columns.values[0]}"
                 print(f"     > uploading signal: {table_name}")
                 df.to_sql(name=table_name,
-                          con=self.engine,
-                          schema=self.schema_name,
-                          index=True,
-                          index_label="time_stamp",
-                          if_exists="append")
+                            con=self.engine,
+                            schema=self.schema_name,
+                            index=True,
+                            index_label="time_stamp",
+                            if_exists="append")
                 self.connection.commit()
+                # set primary keys
+                self._querry(f'ALTER TABLE {self.schema_name}."{table_name}" ADD PRIMARY KEY (time_stamp)')
 
-        except Exception as e:
-            print()
-            print(f"ERROR: {e}")
-            return False
-        
-        return True
+            except IntegrityError:
+                print("       - WARNING: Skipping signal upload due to unique violation. This record already exists in the DB.")
+            
+            except Exception as e:
+                print()
+                print(f"WARNING: {e}")
     
 
-    def finish(self) -> bool:
+    def finish(self) -> None:
         try:
             print("Closing database connection ...  ", end="")
             self.connection.close()
@@ -128,10 +132,8 @@ class DatabaseHandle:
             
         except Exception as e:
             print()
-            print(f"ERROR: {e}")
-            return False
-        
-        return True
+            print(f"ERROR: {e}")        
+
 
 # ===========================================================================================================
 # ===========================================================================================================
@@ -172,7 +174,7 @@ def get_converted_files() -> list:
     dir = os.listdir(os.path.join("Temp", "converted"))
 
     if len(dir) == 0:
-        raise OSError
+        print("   WARNING: No signals were converted")
     
     for file in dir:
         if file.endswith(".parquet"):
@@ -184,13 +186,17 @@ def get_converted_files() -> list:
 def get_aggregated_dfs() -> pd.DataFrame:
     files = []
     out = []
+    dir = []
     # get all .parquet files
-    dir = os.listdir(os.path.join("Temp", "aggregated"))
+    target_dir = os.path.join("Temp", "aggregated")
+    if os.path.exists(target_dir):
+        dir = os.listdir(target_dir)
 
     for file in dir:
         if file.endswith(".parquet"):
             files.append(os.path.join("Temp", "aggregated", file))
 
+    
     files.sort()
 
     for file in files:
@@ -245,42 +251,48 @@ def convert_mf4(mf4_file: os.path, dbc_set: set, name: str) -> None:
     mdf_df = extracted_mdf.to_dataframe(time_from_zero=False, time_as_date=True)
     mdf_df.index = pd.to_datetime(mdf_df.index)
     mdf_df.index = mdf_df.index.round('1us')
-
+    
     store_multisignal_df(mdf_df, name)
 
 
-def aggregate(df, time_max: int, name: str) -> None:
+def aggregate(df, time_max: int, name: str, lock: threading.Lock) -> None:
     """Aggregates input signal dataframe by removing redundant values"""
     # iterate signals
+    num_rows = df.shape[0]
 
-    if df.shape[0] > 0:
+    if num_rows > 0:
         sig_name = df.columns.values[0]
-        print(f"     > aggregating signal: {sig_name}")
+        with lock:
+            print(f"     > started aggregating signal: {sig_name}")
         # create an array of indexes to use as a mask for the dataframe
         idx_array = []
         # insert first index into the array
         previous = 0
         idx_array.append(previous)
         
-        for idx in range(df.shape[0]):
+        for idx in range(num_rows):
             time_diff = df.index[idx] - df.index[previous]
-            if (df.iloc[previous, 0] != df.iloc[idx, 0]) or (time_diff > timedelta(seconds=time_max)):
+            if (df.iat[previous, 0] != df.iat[idx, 0]):
                 idx_array.append(idx-1)
+                idx_array.append(idx)
+                previous = idx
+            elif (time_diff > timedelta(seconds=time_max)):
                 idx_array.append(idx)
                 previous = idx
 
         # add last item into the mask
-        idx_array.append(df.shape[0] - 1)
-        # remove duplicates and create a new dataframe
+        idx_array.append(num_rows - 1)
+        # create a new dataframe and remove duplicates
         result_df = df.iloc[list(dict.fromkeys(idx_array))]
 
         target_dir = os.path.join("Temp", "aggregated")
         if not os.path.exists(target_dir):
             os.makedirs(target_dir)
-        result_df.to_parquet(f'{os.path.join(target_dir, name)}-{sig_name}.parquet', engine="pyarrow", index=True)
-        print(f"     = signal {sig_name} done!")
+        
+        with lock:
+            result_df.to_parquet(f'{os.path.join(target_dir, name)}-{sig_name}.parquet', engine="pyarrow", index=True)
+            print(f"     = finished agg. signal: {sig_name}")
                 
-
 
 def split_df_by_cols(df) -> list:
     column_df = []
@@ -307,25 +319,42 @@ def count_files_in_dir(dir: str, end: str) -> int:
     return count
 
 
-def move_files() -> None:
-    for item in os.listdir("SourceMF4"):
-        source_item = os.path.join("SourceMF4", item)
-        destination_item = os.path.join("DoneMF4", item)
-        shutil.move(source_item, destination_item)
-
-
-def rename_done_files(msg: str) -> None:
+def rm_tree_if_exist(root: list) -> None:
     try:
-        if os.path.exists("DoneMF4"):
-            files = os.listdir("DoneMF4")
-            for idx, file in enumerate(files):
-                curr_name = os.path.join("DoneMF4", file)
-                new_name = os.path.join("DoneMF4", f"{msg}-{idx}.MF4")
-                os.rename(curr_name, new_name)
+        for dir in root:
+            if os.path.exists(dir):
+                shutil.rmtree(dir)
+    except OSError:
+        print()
+        print(f"ERROR: Failed to remove tree of root {root}")
+        sys.exit(1)
 
-    except Exception as e:
-        print("ERROR while renaming done files:")
-        print(e)
+
+def rm_empty_subdirs(top_level: str) -> None:
+    try:
+        for root, dirs, files in os.walk(top_level, topdown=False):
+            for dir_name in dirs:
+                dir_path = os.path.join(root, dir_name)
+                if not os.listdir(dir_path):
+                    os.rmdir(dir_path)
+    except OSError:
+        print()
+        print(f"ERROR: Failed to remove empty subdirs of root {top_level}")
+        sys.exit(1)
+
+
+def move_done_file(file: os.path) -> None:
+    # move the given file to DoneMF4
+    target_file = file.replace("SourceMF4", "DoneMF4")
+    target_dir = os.path.dirname(target_file)
+
+    if not os.path.exists(target_dir):
+        os.makedirs(target_dir)
+
+    shutil.move(file, target_file)
+
+    # remove empty source folders
+    rm_empty_subdirs("SourceMF4")
 
 
 def process_handle(dbc_set: set, config) -> bool:
@@ -374,7 +403,8 @@ def process_handle(dbc_set: set, config) -> bool:
                 for signal_file in converted_files:
                     signal_df = pd.read_parquet(signal_file, engine="pyarrow")
                     signal_df.index = pd.to_datetime(signal_df.index)
-                    thread = threading.Thread(target=aggregate, args=(signal_df, config["settings"]["agg_max_skip_seconds"], str(signal_file.split("-")[0].split("\\")[2])))
+                    lock = Lock()
+                    thread = threading.Thread(target=aggregate, args=(signal_df, config["settings"]["agg_max_skip_seconds"], str(signal_file.split("-")[0].split("\\")[2]), lock))
                     threads.append(thread)
                     thread.start()
                 
@@ -394,15 +424,13 @@ def process_handle(dbc_set: set, config) -> bool:
                 dfs_to_upload = converted_df
 
             print("   - uploading... ")
-            if not db.upload_data(dfs_to_upload):
-                return False  
-
+            db.upload_data(dfs_to_upload)
+  
             print("   - moving the file... ")
-            new_file_name = str(idx) + "-" + str(file.split("\\")[-1])
+            move_done_file(file)
 
-            shutil.move(file, os.path.join("DoneMF4", new_file_name))
-            shutil.rmtree(os.path.join("Temp", "aggregated"))
-            shutil.rmtree(os.path.join("Temp", "converted"))
+            # delete temp folders
+            rm_tree_if_exist([os.path.join("Temp", "converted"), os.path.join("Temp", "aggregated")])
 
             num_of_done_mf4_files += 1
             print(f"   - DONE!     Overall progress:  {round((num_of_done_mf4_files / num_of_mf4_files)*100, 2)} %")
@@ -421,17 +449,41 @@ def process_handle(dbc_set: set, config) -> bool:
     
     return True
 
+
+def prompt_warning(schema_name) -> None:
+    print()
+    print(" ! WARNING ! WARNING ! WARNING ! WARNING ! WARNING ! WARNING !")
+    print()
+    print(f'   YOU ARE ABOUT TO DELETE THE CURRENT {schema_name} SCHEMA')
+    print('   Do you really want to proceed?')
+    print()
+    print('   Enter "y" for YES or "n" for NO:  ', end="")
+
+    while(True):
+        resp = input()
+        if resp == 'y' or resp == 'Y':
+            print('   Okay.')
+            print()
+            break
+        elif resp == 'n' or resp == 'N':
+            print('   Change the settings.clean_upload to "false" in config.json file')
+            print()
+            sys.exit(0)
+        else:
+            print('   Unknown response. Try again, please:  ', end='')
+
 # ===========================================================================================================
 
 def main():
-    # rename done files to avoid future colision
-    rename_done_files("tempName")
-
     print()
     # read configuration
     print("Reading config file ...  ", end="")
     config = open_config()
     print("done!")
+
+    # prompt warning when clean database is selected
+    if config["settings"]["clean_upload"]:
+        prompt_warning(config["database"]["schema_name"])
 
     # read all DBC files
     print("Reading all DBC files ...  ", end="")
@@ -442,9 +494,6 @@ def main():
     print("Converting, decoding and uploading the MF4 files ...")
     if not process_handle(dbc_set, config):
         return
-    
-    # rename done files to avoid future colision
-    rename_done_files("doneFile")
 
     print()
     print("                                      ~ ")           

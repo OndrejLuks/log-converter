@@ -1,6 +1,7 @@
 {
     "settings": {
         "aggregate": true,
+        "agg_max_skip_seconds": 30,
         "_comment": "clean_upload means data will not append, OLD SCHEMA WILL BE DELETED",
         "clean_upload": true
     },
