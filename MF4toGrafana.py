@@ -14,8 +14,8 @@
 # ==========================================================================================================================
 
 from asammdf import MDF
-from sqlalchemy import create_engine, schema
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy import create_engine, schema, Table, MetaData
+from sqlalchemy.exc import IntegrityError, ProgrammingError
 from sqlalchemy.sql import text
 from datetime import timedelta
 from threading import Lock
@@ -54,9 +54,12 @@ class DatabaseHandle:
             self.connection.execute(msg)
             self.connection.commit()
 
+        except ProgrammingError:
+            print("       - pkey already set")
+
         except Exception as e:
             print()
-            print(f"WARNING: {e}")
+            print(f"WARNINGssss: {e}")
 
     
     def setPkey(self, data: list) -> None:
@@ -71,6 +74,7 @@ class DatabaseHandle:
         try:
             self.engine = create_engine(self.conn_string)
             self.connection = self.engine.connect()
+            self.meta = MetaData()
 
         except Exception as e:
             print()
@@ -113,8 +117,12 @@ class DatabaseHandle:
                             index_label="time_stamp",
                             if_exists="append")
                 self.connection.commit()
-                # set primary keys
+                # set primary key
                 self._querry(f'ALTER TABLE {self.schema_name}."{table_name}" ADD PRIMARY KEY (time_stamp)')
+
+            except ProgrammingError:
+                # primary key is already set
+                pass
 
             except IntegrityError:
                 print("       - WARNING: Skipping signal upload due to unique violation. This record already exists in the DB.")
