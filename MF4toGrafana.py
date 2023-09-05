@@ -24,7 +24,6 @@ import os
 import sys
 import json
 import shutil
-import pyarrow
 import threading
 
 # ===========================================================================================================
@@ -253,6 +252,7 @@ def convert_mf4(mf4_file: os.path, dbc_set: set, name: str) -> None:
     """Converts and decodes MF4 files to a dataframe using DBC files."""
     # convert MF4 to MDF
     mdf = MDF(mf4_file)
+
     # extract CAN messages
     extracted_mdf = mdf.extract_bus_logging(database_files=dbc_set)
     # return MDF converted to dataframe
