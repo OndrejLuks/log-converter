@@ -11,6 +11,9 @@ pip install psycopg2
 pip install sqlalchemy
 pip install asammdf
 pip install pyarrow
+pip install can_decoder
+pip install canedge_browser
+pip install mdf_iter
 
 echo:
 echo =======================
