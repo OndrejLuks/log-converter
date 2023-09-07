@@ -59,7 +59,7 @@ class DatabaseHandle:
 
         except Exception as e:
             print()
-            print(f"WARNINGssss: {e}")
+            print(f"WARNING: {e}")
 
     
     def setPkey(self, data: list) -> None:
@@ -421,12 +421,12 @@ def process_handle(dbc_list: set, config) -> bool:
                 dfs_to_upload = get_aggregated_dfs()
             
             else:
-                for idx, file in enumerate(converted_files):
-                    converted_df = pd.read_parquet(file, engine="pyarrow")
+                for idx, fle in enumerate(converted_files):
+                    converted_df = pd.read_parquet(fle, engine="pyarrow")
                     converted_df.index = pd.to_datetime(converted_df.index)
 
-                # assign signal dataframes to upload
-                dfs_to_upload = converted_df
+                    # assign signal dataframes to upload
+                    dfs_to_upload.append(converted_df)
 
             print("   - uploading... ")
             db.upload_data(dfs_to_upload)
