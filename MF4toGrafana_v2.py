@@ -60,7 +60,7 @@ class DatabaseHandle:
 
         except Exception as e:
             print()
-            print(f"WARNING: {e}")
+            print(f"WARNING - querry:  {e}")
 
 
     def connect(self) -> None:
@@ -71,7 +71,7 @@ class DatabaseHandle:
 
         except Exception as e:
             print()
-            print(f"ERROR: {e}")
+            print(f"DB CONNECTION ERROR:  {e}")
             sys.exit(1)
     
 
@@ -92,7 +92,7 @@ class DatabaseHandle:
                 
         except Exception as e:
             print()
-            print(f"ERROR: {e}")
+            print(f"ERROR - schema:  {e}")
             sys.exit(1)
     
 
@@ -117,7 +117,7 @@ class DatabaseHandle:
             
             except Exception as e:
                 print()
-                print(f"WARNING: {e}")
+                print(f"DB UPLOAD WARNING:  {e}")
     
 
     def finish(self) -> None:
@@ -129,7 +129,7 @@ class DatabaseHandle:
             
         except Exception as e:
             print()
-            print(f"ERROR: {e}")        
+            print(f"DB CLOSING ERROR:  {e}")        
 
 
 # ===========================================================================================================
@@ -141,6 +141,7 @@ def open_config():
         file = open("config.json")
         data = json.load(file)
         file.close()
+
     except FileNotFoundError:
         print()
         print("ERROR while reading config.json file. Check for file existance.")
@@ -257,6 +258,32 @@ def get_converted_files() -> list:
     return out
 
 
+def get_MF4_files() -> list:
+    """Generates a list of paths to all found MF4 files in the SourceMF4 folder. Returns also the number of found files."""
+    out = []
+    try:
+        # search for MF4 files
+        for root, dirs, files in os.walk("SourceMF4"):
+            # mostly "files" consists of only 1 file
+            for file in files:
+                if file.endswith(".MF4"):
+                    # found MF4 file
+                    mf4_file = os.path.join(root, file)
+                    out.append(mf4_file)
+
+    except Exception as e:
+        print()
+        print(f"MF4 READING WARNING:  {e}") 
+        sys.exit(1)
+
+    if len(out) == 0:
+        print()
+        print("WARNING: No MF4 files found!")
+        print()
+
+    return out, len(out)
+
+
 def get_aggregated_dfs() -> list:
     """Extracts and returns a list of aggregated MF4 files (signals) from Temp folder"""
     files = []
@@ -291,7 +318,7 @@ def create_dbc_list() -> list:
             raise OSError
 
         for dbc_file in dir:
-            if ".dbc" in dbc_file:
+            if dbc_file.endswith(".dbc"):
                 db = can_decoder.load_dbc(os.path.join("DBCfiles", dbc_file))
                 db_list.append(db)
 
@@ -315,7 +342,7 @@ def count_files_in_dir(dir: str, end: str) -> int:
             raise OSError
 
     except OSError:
-        print(f"ERROR while loading MF4 files. Check for {dir} or {end} file existance.")
+        print(f"ERROR while loading {end} files. Check for {dir} or {end} file existance.")
         sys.exit(1)
 
     return count
@@ -362,7 +389,7 @@ def move_done_file(file: os.path) -> None:
 
     except Exception as e:
         print()
-        print(f"WARNING: {e}")
+        print(f"FILE MOVING WARNING:  {e}")
 
     # remove empty source folders
     rm_empty_subdirs("SourceMF4")
@@ -376,7 +403,7 @@ def create_dir(target_dir: str) -> None:
 
     except Exception as e:
         print()
-        print(f"WARNING: {e}") 
+        print(f"DIR CREATION WARNING:  {e}") 
 
 # -----------------------------------------------------------------------------------------------------------
 
@@ -390,24 +417,11 @@ def process_handle(dbc_list: set, config) -> None:
     
     rm_tree_if_exist(["Temp"])
     
-    mf4_file_list = []
+    # load MF4 files
+    mf4_file_list, num_of_mf4_files = get_MF4_files()
+    num_of_done_mf4_files = 0
 
-    try:   
-        # search for MF4 files
-        for root, dirs, files in os.walk("SourceMF4"):
-            # mostly "files" consists of only 1 file
-            for file in files:
-                if file.endswith(".MF4"):
-                    # found MF4 file
-                    mf4_file = os.path.join(root, file)
-                    mf4_file_list.append(mf4_file)
-        
-        num_of_mf4_files = len(mf4_file_list)
-        num_of_done_mf4_files = 0
-        
-        if num_of_mf4_files == 0:
-            print("WARNING: No MF4 files found!")
-
+    try: 
         for idx, file in enumerate(mf4_file_list):
             # CONVERT FILE into Signal files
             print(f" - Converting: {file}")
@@ -416,10 +430,11 @@ def process_handle(dbc_list: set, config) -> None:
             dfs_to_upload = []
             converted_files = get_converted_files()
 
+            # AGGREGATE if requested
             if config["settings"]["aggregate"]:
                 threads = []
                 print("   - aggregating... ")
-
+                # run each signal in a different thread
                 for signal_file in converted_files:
                     signal_df = pd.read_parquet(signal_file, engine="pyarrow")
                     signal_df.index = pd.to_datetime(signal_df.index)
@@ -443,9 +458,11 @@ def process_handle(dbc_list: set, config) -> None:
                     # assign signal dataframes to upload
                     dfs_to_upload.append(converted_df)
 
+            # UPLOAD TO DB
             print("   - uploading... ")
             db.upload_data(dfs_to_upload)
   
+            # MOVE DONE FILES if requested
             if config["settings"]["move_done_files"]:
                 print("   - moving the file... ")
                 move_done_file(file)
@@ -456,16 +473,10 @@ def process_handle(dbc_list: set, config) -> None:
             num_of_done_mf4_files += 1
             print(f"   - DONE!     Overall progress:  {round((num_of_done_mf4_files / num_of_mf4_files)*100, 2)} %")
             print()
-
-
-    except OSError:
-        print()
-        print("ERROR in process_handle function while dealing with files")
-        sys.exit(1)
     
     except Exception as e:
         print()
-        print(f"ERROR: {e}")
+        print(f"Process ERROR:  {e}")
         sys.exit(1)
 
 # -----------------------------------------------------------------------------------------------------------
