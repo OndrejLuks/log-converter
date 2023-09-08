@@ -11,7 +11,7 @@
 # ==========================================================================================================================
 
 from asammdf import MDF
-from sqlalchemy import create_engine, schema, Table, MetaData
+from sqlalchemy import create_engine, schema
 from sqlalchemy.exc import IntegrityError, ProgrammingError
 from sqlalchemy.sql import text
 from datetime import timedelta
@@ -74,7 +74,6 @@ class DatabaseHandle:
         try:
             self.engine = create_engine(self.conn_string)
             self.connection = self.engine.connect()
-            self.meta = MetaData()
 
         except Exception as e:
             print()
@@ -431,11 +430,12 @@ def process_handle(dbc_list: set, config) -> bool:
             print("   - uploading... ")
             db.upload_data(dfs_to_upload)
   
-            print("   - moving the file... ")
-            move_done_file(file)
+            if config["settings"]["move_done_files"]:
+                print("   - moving the file... ")
+                move_done_file(file)
 
-            # delete temp folders
-            rm_tree_if_exist([os.path.join("Temp", "converted"), os.path.join("Temp", "aggregated")])
+                # delete temp folders
+                rm_tree_if_exist([os.path.join("Temp", "converted"), os.path.join("Temp", "aggregated")])
 
             num_of_done_mf4_files += 1
             print(f"   - DONE!     Overall progress:  {round((num_of_done_mf4_files / num_of_mf4_files)*100, 2)} %")
