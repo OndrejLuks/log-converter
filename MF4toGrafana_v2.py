@@ -10,7 +10,6 @@
 # ==========================================================================================================================
 # ==========================================================================================================================
 
-from asammdf import MDF
 from sqlalchemy import create_engine, schema
 from sqlalchemy.exc import IntegrityError, ProgrammingError
 from sqlalchemy.sql import text
@@ -49,25 +48,19 @@ class DatabaseHandle:
 
     
     def _querry(self, message: str) -> None:
+        """Sends and executes a querry specified in the message to the database."""
         try:
             msg = text(message)
             self.connection.execute(msg)
             self.connection.commit()
 
         except ProgrammingError:
-            print("       - pkey already set")
+            # occurs when primary key is attempted to set again
+            pass
 
         except Exception as e:
             print()
             print(f"WARNING: {e}")
-
-    
-    def setPkey(self, data: list) -> None:
-        for df in data:
-                table_name = f"{df.columns.values[0]}"
-                self._querry(f'ALTER TABLE {self.schema_name}."{table_name}" ADD PRIMARY KEY (time_stamp)')
-        
-        self.hasPkey = True
 
 
     def connect(self) -> bool:
@@ -118,10 +111,6 @@ class DatabaseHandle:
                 self.connection.commit()
                 # set primary key
                 self._querry(f'ALTER TABLE {self.schema_name}."{table_name}" ADD PRIMARY KEY (time_stamp)')
-
-            except ProgrammingError:
-                # primary key is already set
-                pass
 
             except IntegrityError:
                 print("       - WARNING: Skipping signal upload due to unique violation. This record already exists in the DB.")
@@ -178,6 +167,16 @@ def setup_fs():
     return canedge_browser.LocalFileSystem(base_path=base_path)
 
 
+def create_dir(target_dir: str) -> None:
+    try:
+        if not os.path.exists(target_dir):
+            os.makedirs(target_dir)
+
+    except Exception as e:
+        print()
+        print(f"WARNING: {e}") 
+
+
 def get_aggregated_dfs() -> pd.DataFrame:
     files = []
     out = []
@@ -225,8 +224,7 @@ def create_dbc_list() -> list:
 
 def store_multisignal_df(big_df: pd.DataFrame, name: str):
     target_dir = os.path.join("Temp", "converted")
-    if not os.path.exists(target_dir):
-        os.makedirs(target_dir)
+    create_dir(target_dir)
 
     columns_dfs = split_df_by_cols(big_df)
 
@@ -288,8 +286,7 @@ def aggregate(df, time_max: int, name: str, lock: threading.Lock) -> None:
         result_df = df.iloc[list(dict.fromkeys(idx_array))]
 
         target_dir = os.path.join("Temp", "aggregated")
-        if not os.path.exists(target_dir):
-            os.makedirs(target_dir)
+        create_dir(target_dir)
         
         with lock:
             result_df.to_parquet(f'{os.path.join(target_dir, name)}-{sig_name}.parquet', engine="pyarrow", index=True)
@@ -352,8 +349,7 @@ def move_done_file(file: os.path) -> None:
     target_file = file.replace("SourceMF4", "DoneMF4")
     target_dir = os.path.dirname(target_file)
 
-    if not os.path.exists(target_dir):
-        os.makedirs(target_dir)
+    create_dir(target_dir)
 
     shutil.move(file, target_file)
 
@@ -372,8 +368,7 @@ def process_handle(dbc_list: set, config) -> bool:
         if not db.create_schema():
             return False
         
-        if os.path.exists("Temp"):
-            shutil.rmtree("Temp")
+        rm_tree_if_exist(["Temp"])
         
         mf4_file_list = []
         
@@ -434,8 +429,8 @@ def process_handle(dbc_list: set, config) -> bool:
                 print("   - moving the file... ")
                 move_done_file(file)
 
-                # delete temp folders
-                rm_tree_if_exist([os.path.join("Temp", "converted"), os.path.join("Temp", "aggregated")])
+            # delete temp folders
+            rm_tree_if_exist([os.path.join("Temp", "converted"), os.path.join("Temp", "aggregated")])
 
             num_of_done_mf4_files += 1
             print(f"   - DONE!     Overall progress:  {round((num_of_done_mf4_files / num_of_mf4_files)*100, 2)} %")
