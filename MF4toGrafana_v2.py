@@ -63,7 +63,8 @@ class DatabaseHandle:
             print(f"WARNING: {e}")
 
 
-    def connect(self) -> bool:
+    def connect(self) -> None:
+        """Function to handle database connection procedure"""
         try:
             self.engine = create_engine(self.conn_string)
             self.connection = self.engine.connect()
@@ -71,14 +72,14 @@ class DatabaseHandle:
         except Exception as e:
             print()
             print(f"ERROR: {e}")
-            return False
-        
-        return True
+            sys.exit(1)
     
 
-    def create_schema(self) -> bool:
+    def create_schema(self) -> None:
+        """Creates schena if not exists"""
         try:
             if self.clean:
+                # clean upload is selected
                 if self.connection.dialect.has_schema(self.connection, self.schema_name):
                     print(f" - Dropping schema {self.schema_name}")
                     self._querry(f"DROP SCHEMA {self.schema_name} CASCADE")
@@ -92,12 +93,11 @@ class DatabaseHandle:
         except Exception as e:
             print()
             print(f"ERROR: {e}")
-            return False
-        
-        return True
+            sys.exit(1)
     
 
     def upload_data(self, data: list) -> None:
+        """Uploads given list of dataframes to the database"""
         for df in data:
             try:
                 table_name = f"{df.columns.values[0]}"
@@ -121,6 +121,7 @@ class DatabaseHandle:
     
 
     def finish(self) -> None:
+        """Function to handle database connection closing"""
         try:
             print("Closing database connection ...  ", end="")
             self.connection.close()
@@ -148,10 +149,104 @@ def open_config():
     return data
 
 
-def get_converted_files() -> list:
-    out = []
-    dir = os.listdir(os.path.join("Temp", "converted"))
+def setup_fs() -> canedge_browser.LocalFileSystem:
+    """Sets up a filesystem required for signal extraxtion from raw MF4"""
+    base_path = Path(__file__).parent
+    return canedge_browser.LocalFileSystem(base_path=base_path)
 
+
+def convert_mf4(mf4_file: os.path, dbc_list: list, name: str) -> None:
+    """Converts and decodes MF4 files to a dataframe using DBC files."""
+    fs = setup_fs()
+    proc = procData.ProcessData(fs, dbc_list)
+
+    # get raw dataframe from mf4 file
+    df_raw, device_id = proc.get_raw_data(mf4_file)
+
+    # replace transport protocol with single frames
+    tp = mfd.MultiFrameDecoder("j1939")
+    df_raw = tp.combine_tp_frames(df_raw)
+
+    # extract can messages
+    df_phys = proc.extract_phys(df_raw)
+
+    # set correct index values
+    df_phys.index = pd.to_datetime(df_phys.index)
+    df_phys.index = df_phys.index.round('1us')
+    
+    # store as signals
+    store_multisignal_df(df_phys, name)
+
+
+def aggregate(df, time_max: int, name: str, lock: threading.Lock) -> None:
+    """Aggregates input signal dataframe by removing redundant values"""
+    num_rows = df.shape[0]
+
+    if num_rows > 0:
+        sig_name = df.columns.values[0]
+        with lock:
+            print(f"     > started aggregating signal: {sig_name}")
+        # create an array of indexes to use as a mask for the dataframe
+        idx_array = []
+        # insert first index into the array
+        previous = 0
+        idx_array.append(previous)
+        # iterate through indexes and store them only if the value changes,
+        # or if the time gap exceeds given seconds
+        for idx in range(num_rows):
+            time_diff = df.index[idx] - df.index[previous]
+            if (df.iat[previous, 0] != df.iat[idx, 0]):
+                idx_array.append(idx-1)
+                idx_array.append(idx)
+                previous = idx
+            elif (time_diff > timedelta(seconds=time_max)):
+                idx_array.append(idx)
+                previous = idx
+
+        # add last item into the mask
+        idx_array.append(num_rows - 1)
+        # create a new dataframe and remove duplicates
+        result_df = df.iloc[list(dict.fromkeys(idx_array))]
+
+        target_dir = os.path.join("Temp", "aggregated")
+        create_dir(target_dir)
+        
+        with lock:
+            result_df.to_parquet(f'{os.path.join(target_dir, name)}-{sig_name}.parquet', engine="pyarrow", index=True)
+            print(f"     = finished agg. signal: {sig_name}")
+                
+
+def split_df_by_cols(df) -> list:
+    """Extracts and returns individual signals from given converted physica-value-dataframe"""
+    column_df = []
+    for signal_name in df['Signal'].unique():
+        signal_df = df[df['Signal'] == signal_name][['Physical Value']].copy()
+        signal_df.rename(columns={'Physical Value': signal_name}, inplace=True)
+        column_df.append(signal_df)
+
+    return column_df
+
+# -----------------------------------------------------------------------------------------------------------
+
+def store_multisignal_df(big_df: pd.DataFrame, name: str) -> None:
+    """Stores individual signals from given converted physica-value-dataframe"""
+    target_dir = os.path.join("Temp", "converted")
+    create_dir(target_dir)
+
+    # extract individual signals from a concentrated dataframe
+    columns_dfs = split_df_by_cols(big_df)
+
+    for df in columns_dfs:
+        df.to_parquet(f'{os.path.join(target_dir, name)}-{df.columns.values[0]}.parquet', engine="pyarrow", index=True)
+
+
+def get_converted_files() -> list:
+    """Extracts and returns a list of converted MF4 files (signals) from Temp folder"""
+    out = []
+    target_dir = os.path.join("Temp", "converted")
+    if os.path.exists(target_dir):
+        dir = os.listdir(target_dir)
+    
     if len(dir) == 0:
         print("   WARNING: No signals were converted")
     
@@ -162,22 +257,8 @@ def get_converted_files() -> list:
     return out
 
 
-def setup_fs():
-    base_path = Path(__file__).parent
-    return canedge_browser.LocalFileSystem(base_path=base_path)
-
-
-def create_dir(target_dir: str) -> None:
-    try:
-        if not os.path.exists(target_dir):
-            os.makedirs(target_dir)
-
-    except Exception as e:
-        print()
-        print(f"WARNING: {e}") 
-
-
-def get_aggregated_dfs() -> pd.DataFrame:
+def get_aggregated_dfs() -> list:
+    """Extracts and returns a list of aggregated MF4 files (signals) from Temp folder"""
     files = []
     out = []
     dir = []
@@ -190,7 +271,6 @@ def get_aggregated_dfs() -> pd.DataFrame:
         if file.endswith(".parquet"):
             files.append(os.path.join("Temp", "aggregated", file))
 
-    
     files.sort()
 
     for file in files:
@@ -222,88 +302,9 @@ def create_dbc_list() -> list:
 
     return db_list
 
-def store_multisignal_df(big_df: pd.DataFrame, name: str):
-    target_dir = os.path.join("Temp", "converted")
-    create_dir(target_dir)
-
-    columns_dfs = split_df_by_cols(big_df)
-
-    for df in columns_dfs:
-        df.to_parquet(f'{os.path.join(target_dir, name)}-{df.columns.values[0]}.parquet', engine="pyarrow", index=True)
-
-
-def convert_mf4(mf4_file: os.path, dbc_list: list, name: str) -> None:
-    """Converts and decodes MF4 files to a dataframe using DBC files."""
-    fs = setup_fs()
-    proc = procData.ProcessData(fs, dbc_list)
-
-    # get raw dataframe from mf4 file
-    df_raw, device_id = proc.get_raw_data(mf4_file)
-
-    # replace transport protocol with single frames
-    tp = mfd.MultiFrameDecoder("j1939")
-    df_raw = tp.combine_tp_frames(df_raw)
-
-    # extract can messages
-    df_phys = proc.extract_phys(df_raw)
-
-    # set correct index values
-    df_phys.index = pd.to_datetime(df_phys.index)
-    df_phys.index = df_phys.index.round('1us')
-    
-    # store as signals
-    store_multisignal_df(df_phys, name)
-
-
-def aggregate(df, time_max: int, name: str, lock: threading.Lock) -> None:
-    """Aggregates input signal dataframe by removing redundant values"""
-    # iterate signals
-    num_rows = df.shape[0]
-
-    if num_rows > 0:
-        sig_name = df.columns.values[0]
-        with lock:
-            print(f"     > started aggregating signal: {sig_name}")
-        # create an array of indexes to use as a mask for the dataframe
-        idx_array = []
-        # insert first index into the array
-        previous = 0
-        idx_array.append(previous)
-        
-        for idx in range(num_rows):
-            time_diff = df.index[idx] - df.index[previous]
-            if (df.iat[previous, 0] != df.iat[idx, 0]):
-                idx_array.append(idx-1)
-                idx_array.append(idx)
-                previous = idx
-            elif (time_diff > timedelta(seconds=time_max)):
-                idx_array.append(idx)
-                previous = idx
-
-        # add last item into the mask
-        idx_array.append(num_rows - 1)
-        # create a new dataframe and remove duplicates
-        result_df = df.iloc[list(dict.fromkeys(idx_array))]
-
-        target_dir = os.path.join("Temp", "aggregated")
-        create_dir(target_dir)
-        
-        with lock:
-            result_df.to_parquet(f'{os.path.join(target_dir, name)}-{sig_name}.parquet', engine="pyarrow", index=True)
-            print(f"     = finished agg. signal: {sig_name}")
-                
-
-def split_df_by_cols(df) -> list:
-    column_df = []
-    for signal_name in df['Signal'].unique():
-        signal_df = df[df['Signal'] == signal_name][['Physical Value']].copy()
-        signal_df.rename(columns={'Physical Value': signal_name}, inplace=True)
-        column_df.append(signal_df)
-
-    return column_df
-
 
 def count_files_in_dir(dir: str, end: str) -> int:
+    """Counts files ending with 'end' in 'dir' directory and subdirectories"""
     count = 0
     try:
         for root, dirs, files in os.walk(dir):
@@ -321,10 +322,12 @@ def count_files_in_dir(dir: str, end: str) -> int:
 
 
 def rm_tree_if_exist(root: list) -> None:
+    """Removes given directory and its subdirectories if they exist"""
     try:
         for dir in root:
             if os.path.exists(dir):
                 shutil.rmtree(dir)
+
     except OSError:
         print()
         print(f"ERROR: Failed to remove tree of root {root}")
@@ -332,6 +335,7 @@ def rm_tree_if_exist(root: list) -> None:
 
 
 def rm_empty_subdirs(top_level: str) -> None:
+    """Removes empty directories in given root"""
     try:
         for root, dirs, files in os.walk(top_level, topdown=False):
             for dir_name in dirs:
@@ -345,33 +349,50 @@ def rm_empty_subdirs(top_level: str) -> None:
 
 
 def move_done_file(file: os.path) -> None:
-    # move the given file to DoneMF4
+    """Moves given file from SourceMF4 folder to DoneMF4 folder"""
+    # get target file path
     target_file = file.replace("SourceMF4", "DoneMF4")
+    # get and create target directory
     target_dir = os.path.dirname(target_file)
-
     create_dir(target_dir)
 
-    shutil.move(file, target_file)
+    try:
+        # move the file
+        shutil.move(file, target_file)
+
+    except Exception as e:
+        print()
+        print(f"WARNING: {e}")
 
     # remove empty source folders
     rm_empty_subdirs("SourceMF4")
 
 
-def process_handle(dbc_list: set, config) -> bool:
-    """Function that handles MF4 files process from conversion to upload"""
+def create_dir(target_dir: str) -> None:
+    """Creates given directory if it doesn't exist"""
     try:
-        # prepare the database
-        db = DatabaseHandle(config)
+        if not os.path.exists(target_dir):
+            os.makedirs(target_dir)
+
+    except Exception as e:
+        print()
+        print(f"WARNING: {e}") 
+
+# -----------------------------------------------------------------------------------------------------------
+
+def process_handle(dbc_list: set, config) -> None:
+    """Function that handles MF4 files process from conversion to upload"""
     
-        if not db.connect():
-            return False
-        if not db.create_schema():
-            return False
-        
-        rm_tree_if_exist(["Temp"])
-        
-        mf4_file_list = []
-        
+    # prepare the database
+    db = DatabaseHandle(config)
+    db.connect()
+    db.create_schema()
+    
+    rm_tree_if_exist(["Temp"])
+    
+    mf4_file_list = []
+
+    try:   
         # search for MF4 files
         for root, dirs, files in os.walk("SourceMF4"):
             # mostly "files" consists of only 1 file
@@ -440,17 +461,17 @@ def process_handle(dbc_list: set, config) -> bool:
     except OSError:
         print()
         print("ERROR in process_handle function while dealing with files")
-        return False
+        sys.exit(1)
     
     except Exception as e:
         print()
         print(f"ERROR: {e}")
-        return False
-    
-    return True
+        sys.exit(1)
 
+# -----------------------------------------------------------------------------------------------------------
 
 def prompt_warning(schema_name) -> None:
+    """Propmts warning if the 'clean_upload' setting is set to true"""
     print()
     print(" ! WARNING ! WARNING ! WARNING ! WARNING ! WARNING ! WARNING !")
     print()
@@ -492,8 +513,7 @@ def main():
 
     # convert and upload MF4 files
     print("Converting, decoding and uploading the MF4 files ...")
-    if not process_handle(dbc_list, config):
-        return
+    process_handle(dbc_list, config)
 
     print()
     print("                                      ~ ")           
