@@ -440,10 +440,10 @@ def process_handle(dbc_list: set, config) -> None:
                 threads = []
                 print("   - aggregating... ")
                 # run each signal in a different thread
+                lock = Lock()
                 for signal_file in converted_files:
                     signal_df = pd.read_parquet(signal_file, engine="pyarrow")
                     signal_df.index = pd.to_datetime(signal_df.index)
-                    lock = Lock()
                     thread = threading.Thread(target=aggregate, args=(signal_df, config["settings"]["agg_max_skip_seconds"], str(signal_file.split("-")[0].split("\\")[2]), lock))
                     threads.append(thread)
                     thread.start()
