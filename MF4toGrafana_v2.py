@@ -174,7 +174,7 @@ def convert_mf4(mf4_file: os.path, dbc_list: list, name: str) -> None:
     # set correct index values
     df_phys.index = pd.to_datetime(df_phys.index)
     df_phys.index = df_phys.index.round('1us')
-    
+
     # store as signals
     store_multisignal_df(df_phys, name)
 
@@ -220,6 +220,11 @@ def aggregate(df, time_max: int, name: str, lock: threading.Lock) -> None:
 def split_df_by_cols(df) -> list:
     """Extracts and returns individual signals from given converted physica-value-dataframe"""
     column_df = []
+
+    if not 'Signal' in df.columns:
+        # No signals were converted
+        return column_df
+
     for signal_name in df['Signal'].unique():
         signal_df = df[df['Signal'] == signal_name][['Physical Value']].copy()
         signal_df.rename(columns={'Physical Value': signal_name}, inplace=True)
@@ -473,7 +478,7 @@ def process_handle(dbc_list: set, config) -> None:
             num_of_done_mf4_files += 1
             print(f"   - DONE!     Overall progress:  {round((num_of_done_mf4_files / num_of_mf4_files)*100, 2)} %")
             print()
-    
+
     except Exception as e:
         print()
         print(f"Process ERROR:  {e}")
