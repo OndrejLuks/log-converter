@@ -10,12 +10,10 @@
 # ==========================================================================================================================
 # ==========================================================================================================================
 
-from sqlalchemy import create_engine, schema
-from sqlalchemy.exc import IntegrityError, ProgrammingError
-from sqlalchemy.sql import text
+
 from datetime import timedelta
 from threading import Lock
-from utils import procData, mfd
+from src import procData, mfd, myDB
 from pathlib import Path
 import pandas as pd
 import os
@@ -26,111 +24,6 @@ import threading
 import can_decoder
 import canedge_browser
 
-# ===========================================================================================================
-# ===========================================================================================================
-
-class DatabaseHandle:
-    def __init__(self, config):
-        self.schema_name = config["database"]["schema_name"]
-        self.host = config["database"]["host"]
-        self.port = config["database"]["port"]
-        self.database = config["database"]["database"]
-        self.user = config["database"]["user"]
-        self.password = config["database"]["password"]
-        self.clean = config["settings"]["clean_upload"]
-        self.hasPkey = False
-
-        self.conn_string = "postgresql://" + self.user + ":" + self.password + "@" + self.host + "/" + self.database
-
-
-    def __del__(self):
-        self.finish()
-
-    
-    def _querry(self, message: str) -> None:
-        """Sends and executes a querry specified in the message to the database."""
-        try:
-            msg = text(message)
-            self.connection.execute(msg)
-            self.connection.commit()
-
-        except ProgrammingError:
-            # occurs when primary key is attempted to set again
-            pass
-
-        except Exception as e:
-            print()
-            print(f"WARNING - querry:  {e}")
-
-
-    def connect(self) -> None:
-        """Function to handle database connection procedure"""
-        try:
-            self.engine = create_engine(self.conn_string)
-            self.connection = self.engine.connect()
-
-        except Exception as e:
-            print()
-            print(f"DB CONNECTION ERROR:  {e}")
-            sys.exit(1)
-    
-
-    def create_schema(self) -> None:
-        """Creates schena if not exists"""
-        try:
-            if self.clean:
-                # clean upload is selected
-                if self.connection.dialect.has_schema(self.connection, self.schema_name):
-                    print(f" - Dropping schema {self.schema_name}")
-                    self._querry(f"DROP SCHEMA {self.schema_name} CASCADE")
-
-            if not self.connection.dialect.has_schema(self.connection, self.schema_name):
-                print(f" - Creating schema {self.schema_name}")
-                self.connection.execute(schema.CreateSchema(self.schema_name))
-                self.connection.commit()
-
-                
-        except Exception as e:
-            print()
-            print(f"ERROR - schema:  {e}")
-            sys.exit(1)
-    
-
-    def upload_data(self, data: list) -> None:
-        """Uploads given list of dataframes to the database"""
-        for df in data:
-            try:
-                table_name = f"{df.columns.values[0]}"
-                print(f"     > uploading signal: {table_name}")
-                df.to_sql(name=table_name,
-                            con=self.engine,
-                            schema=self.schema_name,
-                            index=True,
-                            index_label="time_stamp",
-                            if_exists="append")
-                self.connection.commit()
-                # set primary key
-                self._querry(f'ALTER TABLE {self.schema_name}."{table_name}" ADD PRIMARY KEY (time_stamp)')
-
-            except IntegrityError:
-                print("       - WARNING: Skipping signal upload due to unique violation. This record already exists in the DB.")
-            
-            except Exception as e:
-                print()
-                print(f"DB UPLOAD WARNING:  {e}")
-    
-
-    def finish(self) -> None:
-        """Function to handle database connection closing"""
-        try:
-            print("Closing database connection ...  ", end="")
-            self.connection.close()
-            print("done!")
-            
-        except Exception as e:
-            print()
-            print(f"DB CLOSING ERROR:  {e}")        
-
 
 # ===========================================================================================================
 # ===========================================================================================================
@@ -138,7 +31,7 @@ class DatabaseHandle:
 def open_config():
     """Loads configure json file (config.json) from root directory. Returns json object."""
     try:
-        file = open("config.json")
+        file = open("config.json", "r")
         data = json.load(file)
         file.close()
 
@@ -246,23 +139,6 @@ def store_multisignal_df(big_df: pd.DataFrame, name: str) -> None:
         df.to_parquet(f'{os.path.join(target_dir, name)}-{df.columns.values[0]}.parquet', engine="pyarrow", index=True)
 
 
-def get_converted_files() -> list:
-    """Extracts and returns a list of converted MF4 files (signals) from Temp folder"""
-    out = []
-    target_dir = os.path.join("Temp", "converted")
-    if os.path.exists(target_dir):
-        dir = os.listdir(target_dir)
-    
-    if len(dir) == 0:
-        print("   WARNING: No signals were converted")
-    
-    for file in dir:
-        if file.endswith(".parquet"):
-            out.append(os.path.join("Temp", "converted", file))
-    
-    return out
-
-
 def get_MF4_files() -> list:
     """Generates a list of paths to all found MF4 files in the SourceMF4 folder. Returns also the number of found files."""
     out = []
@@ -289,22 +165,24 @@ def get_MF4_files() -> list:
     return out, len(out)
 
 
-def get_aggregated_dfs() -> list:
-    """Extracts and returns a list of aggregated MF4 files (signals) from Temp folder"""
+def get_temp_files(folder: str) -> list:
+    """Extracts and returns a list of desired .parquet files (signals) converted to dataframes from Temp folder"""
     files = []
     out = []
     dir = []
+
     # get all .parquet files
-    target_dir = os.path.join("Temp", "aggregated")
+    target_dir = os.path.join("Temp", folder)
     if os.path.exists(target_dir):
         dir = os.listdir(target_dir)
 
     for file in dir:
         if file.endswith(".parquet"):
-            files.append(os.path.join("Temp", "aggregated", file))
+            files.append(os.path.join("Temp", folder, file))
 
     files.sort()
 
+    # convert parquet to dataframes
     for file in files:
         agg_signal_df = pd.read_parquet(file, engine="pyarrow")
         agg_signal_df.index = pd.to_datetime(agg_signal_df.index)
@@ -416,7 +294,7 @@ def process_handle(dbc_list: set, config) -> None:
     """Function that handles MF4 files process from conversion to upload"""
     
     # prepare the database
-    db = DatabaseHandle(config)
+    db = myDB.DatabaseHandle(config)
     db.connect()
     db.create_schema()
     
@@ -433,7 +311,7 @@ def process_handle(dbc_list: set, config) -> None:
             convert_mf4(file, dbc_list, str(idx))
 
             dfs_to_upload = []
-            converted_files = get_converted_files()
+            converted_files = get_temp_files("converted")
 
             # AGGREGATE if requested
             if config["settings"]["aggregate"]:
@@ -441,10 +319,8 @@ def process_handle(dbc_list: set, config) -> None:
                 print("   - aggregating... ")
                 # run each signal in a different thread
                 lock = Lock()
-                for signal_file in converted_files:
-                    signal_df = pd.read_parquet(signal_file, engine="pyarrow")
-                    signal_df.index = pd.to_datetime(signal_df.index)
-                    thread = threading.Thread(target=aggregate, args=(signal_df, config["settings"]["agg_max_skip_seconds"], str(signal_file.split("-")[0].split("\\")[2]), lock))
+                for signal_df in converted_files:
+                    thread = threading.Thread(target=aggregate, args=(signal_df, config["settings"]["agg_max_skip_seconds"], str(idx), lock))
                     threads.append(thread)
                     thread.start()
                 
@@ -453,15 +329,10 @@ def process_handle(dbc_list: set, config) -> None:
                     thr.join()
 
                 # get dataframes to upload
-                dfs_to_upload = get_aggregated_dfs()
+                dfs_to_upload = get_temp_files("aggregated")
             
             else:
-                for idx, fle in enumerate(converted_files):
-                    converted_df = pd.read_parquet(fle, engine="pyarrow")
-                    converted_df.index = pd.to_datetime(converted_df.index)
-
-                    # assign signal dataframes to upload
-                    dfs_to_upload.append(converted_df)
+                dfs_to_upload = converted_files
 
             # UPLOAD TO DB
             print("   - uploading... ")
