@@ -243,7 +243,11 @@ class MultiFrameDecoder:
                     df_raw_res_id_new = pd.DataFrame(frame_list, columns=base_frame.index, index=frame_timestamp_list)
                     df_raw.append(df_raw_res_id_new)
 
-        df_raw = pd.concat(df_raw,join='outer')
+        # exclude empty dataframes
+        non_empty_df_list = [df for df in df_raw if not df.empty]
+        # concat
+        df_raw = pd.concat(non_empty_df_list, join='outer')
+
         df_raw.index.name = "TimeStamp"
         df_raw = df_raw.sort_index()
         return df_raw
