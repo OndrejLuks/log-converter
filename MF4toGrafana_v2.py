@@ -19,6 +19,7 @@ import pandas as pd
 import os
 import sys
 import json
+import pytz
 import shutil
 import threading
 import can_decoder
@@ -49,7 +50,7 @@ def setup_fs() -> canedge_browser.LocalFileSystem:
     return canedge_browser.LocalFileSystem(base_path=base_path)
 
 
-def convert_mf4(mf4_file: os.path, dbc_list: list, name: str) -> None:
+def convert_mf4(mf4_file: os.path, dbc_list: list, name: str, write_info: bool) -> None:
     """Converts and decodes MF4 files to a dataframe using DBC files."""
     fs = setup_fs()
     proc = procData.ProcessData(fs, dbc_list)
@@ -68,7 +69,13 @@ def convert_mf4(mf4_file: os.path, dbc_list: list, name: str) -> None:
     df_phys.index = pd.to_datetime(df_phys.index)
     df_phys.index = df_phys.index.round('1us')
 
+    # write time info if required
+    if write_info:
+        print("   - writing time information into MF4-info.csv... ")
+        write_time_info(mf4_file, df_phys.index[0], df_phys.index[-1])
+
     # store as signals
+    print("   - storing converted signals... ")
     store_multisignal_df(df_phys, name)
 
 
@@ -126,6 +133,28 @@ def split_df_by_cols(df) -> list:
     return column_df
 
 # -----------------------------------------------------------------------------------------------------------
+
+def write_time_info(file: str, start_time, end_time) -> None:
+    """Writes start and end timestamp information about inputted file into MF4-info.csv"""
+    try:
+        file_name = os.path.relpath(file, "SourceMF4")
+        prg_timezone = pytz.timezone('Europe/Prague')
+        start_time = start_time.astimezone(prg_timezone)
+        end_time = end_time.astimezone(prg_timezone)
+
+        # create header if file does not exist
+        if not os.path.exists("MF4-info.csv"):
+            with open('MF4-info.csv', 'a') as f:
+                f.write("file_name,recorded_from,recorded_to\n")
+
+        # write file informatin
+        with open('MF4-info.csv', 'a') as f:
+            f.write(file_name + "," + str(start_time) + "," + str(end_time) + "\n")
+
+    except Exception as e:
+        print()
+        print(f"INFO RECORDING WARNING:  {e}") 
+
 
 def store_multisignal_df(big_df: pd.DataFrame, name: str) -> None:
     """Stores individual signals from given converted physica-value-dataframe"""
@@ -308,7 +337,7 @@ def process_handle(dbc_list: set, config) -> None:
         for idx, file in enumerate(mf4_file_list):
             # CONVERT FILE into Signal files
             print(f" - Converting: {file}")
-            convert_mf4(file, dbc_list, str(idx))
+            convert_mf4(file, dbc_list, str(idx), config["settings"]["write_time_info"])
 
             dfs_to_upload = []
             converted_files = get_temp_files("converted")

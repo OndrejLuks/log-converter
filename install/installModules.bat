@@ -14,6 +14,7 @@ pip install pyarrow
 pip install can_decoder
 pip install canedge_browser
 pip install mdf_iter
+pip install pytz
 
 echo:
 echo =======================
