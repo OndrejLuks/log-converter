@@ -1,0 +1,2606 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": 30,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "mtGoB_3Vk"
+      },
+      "description": "Max 3 values can be displayed on this axis",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 4,
+      "options": {
+        "autoScroll": false,
+        "displayMode": "minimize",
+        "favorites": true,
+        "filter": true,
+        "groupSelection": false,
+        "header": true,
+        "padding": 5,
+        "showName": false,
+        "statusSort": false,
+        "sticky": false,
+        "variable": "comparison_1_left"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "hide": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Comparison #1 - LEFT axis",
+      "transparent": true,
+      "type": "volkovlabs-variable-panel"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "mtGoB_3Vk"
+      },
+      "description": "Max 3 values can be displayed on this axis",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 3,
+      "options": {
+        "autoScroll": false,
+        "displayMode": "minimize",
+        "favorites": true,
+        "filter": true,
+        "groupSelection": false,
+        "header": true,
+        "padding": 5,
+        "showName": false,
+        "statusSort": false,
+        "sticky": false,
+        "variable": "comparison_1_right"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": true,
+          "rawSql": "",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Comparison #1 - RIGHT axis",
+      "transparent": true,
+      "type": "volkovlabs-variable-panel"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "mtGoB_3Vk"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisGridShow": true,
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisWidth": 110,
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": 3600000,
+            "lineInterpolation": "stepAfter",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Left 1"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Left 2"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Left 3"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Right 1"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Right 2"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Right 3"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 3
+      },
+      "id": 1,
+      "interval": "1s",
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "10.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_1_left:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 1",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_1_left:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 2",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_1_left:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 3",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_1_right:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 1",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_1_right:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 2",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_1_right:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 3",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Values comparison #1",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "mtGoB_3Vk"
+      },
+      "description": "Max 3 values can be displayed on this axis",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 12,
+        "x": 0,
+        "y": 12
+      },
+      "id": 9,
+      "options": {
+        "autoScroll": false,
+        "displayMode": "minimize",
+        "favorites": true,
+        "filter": true,
+        "groupSelection": false,
+        "header": true,
+        "padding": 5,
+        "showName": false,
+        "statusSort": false,
+        "sticky": false,
+        "variable": "comparison_2_left"
+      },
+      "title": "Comparison #2 - LEFT axis",
+      "transparent": true,
+      "type": "volkovlabs-variable-panel"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "mtGoB_3Vk"
+      },
+      "description": "Max 3 values can be displayed on this axis",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 12,
+        "x": 12,
+        "y": 12
+      },
+      "id": 11,
+      "options": {
+        "autoScroll": false,
+        "displayMode": "minimize",
+        "favorites": true,
+        "filter": true,
+        "groupSelection": false,
+        "header": true,
+        "padding": 5,
+        "showName": false,
+        "statusSort": false,
+        "sticky": false,
+        "variable": "comparison_2_right"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawSql": "",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Comparison #2 - RIGHT axis",
+      "transparent": true,
+      "type": "volkovlabs-variable-panel"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "mtGoB_3Vk"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisGridShow": true,
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisWidth": 110,
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": 3600000,
+            "lineInterpolation": "stepAfter",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Left 1"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Left 2"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Left 3"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Right 1"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Right 2"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Right 3"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 15
+      },
+      "id": 5,
+      "interval": "1s",
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "10.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_2_left:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 1",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_2_left:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 2",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_2_left:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 3",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_2_right:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 1",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_2_right:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 2",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_2_right:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 3",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Values comparison #2",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "mtGoB_3Vk"
+      },
+      "description": "Max 3 values can be displayed on this axis",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 12,
+        "x": 0,
+        "y": 24
+      },
+      "id": 10,
+      "options": {
+        "autoScroll": false,
+        "displayMode": "minimize",
+        "favorites": true,
+        "filter": true,
+        "groupSelection": false,
+        "header": true,
+        "padding": 5,
+        "showName": false,
+        "statusSort": false,
+        "sticky": false,
+        "variable": "comparison_3_left"
+      },
+      "title": "Comparison #3 - LEFT axis",
+      "transparent": true,
+      "type": "volkovlabs-variable-panel"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "mtGoB_3Vk"
+      },
+      "description": "Max 3 values can be displayed on this axis",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 12,
+        "x": 12,
+        "y": 24
+      },
+      "id": 12,
+      "options": {
+        "autoScroll": false,
+        "displayMode": "minimize",
+        "favorites": true,
+        "filter": true,
+        "groupSelection": false,
+        "header": true,
+        "padding": 5,
+        "showName": false,
+        "statusSort": false,
+        "sticky": false,
+        "variable": "comparison_3_left"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawSql": "",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Comparison #3 - RIGHT axis",
+      "transparent": true,
+      "type": "volkovlabs-variable-panel"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "mtGoB_3Vk"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisGridShow": true,
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisWidth": 110,
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": 3600000,
+            "lineInterpolation": "stepAfter",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Left 1"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Left 2"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Left 3"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Right 1"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Right 2"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Right 3"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 27
+      },
+      "id": 6,
+      "interval": "1s",
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "10.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_3_left:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 1",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_3_left:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 2",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_3_left:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 3",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_3_right:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 1",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_3_right:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 2",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_3_right:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 3",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Values comparison #3",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "mtGoB_3Vk"
+      },
+      "description": "Max 3 values can be displayed on this axis",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 12,
+        "x": 0,
+        "y": 36
+      },
+      "id": 13,
+      "options": {
+        "autoScroll": false,
+        "displayMode": "minimize",
+        "favorites": true,
+        "filter": true,
+        "groupSelection": false,
+        "header": true,
+        "padding": 5,
+        "showName": false,
+        "statusSort": false,
+        "sticky": false,
+        "variable": "comparison_4_left"
+      },
+      "title": "Comparison #4 - LEFT axis",
+      "transparent": true,
+      "type": "volkovlabs-variable-panel"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "mtGoB_3Vk"
+      },
+      "description": "Max 3 values can be displayed on this axis",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 12,
+        "x": 12,
+        "y": 36
+      },
+      "id": 14,
+      "options": {
+        "autoScroll": false,
+        "displayMode": "minimize",
+        "favorites": true,
+        "filter": true,
+        "groupSelection": false,
+        "header": true,
+        "padding": 5,
+        "showName": false,
+        "statusSort": false,
+        "sticky": false,
+        "variable": "comparison_4_right"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawSql": "",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Comparison #4 - RIGHT axis",
+      "transparent": true,
+      "type": "volkovlabs-variable-panel"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "mtGoB_3Vk"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisGridShow": true,
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisWidth": 110,
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": 3600000,
+            "lineInterpolation": "stepAfter",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Left 1"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Left 2"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Left 3"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Right 1"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Right 2"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Right 3"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 39
+      },
+      "id": 7,
+      "interval": "1s",
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "10.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_4_left:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 1",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_4_left:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 2",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_4_left:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 3",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_4_right:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 1",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_4_right:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 2",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_4_right:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 3",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Values comparison #4",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "mtGoB_3Vk"
+      },
+      "description": "Max 3 values can be displayed on this axis",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 12,
+        "x": 0,
+        "y": 48
+      },
+      "id": 15,
+      "options": {
+        "autoScroll": false,
+        "displayMode": "minimize",
+        "favorites": true,
+        "filter": true,
+        "groupSelection": false,
+        "header": true,
+        "padding": 5,
+        "showName": false,
+        "statusSort": false,
+        "sticky": false,
+        "variable": "comparison_5_left"
+      },
+      "title": "Comparison #5 - LEFT axis",
+      "transparent": true,
+      "type": "volkovlabs-variable-panel"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "mtGoB_3Vk"
+      },
+      "description": "Max 3 values can be displayed on this axis",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 12,
+        "x": 12,
+        "y": 48
+      },
+      "id": 16,
+      "options": {
+        "autoScroll": false,
+        "displayMode": "minimize",
+        "favorites": true,
+        "filter": true,
+        "groupSelection": false,
+        "header": true,
+        "padding": 5,
+        "showName": false,
+        "statusSort": false,
+        "sticky": false,
+        "variable": "comparison_5_right"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawSql": "",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Comparison #5 - RIGHT axis",
+      "transparent": true,
+      "type": "volkovlabs-variable-panel"
+    },
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "mtGoB_3Vk"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisGridShow": true,
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisWidth": 110,
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": 3600000,
+            "lineInterpolation": "stepAfter",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Left 1"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Left 2"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Left 3"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Right 1"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Right 2"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Right 3"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 51
+      },
+      "id": 8,
+      "interval": "1s",
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "10.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_5_left:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 1",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_5_left:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 2",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_5_left:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 3",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_5_right:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 1",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_5_right:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 2",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_5_right:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 3",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Values comparison #5",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "allValue": "blank",
+        "current": {
+          "selected": true,
+          "text": [
+            "Aux1CurrentFemale"
+          ],
+          "value": [
+            "Aux1CurrentFemale"
+          ]
+        },
+        "datasource": {
+          "type": "postgres",
+          "uid": "mtGoB_3Vk"
+        },
+        "definition": "SELECT \"table_name\" as TNM\nFROM information_schema.tables \nWHERE table_schema = 'emex_gen2_7371';\n\n",
+        "hide": 2,
+        "includeAll": false,
+        "label": "Select:",
+        "multi": true,
+        "name": "comparison_1_left",
+        "options": [],
+        "query": "SELECT \"table_name\" as TNM\nFROM information_schema.tables \nWHERE table_schema = 'emex_gen2_7371';\n\n",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": [
+            "Aux1CurrentFemale"
+          ],
+          "value": [
+            "Aux1CurrentFemale"
+          ]
+        },
+        "datasource": {
+          "type": "postgres",
+          "uid": "mtGoB_3Vk"
+        },
+        "definition": "SELECT \"table_name\" as TNM\nFROM information_schema.tables \nWHERE table_schema = 'emex_gen2_7371';\n\n",
+        "hide": 2,
+        "includeAll": false,
+        "label": "Select:",
+        "multi": true,
+        "name": "comparison_1_right",
+        "options": [],
+        "query": "SELECT \"table_name\" as TNM\nFROM information_schema.tables \nWHERE table_schema = 'emex_gen2_7371';\n\n",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": [
+            "BusVoltage"
+          ],
+          "value": [
+            "BusVoltage"
+          ]
+        },
+        "datasource": {
+          "type": "postgres",
+          "uid": "mtGoB_3Vk"
+        },
+        "definition": "SELECT \"table_name\" as TNM\nFROM information_schema.tables \nWHERE table_schema = 'emex_gen2_7371';\n\n",
+        "hide": 2,
+        "includeAll": false,
+        "label": "Select:",
+        "multi": true,
+        "name": "comparison_2_left",
+        "options": [],
+        "query": "SELECT \"table_name\" as TNM\nFROM information_schema.tables \nWHERE table_schema = 'emex_gen2_7371';\n\n",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": [
+            "CellBalancingActive"
+          ],
+          "value": [
+            "CellBalancingActive"
+          ]
+        },
+        "datasource": {
+          "type": "postgres",
+          "uid": "mtGoB_3Vk"
+        },
+        "definition": "SELECT \"table_name\" as TNM\nFROM information_schema.tables \nWHERE table_schema = 'emex_gen2_7371';\n\n",
+        "hide": 2,
+        "includeAll": false,
+        "label": "Select:",
+        "multi": true,
+        "name": "comparison_2_right",
+        "options": [],
+        "query": "SELECT \"table_name\" as TNM\nFROM information_schema.tables \nWHERE table_schema = 'emex_gen2_7371';\n\n",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": [
+            "BusVoltage"
+          ],
+          "value": [
+            "BusVoltage"
+          ]
+        },
+        "datasource": {
+          "type": "postgres",
+          "uid": "mtGoB_3Vk"
+        },
+        "definition": "SELECT \"table_name\" as TNM\nFROM information_schema.tables \nWHERE table_schema = 'emex_gen2_7371';\n\n",
+        "hide": 2,
+        "includeAll": false,
+        "label": "Select:",
+        "multi": true,
+        "name": "comparison_3_left",
+        "options": [],
+        "query": "SELECT \"table_name\" as TNM\nFROM information_schema.tables \nWHERE table_schema = 'emex_gen2_7371';\n\n",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": [
+            "BusVoltage"
+          ],
+          "value": [
+            "BusVoltage"
+          ]
+        },
+        "datasource": {
+          "type": "postgres",
+          "uid": "mtGoB_3Vk"
+        },
+        "definition": "SELECT \"table_name\" as TNM\nFROM information_schema.tables \nWHERE table_schema = 'emex_gen2_7371';\n\n",
+        "hide": 2,
+        "includeAll": false,
+        "label": "Select:",
+        "multi": true,
+        "name": "comparison_3_right",
+        "options": [],
+        "query": "SELECT \"table_name\" as TNM\nFROM information_schema.tables \nWHERE table_schema = 'emex_gen2_7371';\n\n",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": [
+            "BusVoltage"
+          ],
+          "value": [
+            "BusVoltage"
+          ]
+        },
+        "datasource": {
+          "type": "postgres",
+          "uid": "mtGoB_3Vk"
+        },
+        "definition": "SELECT \"table_name\" as TNM\nFROM information_schema.tables \nWHERE table_schema = 'emex_gen2_7371';\n\n",
+        "hide": 2,
+        "includeAll": false,
+        "label": "Select:",
+        "multi": true,
+        "name": "comparison_4_left",
+        "options": [],
+        "query": "SELECT \"table_name\" as TNM\nFROM information_schema.tables \nWHERE table_schema = 'emex_gen2_7371';\n\n",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": [
+            "BusVoltage"
+          ],
+          "value": [
+            "BusVoltage"
+          ]
+        },
+        "datasource": {
+          "type": "postgres",
+          "uid": "mtGoB_3Vk"
+        },
+        "definition": "SELECT \"table_name\" as TNM\nFROM information_schema.tables \nWHERE table_schema = 'emex_gen2_7371';\n\n",
+        "hide": 2,
+        "includeAll": false,
+        "label": "Select:",
+        "multi": true,
+        "name": "comparison_4_right",
+        "options": [],
+        "query": "SELECT \"table_name\" as TNM\nFROM information_schema.tables \nWHERE table_schema = 'emex_gen2_7371';\n\n",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": [
+            "BusVoltage"
+          ],
+          "value": [
+            "BusVoltage"
+          ]
+        },
+        "datasource": {
+          "type": "postgres",
+          "uid": "mtGoB_3Vk"
+        },
+        "definition": "SELECT \"table_name\" as TNM\nFROM information_schema.tables \nWHERE table_schema = 'emex_gen2_7371';\n\n",
+        "hide": 2,
+        "includeAll": false,
+        "label": "Select:",
+        "multi": true,
+        "name": "comparison_5_left",
+        "options": [],
+        "query": "SELECT \"table_name\" as TNM\nFROM information_schema.tables \nWHERE table_schema = 'emex_gen2_7371';\n\n",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": [
+            "BusVoltage"
+          ],
+          "value": [
+            "BusVoltage"
+          ]
+        },
+        "datasource": {
+          "type": "postgres",
+          "uid": "mtGoB_3Vk"
+        },
+        "definition": "SELECT \"table_name\" as TNM\nFROM information_schema.tables \nWHERE table_schema = 'emex_gen2_7371';\n\n",
+        "hide": 2,
+        "includeAll": false,
+        "label": "Select:",
+        "multi": true,
+        "name": "comparison_5_right",
+        "options": [],
+        "query": "SELECT \"table_name\" as TNM\nFROM information_schema.tables \nWHERE table_schema = 'emex_gen2_7371';\n\n",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-30d",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "E19e Gen II - Comparison view",
+  "uid": "aaacc697-080c-4efc-8636-d11aa6a7e510",
+  "version": 70,
+  "weekStart": ""
+}
