@@ -75,7 +75,6 @@ def convert_mf4(mf4_file: os.path, dbc_list: list, name: str, write_info: bool) 
         write_time_info(mf4_file, df_phys.index[0], df_phys.index[-1])
 
     # store as signals
-    print("   - storing converted signals... ")
     store_multisignal_df(df_phys, name)
 
 
@@ -162,8 +161,10 @@ def store_multisignal_df(big_df: pd.DataFrame, name: str) -> None:
     create_dir(target_dir)
 
     # extract individual signals from a concentrated dataframe
+    print("   - extracting individual signals... ")
     columns_dfs = split_df_by_cols(big_df)
 
+    print("   - storing signals... ")
     for df in columns_dfs:
         df.to_parquet(f'{os.path.join(target_dir, name)}-{df.columns.values[0]}.parquet', engine="pyarrow", index=True)
 
@@ -378,6 +379,8 @@ def process_handle(dbc_list: set, config) -> None:
             num_of_done_mf4_files += 1
             print(f"   - DONE!     Overall progress:  {round((num_of_done_mf4_files / num_of_mf4_files)*100, 2)} %")
             print()
+        
+        rm_tree_if_exist(["Temp"])
 
     except Exception as e:
         print()
