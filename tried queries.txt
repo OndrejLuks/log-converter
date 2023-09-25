@@ -1,0 +1,306 @@
+SET
+  search_path TO emex_gen2_7371;
+DO $$
+DECLARE
+  query text;
+  sig_name text;
+BEGIN 
+  query := 'SELECT $__timeGroupAlias(time_stamp,$__interval)';
+
+  FOR i IN 1..array_length(${comparison_1:raw},1)
+	LOOP
+    query:=query||format('"%s"', ${comparison_1:raw}[i]);
+    IF i <> array_length(${comparison_1:raw}, 1) THEN
+		query := query || ', ';
+    END IF;
+  END LOOP;
+
+  query := query || ' FROM (';
+
+  FOR i IN 1..array_length(${comparison_1:raw}, 1)
+	LOOP
+    query := query || format('SELECT time_stamp, "%s" FROM "%s"', ${comparison_1:raw}[i]);
+    IF i <> array_length(${comparison_1:raw}, 1) THEN
+		query := query || ' UNION ALL ';
+    END IF;
+  END LOOP;
+
+  query := query || ') AS combined_data';
+  
+  EXECUTE query;
+END $$;
+
+
+->	doesn't work because of capital letters conversion
+
+
+=======================================================================================================
+
+SET
+  search_path TO emex_gen2_7371;
+DO $$
+DECLARE
+  query text;
+  sig_name text;
+BEGIN 
+  query := 'SELECT $__timeGroupAlias(time_stamp,$__interval)';
+
+  CREATE TEMP TABLE temp_signal_names (name text);
+
+  FOREACH sig_name IN ARRAY ${comparison_1:raw}
+  LOOP
+    INSERT INTO temp_signal_names (name) VALUES (sig_name);
+  END LOOP;
+
+  FOR sig_name IN (SELECT name FROM temp_signal_names)
+  LOOP
+    query:=query||format('"%s"', sig_name);
+    IF sig_name <> (SELECT max(name) FROM temp_signal_names) THEN query := query || ', ';
+    END IF;
+  END LOOP;
+
+  query := query || ' FROM (';
+
+-- Generate subqueries for each signal table
+  FOR sig_name IN (SELECT name FROM temp_signal_names)
+  LOOP
+    query := query || format('SELECT time_stamp, "%s" FROM "%s"', sig_name);
+    IF sig_name <> (SELECT max(name) FROM temp_signal_names) THEN query := query || ' UNION ALL ';
+    END IF;
+  END LOOP;
+
+  query := query || ') AS combined_data';
+  
+  EXECUTE query;
+
+  DROP TABLE temp_signal_names;
+END $$;
+
+
+->	doesn't work because of capital letters conversion
+
+
+=======================================================================================================
+
+SET
+  search_path TO emex_gen2_7371;
+DO $$
+DECLARE
+  query text;
+  sig_name text;
+BEGIN 
+  query := 'SELECT $__timeGroupAlias(time_stamp,$__interval)';
+
+  FOREACH sig_name IN ARRAY ${comparison_1:raw}
+	LOOP
+    query:=query || format(', "%s"', sig_name);
+  END LOOP;
+
+  query := query || ' FROM (';
+
+  FOREACH sig_name IN ARRAY ${comparison_1:raw}
+	LOOP
+    query := query || format('SELECT time_stamp, "%s" FROM "%s"', sig_name);
+    IF sig_name <> ${comparison_1:raw}[array_length(sig_names, 1)] THEN
+      query := query || ' UNION ALL ';
+    END IF;
+  END LOOP;
+
+  query := query || ') AS combined_data';
+  
+  EXECUTE query;
+END $$;
+
+
+->	doesn't work because of capital letters conversion
+
+
+=======================================================================================================
+
+
+SET search_path TO mex_test;
+
+DO $$
+DECLARE
+	arr_names text[];
+BEGIN
+	arr_names := ARRAY['Current'];
+	
+	return(
+	SELECT time_stamp, "Current", "BusVoltage" FROM "Current", "BusVoltage"
+	ORDER BY time_stamp ASC LIMIT 100;
+	)
+END;
+$$;
+
+->	doesn't work because of ambiguous time_stamp columns
+
+
+=======================================================================================================
+
+
+SET search_path TO mex_test;
+
+SELECT * FROM(
+	SELECT * FROM "Current"
+	FULL JOIN "BusVoltage"
+	ON "Current".time_stamp = "BusVoltage".time_stamp
+) AS foo
+
+
+->	doesn't work because of ambiguous time_stamp columns
+
+
+=======================================================================================================
+
+SET
+  search_path TO emex_gen2_7371;
+  
+SELECT
+  $__timeGroupAlias(time_stamp,$__interval),
+  ${comparison_1:doublequote}[1]
+FROM "MotorTemperature1"
+WHERE
+  $__timeFilter(time_stamp)
+GROUP BY 1
+ORDER BY 1
+
+
+->	doesn't work because I can't access elements
+
+
+=======================================================================================================
+
+
+SET search_path TO mex_test;
+
+SELECT
+	COALESCE(t1.time_stamp, t2.time_stamp) as time_stamp,
+	t1."Current",
+	t2."BusVoltage"
+FROM (
+	SELECT time_stamp, "Current"
+	FROM "Current"
+) t1
+FULL OUTER JOIN (
+	SELECT time_stamp, "BusVoltage"
+	from "BusVoltage"
+) t2
+ON t1.time_stamp = t2.time_stamp
+ORDER BY time_stamp
+
+
+->	Works for 2 values
+
+
+=======================================================================================================
+
+
+SET
+  search_path TO emex_gen2_7371;
+
+DO $$
+DECLARE
+  dyn_col_name text;
+  dyn_query text;
+
+BEGIN
+  dyn_col_name := SPLIT_PART('${comparison_1:raw}', ',', 2);
+
+  dyn_query := 'SELECT $__timeGroupAlias(time_stamp,$__interval), "' || dyn_col_name || '" FROM "' || dyn_col_name || '"
+  
+  GROUP BY "' || dyn_col_name || '"."' || dyn_col_name || '", "' || dyn_col_name || '"."time_stamp"
+  ORDER BY 1';
+
+  EXECUTE dyn_query;
+END $$;
+
+
+->	doesn't work - returns blank
+
+
+=======================================================================================================
+
+
+SET
+  search_path TO emex_gen2_7371;
+
+DO $$
+DECLARE
+  tbl_name text;
+  dyn_query text;
+
+BEGIN
+
+  SELECT SPLIT_PART('${comparison_1:doublequote}', ',', 2) into tbl_name;
+
+  dyn_query := 'SELECT * FROM ' || tbl_name;
+  
+  EXECUTE dyn_query;
+
+END $$;
+
+
+->	doesn't work - returns blank
+
+
+=======================================================================================================
+
+
+SET
+  search_path TO emex_gen2_7371;
+
+DROP TABLE IF EXISTS temp_query_tbl;
+
+DO $get_data$
+DECLARE
+  tbl_name text;
+  dyn_query text;
+
+BEGIN
+  SELECT SPLIT_PART('${comparison_1:raw}', ',', 2) into tbl_name;
+
+  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT * FROM %1$I ;', tbl_name);
+  
+  EXECUTE dyn_query;
+
+END $get_data$;
+
+SELECT * FROM temp_query_tbl;
+
+
+->	WORKS
+
+
+=======================================================================================================
+
+SET
+  search_path TO emex_gen2_7371;
+
+DROP TABLE IF EXISTS temp_query_tbl;
+
+DO $get_data$
+DECLARE
+  tbl_name text;
+  dyn_query text;
+
+BEGIN
+  SELECT SPLIT_PART('${comparison_1:raw}', ',', 1) into tbl_name;
+
+  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) FROM %1$I GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name);
+  
+  EXECUTE dyn_query;
+
+END $get_data$;
+
+SELECT * FROM temp_query_tbl;
+
+DROP TABLE IF EXISTS temp_query_tbl;
+
+
+-> WORKS EVEN BETTER
+
+
+
+
+
