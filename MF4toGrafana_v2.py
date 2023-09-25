@@ -109,9 +109,10 @@ def aggregate(df, time_max: int, name: str, lock: threading.Lock) -> None:
         result_df = df.iloc[list(dict.fromkeys(idx_array))]
 
         target_dir = os.path.join("Temp", "aggregated")
-        create_dir(target_dir)
         
+        # safely store the aggregated signal
         with lock:
+            create_dir(target_dir)
             result_df.to_parquet(f'{os.path.join(target_dir, name)}-{sig_name}.parquet', engine="pyarrow", index=True)
             print(f"     = finished agg. signal: {sig_name}")
                 
