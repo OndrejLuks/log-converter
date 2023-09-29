@@ -216,7 +216,7 @@
           {
             "matcher": {
               "id": "byFrameRefID",
-              "options": "Left 1"
+              "options": "Left 1 - max"
             },
             "properties": [
               {
@@ -228,7 +228,7 @@
           {
             "matcher": {
               "id": "byFrameRefID",
-              "options": "Left 2"
+              "options": "Left 2 - max"
             },
             "properties": [
               {
@@ -240,7 +240,7 @@
           {
             "matcher": {
               "id": "byFrameRefID",
-              "options": "Left 3"
+              "options": "Left 3 - max"
             },
             "properties": [
               {
@@ -252,7 +252,7 @@
           {
             "matcher": {
               "id": "byFrameRefID",
-              "options": "Right 1"
+              "options": "Right 1 - max"
             },
             "properties": [
               {
@@ -264,7 +264,7 @@
           {
             "matcher": {
               "id": "byFrameRefID",
-              "options": "Right 2"
+              "options": "Right 2 - max"
             },
             "properties": [
               {
@@ -276,7 +276,79 @@
           {
             "matcher": {
               "id": "byFrameRefID",
-              "options": "Right 3"
+              "options": "Right 3 - max"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Left 1 - min"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Left 2 - min"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Left 3 - min"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Right 1 - min"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Right 2 - min"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Right 3 - min"
             },
             "properties": [
               {
@@ -294,7 +366,7 @@
         "y": 3
       },
       "id": 1,
-      "interval": "1s",
+      "interval": "10ms",
       "options": {
         "legend": {
           "calcs": [],
@@ -318,8 +390,8 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_1_left:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
-          "refId": "Left 1",
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_1_left:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I' || '\"-MAX\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 1 - max",
           "sql": {
             "columns": [
               {
@@ -347,8 +419,8 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_1_left:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
-          "refId": "Left 2",
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_1_left:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), min(%1$I) AS %1$I' || '\"-MIN\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 1 - min",
           "sql": {
             "columns": [
               {
@@ -376,8 +448,8 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_1_left:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);  \r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
-          "refId": "Left 3",
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_1_left:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I' || '\"-MAX\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 2 - max",
           "sql": {
             "columns": [
               {
@@ -405,8 +477,8 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_1_right:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
-          "refId": "Right 1",
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_1_left:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), min(%1$I) AS %1$I' || '\"-MIN\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 2 - min",
           "sql": {
             "columns": [
               {
@@ -434,8 +506,8 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_1_right:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
-          "refId": "Right 2",
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_1_left:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I' || '\"-MAX\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 3 - max",
           "sql": {
             "columns": [
               {
@@ -463,8 +535,182 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_1_right:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
-          "refId": "Right 3",
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_1_left:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), min(%1$I) AS %1$I' || '\"-MIN\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 3 - min",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_1_right:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I' || '\"-MAX\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 1 - max",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_1_right:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), min(%1$I) AS %1$I' || '\"-MIN\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 1 - min",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_1_right:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I' || '\"-MAX\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 2 - max",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_1_right:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), min(%1$I) AS %1$I' || '\"-MIN\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 2 - min",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_1_right:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I' || '\"-MAX\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 3 - max",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_1_right:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), min(%1$I) AS %1$I' || '\"-MIN\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 3 - min",
           "sql": {
             "columns": [
               {
@@ -670,7 +916,7 @@
           {
             "matcher": {
               "id": "byFrameRefID",
-              "options": "Left 1"
+              "options": "Left 1 - max"
             },
             "properties": [
               {
@@ -682,7 +928,7 @@
           {
             "matcher": {
               "id": "byFrameRefID",
-              "options": "Left 2"
+              "options": "Left 2 - max"
             },
             "properties": [
               {
@@ -694,7 +940,7 @@
           {
             "matcher": {
               "id": "byFrameRefID",
-              "options": "Left 3"
+              "options": "Left 3 - max"
             },
             "properties": [
               {
@@ -706,7 +952,7 @@
           {
             "matcher": {
               "id": "byFrameRefID",
-              "options": "Right 1"
+              "options": "Right 1 - max"
             },
             "properties": [
               {
@@ -718,7 +964,7 @@
           {
             "matcher": {
               "id": "byFrameRefID",
-              "options": "Right 2"
+              "options": "Right 2 - max"
             },
             "properties": [
               {
@@ -730,7 +976,79 @@
           {
             "matcher": {
               "id": "byFrameRefID",
-              "options": "Right 3"
+              "options": "Right 3 - max"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Left 1 - min"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Left 2 - min"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Left 3 - min"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Right 1 - min"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Right 2 - min"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Right 3 - min"
             },
             "properties": [
               {
@@ -747,8 +1065,8 @@
         "x": 0,
         "y": 15
       },
-      "id": 5,
-      "interval": "1s",
+      "id": 17,
+      "interval": "10ms",
       "options": {
         "legend": {
           "calcs": [],
@@ -772,8 +1090,8 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_2_left:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
-          "refId": "Left 1",
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_2_left:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I' || '\"-MAX\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 1 - max",
           "sql": {
             "columns": [
               {
@@ -801,8 +1119,8 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_2_left:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
-          "refId": "Left 2",
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_2_left:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), min(%1$I) AS %1$I' || '\"-MIN\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 1 - min",
           "sql": {
             "columns": [
               {
@@ -830,8 +1148,8 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_2_left:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
-          "refId": "Left 3",
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_2_left:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I' || '\"-MAX\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 2 - max",
           "sql": {
             "columns": [
               {
@@ -859,8 +1177,8 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_2_right:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
-          "refId": "Right 1",
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_2_left:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), min(%1$I) AS %1$I' || '\"-MIN\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 2 - min",
           "sql": {
             "columns": [
               {
@@ -888,8 +1206,8 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_2_right:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
-          "refId": "Right 2",
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_2_left:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I' || '\"-MAX\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 3 - max",
           "sql": {
             "columns": [
               {
@@ -917,8 +1235,182 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_2_right:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
-          "refId": "Right 3",
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_2_left:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), min(%1$I) AS %1$I' || '\"-MIN\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 3 - min",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_2_right:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I' || '\"-MAX\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 1 - max",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_2_right:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), min(%1$I) AS %1$I' || '\"-MIN\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 1 - min",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_2_right:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I' || '\"-MAX\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 2 - max",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_2_right:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), min(%1$I) AS %1$I' || '\"-MIN\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 2 - min",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_2_right:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I' || '\"-MAX\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 3 - max",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_2_right:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), min(%1$I) AS %1$I' || '\"-MIN\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 3 - min",
           "sql": {
             "columns": [
               {
@@ -1123,7 +1615,7 @@
           {
             "matcher": {
               "id": "byFrameRefID",
-              "options": "Left 1"
+              "options": "Left 1 - max"
             },
             "properties": [
               {
@@ -1135,7 +1627,7 @@
           {
             "matcher": {
               "id": "byFrameRefID",
-              "options": "Left 2"
+              "options": "Left 2 - max"
             },
             "properties": [
               {
@@ -1147,7 +1639,7 @@
           {
             "matcher": {
               "id": "byFrameRefID",
-              "options": "Left 3"
+              "options": "Left 3 - max"
             },
             "properties": [
               {
@@ -1159,7 +1651,7 @@
           {
             "matcher": {
               "id": "byFrameRefID",
-              "options": "Right 1"
+              "options": "Right 1 - max"
             },
             "properties": [
               {
@@ -1171,7 +1663,7 @@
           {
             "matcher": {
               "id": "byFrameRefID",
-              "options": "Right 2"
+              "options": "Right 2 - max"
             },
             "properties": [
               {
@@ -1183,7 +1675,79 @@
           {
             "matcher": {
               "id": "byFrameRefID",
-              "options": "Right 3"
+              "options": "Right 3 - max"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Left 1 - min"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Left 2 - min"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Left 3 - min"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Right 1 - min"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Right 2 - min"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Right 3 - min"
             },
             "properties": [
               {
@@ -1200,8 +1764,8 @@
         "x": 0,
         "y": 27
       },
-      "id": 6,
-      "interval": "1s",
+      "id": 18,
+      "interval": "10ms",
       "options": {
         "legend": {
           "calcs": [],
@@ -1225,8 +1789,8 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_3_left:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
-          "refId": "Left 1",
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_3_left:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I' || '\"-MAX\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 1 - max",
           "sql": {
             "columns": [
               {
@@ -1254,8 +1818,8 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_3_left:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
-          "refId": "Left 2",
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_3_left:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), min(%1$I) AS %1$I' || '\"-MIN\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 1 - min",
           "sql": {
             "columns": [
               {
@@ -1283,8 +1847,8 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_3_left:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
-          "refId": "Left 3",
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_3_left:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I' || '\"-MAX\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 2 - max",
           "sql": {
             "columns": [
               {
@@ -1312,8 +1876,8 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_3_right:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
-          "refId": "Right 1",
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_3_left:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), min(%1$I) AS %1$I' || '\"-MIN\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 2 - min",
           "sql": {
             "columns": [
               {
@@ -1341,8 +1905,8 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_3_right:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
-          "refId": "Right 2",
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_3_left:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I' || '\"-MAX\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 3 - max",
           "sql": {
             "columns": [
               {
@@ -1370,8 +1934,182 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_3_right:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
-          "refId": "Right 3",
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_3_left:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), min(%1$I) AS %1$I' || '\"-MIN\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 3 - min",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_3_right:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I' || '\"-MAX\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 1 - max",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_3_right:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), min(%1$I) AS %1$I' || '\"-MIN\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 1 - min",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_3_right:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I' || '\"-MAX\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 2 - max",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_3_right:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), min(%1$I) AS %1$I' || '\"-MIN\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 2 - min",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_3_right:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I' || '\"-MAX\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 3 - max",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_3_right:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), min(%1$I) AS %1$I' || '\"-MIN\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 3 - min",
           "sql": {
             "columns": [
               {
@@ -1574,7 +2312,7 @@
           {
             "matcher": {
               "id": "byFrameRefID",
-              "options": "Left 1"
+              "options": "Left 1 - max"
             },
             "properties": [
               {
@@ -1586,7 +2324,7 @@
           {
             "matcher": {
               "id": "byFrameRefID",
-              "options": "Left 2"
+              "options": "Left 2 - max"
             },
             "properties": [
               {
@@ -1598,7 +2336,7 @@
           {
             "matcher": {
               "id": "byFrameRefID",
-              "options": "Left 3"
+              "options": "Left 3 - max"
             },
             "properties": [
               {
@@ -1610,7 +2348,7 @@
           {
             "matcher": {
               "id": "byFrameRefID",
-              "options": "Right 1"
+              "options": "Right 1 - max"
             },
             "properties": [
               {
@@ -1622,7 +2360,7 @@
           {
             "matcher": {
               "id": "byFrameRefID",
-              "options": "Right 2"
+              "options": "Right 2 - max"
             },
             "properties": [
               {
@@ -1634,7 +2372,79 @@
           {
             "matcher": {
               "id": "byFrameRefID",
-              "options": "Right 3"
+              "options": "Right 3 - max"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Left 1 - min"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Left 2 - min"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Left 3 - min"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Right 1 - min"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Right 2 - min"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Right 3 - min"
             },
             "properties": [
               {
@@ -1651,8 +2461,8 @@
         "x": 0,
         "y": 39
       },
-      "id": 7,
-      "interval": "1s",
+      "id": 19,
+      "interval": "10ms",
       "options": {
         "legend": {
           "calcs": [],
@@ -1676,8 +2486,8 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_4_left:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
-          "refId": "Left 1",
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_4_left:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I' || '\"-MAX\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 1 - max",
           "sql": {
             "columns": [
               {
@@ -1705,8 +2515,8 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_4_left:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
-          "refId": "Left 2",
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_4_left:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), min(%1$I) AS %1$I' || '\"-MIN\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 1 - min",
           "sql": {
             "columns": [
               {
@@ -1734,8 +2544,8 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_4_left:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
-          "refId": "Left 3",
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_4_left:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I' || '\"-MAX\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 2 - max",
           "sql": {
             "columns": [
               {
@@ -1763,8 +2573,8 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_4_right:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
-          "refId": "Right 1",
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_4_left:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), min(%1$I) AS %1$I' || '\"-MIN\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 2 - min",
           "sql": {
             "columns": [
               {
@@ -1792,8 +2602,8 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_4_right:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
-          "refId": "Right 2",
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_4_left:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I' || '\"-MAX\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 3 - max",
           "sql": {
             "columns": [
               {
@@ -1821,8 +2631,182 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_4_right:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
-          "refId": "Right 3",
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_4_left:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), min(%1$I) AS %1$I' || '\"-MIN\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 3 - min",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_4_right:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I' || '\"-MAX\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 1 - max",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_4_right:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), min(%1$I) AS %1$I' || '\"-MIN\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 1 - min",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_4_right:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I' || '\"-MAX\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 2 - max",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_4_right:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), min(%1$I) AS %1$I' || '\"-MIN\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 2 - min",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_4_right:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I' || '\"-MAX\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 3 - max",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_4_right:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), min(%1$I) AS %1$I' || '\"-MIN\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 3 - min",
           "sql": {
             "columns": [
               {
@@ -2025,7 +3009,7 @@
           {
             "matcher": {
               "id": "byFrameRefID",
-              "options": "Left 1"
+              "options": "Left 1 - max"
             },
             "properties": [
               {
@@ -2037,7 +3021,7 @@
           {
             "matcher": {
               "id": "byFrameRefID",
-              "options": "Left 2"
+              "options": "Left 2 - max"
             },
             "properties": [
               {
@@ -2049,7 +3033,7 @@
           {
             "matcher": {
               "id": "byFrameRefID",
-              "options": "Left 3"
+              "options": "Left 3 - max"
             },
             "properties": [
               {
@@ -2061,7 +3045,7 @@
           {
             "matcher": {
               "id": "byFrameRefID",
-              "options": "Right 1"
+              "options": "Right 1 - max"
             },
             "properties": [
               {
@@ -2073,7 +3057,7 @@
           {
             "matcher": {
               "id": "byFrameRefID",
-              "options": "Right 2"
+              "options": "Right 2 - max"
             },
             "properties": [
               {
@@ -2085,7 +3069,79 @@
           {
             "matcher": {
               "id": "byFrameRefID",
-              "options": "Right 3"
+              "options": "Right 3 - max"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Left 1 - min"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Left 2 - min"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Left 3 - min"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Right 1 - min"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Right 2 - min"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Right 3 - min"
             },
             "properties": [
               {
@@ -2102,8 +3158,8 @@
         "x": 0,
         "y": 51
       },
-      "id": 8,
-      "interval": "1s",
+      "id": 20,
+      "interval": "10ms",
       "options": {
         "legend": {
           "calcs": [],
@@ -2127,8 +3183,8 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_5_left:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
-          "refId": "Left 1",
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_5_left:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I' || '\"-MAX\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 1 - max",
           "sql": {
             "columns": [
               {
@@ -2156,8 +3212,8 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_5_left:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
-          "refId": "Left 2",
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_5_left:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), min(%1$I) AS %1$I' || '\"-MIN\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 1 - min",
           "sql": {
             "columns": [
               {
@@ -2185,8 +3241,8 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_5_left:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
-          "refId": "Left 3",
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_5_left:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I' || '\"-MAX\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 2 - max",
           "sql": {
             "columns": [
               {
@@ -2214,8 +3270,8 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_5_right:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
-          "refId": "Right 1",
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_5_left:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), min(%1$I) AS %1$I' || '\"-MIN\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n  \r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 2 - min",
           "sql": {
             "columns": [
               {
@@ -2243,8 +3299,8 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_5_right:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
-          "refId": "Right 2",
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_5_left:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I' || '\"-MAX\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 3 - max",
           "sql": {
             "columns": [
               {
@@ -2272,8 +3328,182 @@
           "format": "table",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_5_right:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
-          "refId": "Right 3",
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_5_left:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), min(%1$I) AS %1$I' || '\"-MIN\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Left 3 - min",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_5_right:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I' || '\"-MAX\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 1 - max",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_5_right:raw}', ',', 1) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), min(%1$I) AS %1$I' || '\"-MIN\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 1 - min",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_5_right:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I' || '\"-MAX\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 2 - max",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_5_right:raw}', ',', 2) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), min(%1$I) AS %1$I' || '\"-MIN\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 2 - min",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_5_right:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), max(%1$I) AS %1$I' || '\"-MAX\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 3 - max",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "mtGoB_3Vk"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SET\r\n  search_path TO emex_gen2_7371;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n\r\nDO $get_data$\r\nDECLARE\r\n  tbl_name text;\r\n  dyn_query text;\r\n\r\nBEGIN\r\n  SELECT SPLIT_PART('${comparison_5_right:raw}', ',', 3) into tbl_name;\r\n\r\n  dyn_query := format('CREATE TABLE temp_query_tbl AS SELECT $__timeGroupAlias(time_stamp,$__interval), min(%1$I) AS %1$I' || '\"-MIN\"' || 'FROM %1$I\r\n  WHERE time_stamp BETWEEN ''${__from:date}'' AND ''${__to:date}'' GROUP BY 1 ORDER BY 1;', tbl_name, tbl_name, tbl_name);\r\n\r\n  EXECUTE dyn_query;\r\n\r\nEND $get_data$;\r\n\r\nSELECT * FROM temp_query_tbl;\r\n\r\nDROP TABLE IF EXISTS temp_query_tbl;\r\n",
+          "refId": "Right 3 - min",
           "sql": {
             "columns": [
               {
@@ -2308,12 +3538,12 @@
         "current": {
           "selected": true,
           "text": [
-            "Current_C21_Pack6",
-            "MinCellVolt_BQ_Pack1"
+            "AverageCellTemp",
+            "Current_C21_Pack6"
           ],
           "value": [
-            "Current_C21_Pack6",
-            "MinCellVolt_BQ_Pack1"
+            "AverageCellTemp",
+            "Current_C21_Pack6"
           ]
         },
         "datasource": {
@@ -2589,13 +3819,13 @@
     ]
   },
   "time": {
-    "from": "2023-09-10T17:09:11.861Z",
-    "to": "2023-09-13T02:30:33.216Z"
+    "from": "2023-09-13T13:04:55.134Z",
+    "to": "2023-09-13T15:29:49.438Z"
   },
   "timepicker": {},
   "timezone": "",
   "title": "E19e Gen II - Comparison view",
   "uid": "aaacc697-080c-4efc-8636-d11aa6a7e510",
-  "version": 79,
+  "version": 95,
   "weekStart": ""
 }
