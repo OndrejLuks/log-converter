@@ -50,7 +50,7 @@ def setup_fs() -> canedge_browser.LocalFileSystem:
     return canedge_browser.LocalFileSystem(base_path=base_path)
 
 
-def convert_mf4(mf4_file: os.path, dbc_list: list, name: str, write_info: bool) -> None:
+def convert_mf4(mf4_file: os.path, dbc_list: list, write_info: bool) -> list:
     """Converts and decodes MF4 files to a dataframe using DBC files."""
     fs = setup_fs()
     proc = procData.ProcessData(fs, dbc_list)
@@ -74,11 +74,11 @@ def convert_mf4(mf4_file: os.path, dbc_list: list, name: str, write_info: bool) 
         print("   - writing time information into MF4-info.csv... ")
         write_time_info(mf4_file, df_phys.index[0], df_phys.index[-1])
 
-    # store as signals
-    store_multisignal_df(df_phys, name)
+    print("   - extracting individual signals... ")
+    return split_df_by_cols(df_phys)
 
 
-def aggregate(df, time_max: int, name: str, lock: threading.Lock) -> None:
+def aggregate(df, time_max: int, lock: threading.Lock, dfs: list) -> None:
     """Aggregates input signal dataframe by removing redundant values"""
     num_rows = df.shape[0]
 
@@ -107,13 +107,10 @@ def aggregate(df, time_max: int, name: str, lock: threading.Lock) -> None:
         idx_array.append(num_rows - 1)
         # create a new dataframe and remove duplicates
         result_df = df.iloc[list(dict.fromkeys(idx_array))]
-
-        target_dir = os.path.join("Temp", "aggregated")
         
         # safely store the aggregated signal
         with lock:
-            create_dir(target_dir)
-            result_df.to_parquet(f'{os.path.join(target_dir, name)}-{sig_name}.parquet', engine="pyarrow", index=True)
+            dfs.append(result_df)
             print(f"     = finished agg. signal: {sig_name}")
                 
 
@@ -156,20 +153,6 @@ def write_time_info(file: str, start_time, end_time) -> None:
         print(f"INFO RECORDING WARNING:  {e}") 
 
 
-def store_multisignal_df(big_df: pd.DataFrame, name: str) -> None:
-    """Stores individual signals from given converted physica-value-dataframe"""
-    target_dir = os.path.join("Temp", "converted")
-    create_dir(target_dir)
-
-    # extract individual signals from a concentrated dataframe
-    print("   - extracting individual signals... ")
-    columns_dfs = split_df_by_cols(big_df)
-
-    print("   - storing signals... ")
-    for df in columns_dfs:
-        df.to_parquet(f'{os.path.join(target_dir, name)}-{df.columns.values[0]}.parquet', engine="pyarrow", index=True)
-
-
 def get_MF4_files() -> list:
     """Generates a list of paths to all found MF4 files in the SourceMF4 folder. Returns also the number of found files."""
     out = []
@@ -196,32 +179,6 @@ def get_MF4_files() -> list:
     return out, len(out)
 
 
-def get_temp_files(folder: str) -> list:
-    """Extracts and returns a list of desired .parquet files (signals) converted to dataframes from Temp folder"""
-    files = []
-    out = []
-    dir = []
-
-    # get all .parquet files
-    target_dir = os.path.join("Temp", folder)
-    if os.path.exists(target_dir):
-        dir = os.listdir(target_dir)
-
-    for file in dir:
-        if file.endswith(".parquet"):
-            files.append(os.path.join("Temp", folder, file))
-
-    files.sort()
-
-    # convert parquet to dataframes
-    for file in files:
-        agg_signal_df = pd.read_parquet(file, engine="pyarrow")
-        agg_signal_df.index = pd.to_datetime(agg_signal_df.index)
-        out.append(agg_signal_df)
-
-    return out
-
-
 def create_dbc_list() -> list:
     """""Creates a list of loaded DBC files via can_decoder"""""
 
@@ -242,37 +199,6 @@ def create_dbc_list() -> list:
         sys.exit(1)
 
     return db_list
-
-
-def count_files_in_dir(dir: str, end: str) -> int:
-    """Counts files ending with 'end' in 'dir' directory and subdirectories"""
-    count = 0
-    try:
-        for root, dirs, files in os.walk(dir):
-            for file in files:
-                if file.endswith(end):
-                    count += 1
-        if count == 0:
-            raise OSError
-
-    except OSError:
-        print(f"ERROR while loading {end} files. Check for {dir} or {end} file existance.")
-        sys.exit(1)
-
-    return count
-
-
-def rm_tree_if_exist(root: list) -> None:
-    """Removes given directory and its subdirectories if they exist"""
-    try:
-        for dir in root:
-            if os.path.exists(dir):
-                shutil.rmtree(dir)
-
-    except OSError:
-        print()
-        print(f"ERROR: Failed to remove tree of root {root}")
-        sys.exit(1)
 
 
 def rm_empty_subdirs(top_level: str) -> None:
@@ -329,20 +255,17 @@ def process_handle(dbc_list: set, config) -> None:
     db.connect()
     db.create_schema()
     
-    rm_tree_if_exist(["Temp"])
-    
     # load MF4 files
     mf4_file_list, num_of_mf4_files = get_MF4_files()
     num_of_done_mf4_files = 0
 
     try: 
-        for idx, file in enumerate(mf4_file_list):
+        for file in mf4_file_list:
             # CONVERT FILE into Signal files
             print(f" - Converting: {file}")
-            convert_mf4(file, dbc_list, str(idx), config["settings"]["write_time_info"])
-
+        
             dfs_to_upload = []
-            converted_files = get_temp_files("converted")
+            converted_files = convert_mf4(file, dbc_list, config["settings"]["write_time_info"])
 
             # AGGREGATE if requested
             if config["settings"]["aggregate"]:
@@ -351,16 +274,13 @@ def process_handle(dbc_list: set, config) -> None:
                 # run each signal in a different thread
                 lock = Lock()
                 for signal_df in converted_files:
-                    thread = threading.Thread(target=aggregate, args=(signal_df, config["settings"]["agg_max_skip_seconds"], str(idx), lock))
+                    thread = threading.Thread(target=aggregate, args=(signal_df, config["settings"]["agg_max_skip_seconds"], lock, dfs_to_upload))
                     threads.append(thread)
                     thread.start()
                 
                 # wait for threads to finish
                 for thr in threads:
                     thr.join()
-
-                # get dataframes to upload
-                dfs_to_upload = get_temp_files("aggregated")
             
             else:
                 dfs_to_upload = converted_files
@@ -374,14 +294,9 @@ def process_handle(dbc_list: set, config) -> None:
                 print("   - moving the file... ")
                 move_done_file(file)
 
-            # delete temp folders
-            rm_tree_if_exist([os.path.join("Temp", "converted"), os.path.join("Temp", "aggregated")])
-
             num_of_done_mf4_files += 1
             print(f"   - DONE!     Overall progress:  {round((num_of_done_mf4_files / num_of_mf4_files)*100, 2)} %")
             print()
-        
-        rm_tree_if_exist(["Temp"])
 
     except Exception as e:
         print()
