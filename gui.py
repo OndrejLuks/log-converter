@@ -3,8 +3,8 @@ import json
 import sys
 
 
-class TopWindowCreate(customtkinter.CTkToplevel):
-    def __init__(self, type: str, msg: str):
+class TopWindowYesNo(customtkinter.CTkToplevel):
+    def __init__(self, type: str, msg: str, btn_callback_yes=None, btn_callback_no=None):
         super().__init__()
 
         self.minsize(300, 150)
@@ -18,29 +18,20 @@ class TopWindowCreate(customtkinter.CTkToplevel):
         self.after(50, self.lift)
 
         # Message
-        self.label = customtkinter.CTkLabel(self, text=msg)
-        self.label.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="nswe")
+        self.label = customtkinter.CTkLabel(self, text=msg, fg_color="white")
+        self.label.grid(row=0, column=0, columnspan=2, padx=10, pady=(20, 0), sticky="nswe")
 
         # Do you really want to proceed?
         self.label = customtkinter.CTkLabel(self, text="Do you really want to proceed?")
         self.label.grid(row=1, column=0, columnspan=2, padx=10, pady=20, sticky="nswe")
 
         # YES button
-        self.btn_start = customtkinter.CTkButton(self, text="Yes", command=self.btn_callback_yes)
+        self.btn_start = customtkinter.CTkButton(self, text="Yes", command=btn_callback_yes)
         self.btn_start.grid(row=2, column=0, padx=10, pady=10, sticky="nswe")
 
         # NO button
-        self.btn_start = customtkinter.CTkButton(self, text="No", command=self.btn_callback_no)
+        self.btn_start = customtkinter.CTkButton(self, text="No", command=btn_callback_no)
         self.btn_start.grid(row=2, column=1, padx=10, pady=10, sticky="nswe")
-
-    def btn_callback_yes(self) -> None:
-        # kill the app
-        sys.exit(0)
-    
-    def btn_callback_no(self) -> None:
-        # delete the window
-        self.destroy()
-        self.update()
         
         
 
@@ -82,6 +73,9 @@ class DatabaseFrame(customtkinter.CTkFrame):
         for entry in self.entries:
             result.append(entry.get())
         return result
+    
+    def save_to_json(self) -> None:
+        return
     
 
 
@@ -135,6 +129,9 @@ class ProcessFrame(customtkinter.CTkFrame):
         for entry in self.entries:
             result.append(entry.get())
         return result
+    
+    def save_to_json(self) -> None:
+        return
 
 
 
@@ -162,14 +159,44 @@ class TextboxFrame(customtkinter.CTkFrame):
 
 
 
+class ProgressFrame(customtkinter.CTkFrame):
+    def __init__(self, master):
+        super().__init__(master)
+
+        self.configure(fg_color="transparent", height=15)
+        self.grid_columnconfigure(1, weight=1)
+
+        # frame title
+        self.title = customtkinter.CTkLabel(self, text="Progress", fg_color="transparent", height=1)
+        self.title.grid_forget()
+        
+        # define progress bar
+        self.progress = customtkinter.CTkProgressBar(master=self, mode="determinate", corner_radius=0, progress_color=("green", "green"), height=1)
+        self.progress.set(0)
+        self.progress.grid_forget()
+
+    def show(self) -> None:
+        self.title.grid(row=0, column=0, padx=10, pady=0, sticky="w")
+        self.progress.grid(row=0, column=1, padx=10, pady=0, sticky="nsew")
+
+    def hide(self) -> None:
+        self.title.grid_forget()
+        self.progress.grid_forget()
+
+    def set_value(self, val) -> None:
+        self.progress.set(val)
+
+
+
 class ButtonsFrame(customtkinter.CTkFrame):
-    def __init__(self, master, db_frame, proc_frame, txt_box, top_window):
+    def __init__(self, master, db_frame, proc_frame, txt_box, top_window, progress):
         super().__init__(master)
 
         self.database_frame = db_frame
         self.process_frame = proc_frame
         self.text_box = txt_box
         self.toplevel_warning = top_window
+        self.progress_bar = progress
 
         self.grid_columnconfigure((0, 1, 2, 3), weight=1)
         self.configure(fg_color="transparent")
@@ -192,7 +219,7 @@ class ButtonsFrame(customtkinter.CTkFrame):
 
 
     def btn_callback_discard(self) -> None:
-        self.open_toplevel_warning("Lol u sure?")
+        self.open_toplevel("WARNING!", "Any changes you made will not be saved.", yes_fc=self.exit_program, no_fc=self.kill_toplevel_window)
         return
     
     def btn_callback_start(self) -> None:
@@ -209,11 +236,27 @@ class ButtonsFrame(customtkinter.CTkFrame):
         return
     
     def start_process(self) -> None:
-        # self.disable_buttons()
-        return
+        self.disable_buttons()
+        # check if clean upload is selected
+
+        # start process
+        self.progress_bar.show()
+
+        return 
 
     def save(self) -> None:
+        self.text_box.write(f"Database: {self.database_frame.get()}\n")
         self.text_box.write(f"Settings: {self.process_frame.get()}\n")
+
+        # save json file
+        self.database_frame.save_to_json()
+        self.process_frame.save_to_json()
+
+        # load new settings
+
+
+        # redraw 
+
         return
     
     def disable_buttons(self) -> None:
@@ -226,10 +269,18 @@ class ButtonsFrame(customtkinter.CTkFrame):
         self.btn_start.configure(state="normal")
         self.btn_save_start.configure(state="normal")
 
-    def open_toplevel_warning(self, msg: str) -> None:
+    def open_toplevel(self,type: str, msg: str, yes_fc=None, no_fc=None) -> None:
         if self.toplevel_warning is None or not self.toplevel_warning.winfo_exists():
-            self.toplevel_warning = TopWindowCreate("WARNING!", msg)
-        # place the top level
+            self.toplevel_warning = TopWindowYesNo(type, msg, yes_fc, no_fc)
+
+    def exit_program(self) -> None:
+        sys.exit(0)
+    
+    def kill_toplevel_window(self) -> None:
+        # delete the window
+        self.toplevel_warning.destroy()
+        self.toplevel_warning.update()
+
 
 
 
@@ -257,8 +308,11 @@ class App(customtkinter.CTk):
         self.text_box = TextboxFrame(self)
         self.text_box.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="nswe")
 
-        self.button_frame = ButtonsFrame(self, self.database_frame, self.process_frame, self.text_box, self.toplevel_window)
-        self.button_frame.grid(row=2, column=0, padx=5, pady=5, columnspan=2, sticky="nswe")
+        self.progress_bar = ProgressFrame(self)
+        self.progress_bar.grid(row=2, column=0, columnspan=2, padx=0, pady=0, sticky="nswe")
+
+        self.button_frame = ButtonsFrame(self, self.database_frame, self.process_frame, self.text_box, self.toplevel_window, self.progress_bar)
+        self.button_frame.grid(row=3, column=0, padx=10, pady=10, columnspan=2, sticky="nswe")
 
 
     def btn_callback(self):
