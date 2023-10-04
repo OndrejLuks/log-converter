@@ -18,7 +18,7 @@ class TopWindowYesNo(customtkinter.CTkToplevel):
         self.after(50, self.lift)
 
         # Message
-        self.label = customtkinter.CTkLabel(self, text=msg, fg_color="white")
+        self.label = customtkinter.CTkLabel(self, text=msg, fg_color="white", corner_radius=6)
         self.label.grid(row=0, column=0, columnspan=2, padx=10, pady=(20, 0), sticky="nswe")
 
         # Do you really want to proceed?
@@ -49,7 +49,7 @@ class DatabaseFrame(customtkinter.CTkFrame):
         self.title.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="we")
         
         # define entry names
-        entry_names = [("Host", "host"),
+        self.entry_names = [("Host", "host"),
                        ("Port", "port"),
                        ("Database", "database"),
                        ("User", "user"),
@@ -57,27 +57,42 @@ class DatabaseFrame(customtkinter.CTkFrame):
                        ("Schema", "schema_name")]
         self.entries = []
         self.labels = []
+
         # create entries
-        for i, name in enumerate(entry_names):
+        for i, name in enumerate(self.entry_names):
             label = customtkinter.CTkLabel(self, text=name[0], fg_color="transparent")
             label.grid(row=i+1, column=0, padx=15, pady=10, sticky="w")
             entry = customtkinter.CTkEntry(self, placeholder_text=self.my_config["database"][name[1]])
             entry.grid(row=i+1, column=1, padx=10, pady=10, sticky="we")
 
             self.labels.append(label)
-            self.entries.append(entry)
+            self.entries.append((entry, name[1]))
 
 
     def get(self) -> list:
         result = []
         for entry in self.entries:
-            result.append(entry.get())
+            result.append(entry[0].get())
         return result
     
-    def save_to_json(self) -> None:
-        return
-    
 
+    def refresh(self) -> None:
+        for entry in self.entries:
+            entry[0].configure(placeholder_text=self.my_config["database"][entry[1]])
+    
+    
+    def save_to_json(self) -> None:
+        # update config
+        for entry in self.entries:
+            val = str(entry[0].get())
+            if not len(val) == 0:
+                self.my_config["database"][entry[1]] = val
+
+        # write to the file:
+        with open("config.json", "w") as file:
+            json.dump(self.my_config, file, indent=4)
+
+    
 
 class ProcessFrame(customtkinter.CTkFrame):
     def __init__(self, master, config):
@@ -97,6 +112,7 @@ class ProcessFrame(customtkinter.CTkFrame):
                         ("Write time info", "write_time_info"),
                         ("Clean upload", "clean_upload")]
         self.switches = []
+
         # create switches
         for i, name in enumerate(switch_names):
             switch = customtkinter.CTkSwitch(self, text=name[0])
@@ -105,7 +121,7 @@ class ProcessFrame(customtkinter.CTkFrame):
             if self.my_config["settings"][name[1]]:
                 switch.select()
 
-            self.switches.append(switch)
+            self.switches.append((switch, name[1]))
 
         # define entry names
         entry_names = [("Agg. max skip seconds", "agg_max_skip_seconds")]
@@ -119,19 +135,40 @@ class ProcessFrame(customtkinter.CTkFrame):
             entry.grid(row=i+1+len(self.switches), column=1, padx=10, pady=10, sticky="we")
 
             self.labels.append(label)
-            self.entries.append(entry)
+            self.entries.append((entry, name[1]))
 
 
     def get(self) -> list:
         result = []
         for switch in self.switches:
-            result.append(switch.get())
+            result.append(switch[0].get())
         for entry in self.entries:
-            result.append(entry.get())
+            result.append(entry[0].get())
         return result
     
+    
+    def refresh(self) -> None:
+        for entry in self.entries:
+            entry[0].configure(placeholder_text=self.my_config["settings"][entry[1]])
+    
+
     def save_to_json(self) -> None:
-        return
+        # update config
+        for switch in self.switches:
+            val = int(switch[0].get())
+            if val == 1:
+                self.my_config["settings"][switch[1]] = True
+            if val == 0:
+                self.my_config["settings"][switch[1]] = False
+
+        for entry in self.entries:
+            val = str(entry[0].get())
+            if not len(val) == 0:
+                self.my_config["settings"][entry[1]] = val
+
+        # write to the file:
+        with open("config.json", "w") as file:
+            json.dump(self.my_config, file, indent=4)
 
 
 
@@ -149,6 +186,7 @@ class TextboxFrame(customtkinter.CTkFrame):
         # define textbox
         self.textbox = customtkinter.CTkTextbox(master=self, corner_radius=0, activate_scrollbars=True, wrap="word")
         self.textbox.grid(row=1, column=0, sticky="nsew")
+        self.textbox.configure(state="disabled")
 
 
     def write(self, msg: str) -> None:
@@ -245,19 +283,16 @@ class ButtonsFrame(customtkinter.CTkFrame):
         return 
 
     def save(self) -> None:
-        self.text_box.write(f"Database: {self.database_frame.get()}\n")
-        self.text_box.write(f"Settings: {self.process_frame.get()}\n")
-
         # save json file
         self.database_frame.save_to_json()
         self.process_frame.save_to_json()
 
-        # load new settings
-
-
         # redraw 
+        self.database_frame.refresh()
+        self.process_frame.refresh()
 
-        return
+        self.text_box.write(f"Successfully saved!\n")
+
     
     def disable_buttons(self) -> None:
         self.btn_discard.configure(state="disabled")
@@ -292,7 +327,7 @@ class App(customtkinter.CTk):
         self.my_config = self.open_config()
         self.toplevel_window = None
 
-        self.title("Simple test")
+        self.title("MF4 Signal converter")
         self.minsize(650, 700)
 
         self.grid_columnconfigure(1, weight=1)
@@ -323,9 +358,8 @@ class App(customtkinter.CTk):
     def open_config(self):
         """Loads configure json file (config.json) from root directory. Returns json object."""
         try:
-            file = open("config.json", "r")
-            data = json.load(file)
-            file.close()
+            with open("config.json", "r") as file:
+                data = json.load(file)
 
         except FileNotFoundError:
             print()
