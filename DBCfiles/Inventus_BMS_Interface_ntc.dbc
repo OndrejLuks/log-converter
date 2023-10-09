@@ -1,0 +1,442 @@
+VERSION ""
+
+
+NS_ : 
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+	BO_TX_BU_
+	BA_DEF_REL_
+	BA_REL_
+	BA_DEF_DEF_REL_
+	BU_SG_REL_
+	BU_EV_REL_
+	BU_BO_REL_
+	SG_MUL_VAL_
+
+BS_:
+
+BU_: Charger BMS Hub
+
+
+BO_ 1481 CHARGER73_PDO3: 8 Vector__XXX
+
+BO_ 1410 CHARGER2_PDO3: 8 Vector__XXX
+
+BO_ 1409 CHARGER1_PDO3: 8 Vector__XXX
+
+BO_ 2633959667 NTCTEMP: 138 BMS
+ SG_ P6CellNTC21 : 1096|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P6CellNTC20 : 1088|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P6CellNTC19 : 1080|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P6CellNTC18 : 1072|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P6CellNTC17 : 1064|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P6CellNTC16 : 1056|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P6CellNTC15 : 1048|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P6CellNTC14 : 1040|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P6CellNTC13 : 1032|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P6CellNTC12 : 1024|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P6CellNTC11 : 1016|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P6CellNTC10 : 1008|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P6CellNTC09 : 1000|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P6CellNTC08 : 992|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P6CellNTC07 : 984|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P6CellNTC06 : 976|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P6CellNTC05 : 968|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P6CellNTC04 : 960|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P6CellNTC03 : 952|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P6CellNTC02 : 944|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P6CellNTC01 : 936|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P6SN : 920|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ P5CellNTC21 : 912|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P5CellNTC20 : 904|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P5CellNTC19 : 896|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P5CellNTC18 : 888|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P5CellNTC17 : 880|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P5CellNTC16 : 872|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P5CellNTC15 : 864|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P5CellNTC14 : 856|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P5CellNTC13 : 848|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P5CellNTC12 : 840|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P5CellNTC11 : 832|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P5CellNTC10 : 824|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P5CellNTC09 : 816|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P5CellNTC08 : 808|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P5CellNTC07 : 800|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P5CellNTC06 : 792|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P5CellNTC05 : 784|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P5CellNTC04 : 776|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P5CellNTC03 : 768|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P5CellNTC02 : 760|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P5CellNTC01 : 752|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P5SN : 736|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ P4CellNTC21 : 728|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P4CellNTC20 : 720|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P4CellNTC19 : 712|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P4CellNTC18 : 704|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P4CellNTC17 : 696|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P4CellNTC16 : 688|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P4CellNTC15 : 680|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P4CellNTC14 : 672|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P4CellNTC13 : 664|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P4CellNTC12 : 656|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P4CellNTC11 : 648|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P4CellNTC10 : 640|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P4CellNTC09 : 632|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P4CellNTC08 : 624|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P4CellNTC07 : 616|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P4CellNTC06 : 608|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P4CellNTC05 : 600|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P4CellNTC04 : 592|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P4CellNTC03 : 584|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P4CellNTC02 : 576|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P4CellNTC01 : 568|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P4SN : 552|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ P3CellNTC21 : 544|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P3CellNTC20 : 536|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P3CellNTC19 : 528|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P3CellNTC18 : 520|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P3CellNTC17 : 512|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P3CellNTC16 : 504|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P3CellNTC15 : 496|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P3CellNTC14 : 488|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P3CellNTC13 : 480|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P3CellNTC12 : 472|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P3CellNTC11 : 464|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P3CellNTC10 : 456|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P3CellNTC09 : 448|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P3CellNTC08 : 440|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P3CellNTC07 : 432|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P3CellNTC06 : 424|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P3CellNTC05 : 416|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P3CellNTC04 : 408|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P3CellNTC03 : 400|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P3CellNTC02 : 392|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P3CellNTC01 : 384|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P3SN : 368|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ P2CellNTC21 : 360|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P2CellNTC20 : 352|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P2CellNTC19 : 344|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P2CellNTC18 : 336|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P2CellNTC17 : 328|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P2CellNTC16 : 320|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P2CellNTC15 : 312|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P2CellNTC14 : 304|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P2CellNTC13 : 296|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P2CellNTC12 : 288|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P2CellNTC11 : 280|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P2CellNTC10 : 272|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P2CellNTC09 : 264|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P2CellNTC08 : 256|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P2CellNTC07 : 248|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P2CellNTC06 : 240|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P2CellNTC05 : 232|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P2CellNTC04 : 224|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P2CellNTC03 : 216|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P2CellNTC02 : 208|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P2CellNTC01 : 200|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P2SN : 184|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ P1CellNTC21 : 176|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P1CellNTC20 : 168|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P1CellNTC19 : 160|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P1CellNTC18 : 152|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P1CellNTC17 : 144|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P1CellNTC16 : 136|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P1CellNTC15 : 128|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P1CellNTC14 : 120|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P1CellNTC13 : 112|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P1CellNTC12 : 104|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P1CellNTC11 : 96|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P1CellNTC10 : 88|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P1CellNTC09 : 80|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P1CellNTC08 : 72|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P1CellNTC07 : 64|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P1CellNTC06 : 56|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P1CellNTC05 : 48|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P1CellNTC04 : 40|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P1CellNTC03 : 32|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P1CellNTC02 : 24|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P1CellNTC01 : 16|8@1+ (1,-40) [0|0] "°C" Vector__XXX
+ SG_ P1SN : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 2364577523 SAE_HVESSS1: 8 BMS
+
+BO_ 2633785075 SAE_HVESSHIST: 37 BMS
+
+BO_ 2566675955 SAE_HVESSCFG: 17 BMS
+
+BO_ 2364580083 SAE_HVESSD7: 8 BMS
+
+BO_ 2364577267 SAE_HVESSD6: 8 BMS
+
+BO_ 2364577011 SAE_HVESSD5: 7 BMS
+
+BO_ 2364576755 SAE_HVESSD4: 8 BMS
+
+BO_ 2364576499 SAE_HVESSD3: 8 BMS
+
+BO_ 2364576243 SAE_HVESSD2: 8 BMS
+
+BO_ 2364575987 SAE_HVESSD1: 8 BMS
+
+BO_ 2566722889 SAE_BCH1: 8 Charger
+
+BO_ 2350642096 SAE_HVESSC1: 8 Hub
+
+
+
+CM_ BO_ 2633959667 "BMS Cell NTC temperature
+On request";
+CM_ BO_ 2364577523 "Status data set 1 for High Voltage Energy Storage System (or Pack 1 in systems with only one pack).";
+CM_ BO_ 2633785075 "Historical data for High Voltage Energy Storage System (or Pack 1 in systems with only one pack).";
+CM_ BO_ 2566675955 "Configuration data for High Voltage Energy Storage System (or Pack 1 in systems with only one pack).
+Note that configuration data should not dynamically change during vehicle operation.";
+CM_ BO_ 2364580083 "Data set 7 (electrical) for High Voltage Energy Storage System (or Pack 1 in systems with only one pack).";
+CM_ BO_ 2364577267 "Data set 6 (external or interface data) for High Voltage Energy Storage System (or Pack 1 in systems with only one pack).";
+CM_ BO_ 2364577011 "Data set 5 (electrical data) for High Voltage Energy Storage System (or Pack 1 in systems with only one pack).";
+CM_ BO_ 2364576755 "Data set 4 (electrical data) for High Voltage Energy Storage System (or Pack 1 in systems with only one pack).";
+CM_ BO_ 2364576499 "Data set 3 (thermal data) for High Voltage Energy Storage System (or Pack 1 in systems with only one pack).";
+CM_ BO_ 2364576243 "Data set 2 (electrical data) for High Voltage Energy Storage System (or Pack 1 in systems with only one pack).";
+CM_ BO_ 2364575987 "Data set 1 (electrical data) for High Voltage Energy Storage System (or Pack 1 in systems with only one pack).";
+CM_ BO_ 2566722889 "Parameters for the battery charger connected to the main battery.";
+CM_ BO_ 2350642096 "Control commands to be sent to High Voltage Energy Storage System (or Pack 1 in systems with only one pack).";
+BA_DEF_ BO_  "TpJ1939VarDlc" ENUM  "No","Yes";
+BA_DEF_ SG_  "SigType" ENUM  "Default","Range","RangeSigned","ASCII","Discrete","Control","ReferencePGN","DTC","StringDelimiter","StringLength","StringLengthControl","MessageCounter","MessageChecksum";
+BA_DEF_ SG_  "GenSigEVName" STRING ;
+BA_DEF_ SG_  "GenSigILSupport" ENUM  "No","Yes";
+BA_DEF_ SG_  "GenSigSendType" ENUM  "Cyclic","OnWrite","OnWriteWithRepetition","OnChange","OnChangeWithRepetition","IfActive","IfActiveWithRepetition","NoSigSendType";
+BA_DEF_ BO_  "GenMsgFastOnStart" INT 0 100000;
+BA_DEF_ SG_  "GenSigInactiveValue" INT 0 0;
+BA_DEF_ BO_  "GenMsgCycleTimeFast" INT 0 3600000;
+BA_DEF_ BO_  "GenMsgNrOfRepetition" INT 0 1000000;
+BA_DEF_ SG_  "GenSigStartValue" INT 0 2147483647;
+BA_DEF_ BO_  "GenMsgDelayTime" INT 0 1000;
+BA_DEF_ BO_  "GenMsgILSupport" ENUM  "No","Yes";
+BA_DEF_ BO_  "GenMsgStartDelayTime" INT 0 100000;
+BA_DEF_ BU_  "NodeLayerModules" STRING ;
+BA_DEF_ BU_  "ECU" STRING ;
+BA_DEF_ BU_  "NmJ1939SystemInstance" INT 0 15;
+BA_DEF_ BU_  "NmJ1939System" INT 0 127;
+BA_DEF_ BU_  "NmJ1939ManufacturerCode" INT 0 2047;
+BA_DEF_ BU_  "NmJ1939IndustryGroup" INT 0 7;
+BA_DEF_ BU_  "NmJ1939IdentityNumber" INT 0 2097151;
+BA_DEF_ BU_  "NmJ1939FunctionInstance" INT 0 7;
+BA_DEF_ BU_  "NmJ1939Function" INT 0 255;
+BA_DEF_ BU_  "NmJ1939ECUInstance" INT 0 3;
+BA_DEF_ BU_  "NmJ1939AAC" INT 0 1;
+BA_DEF_ BU_  "NmStationAddress" INT 0 255;
+BA_DEF_ BO_  "GenMsgSendType" ENUM  "cyclic","NotUsed","IfActive","NotUsed","NotUsed","NotUsed","NotUsed","NotUsed","noMsgSendType";
+BA_DEF_ BO_  "GenMsgRequestable" INT 0 1;
+BA_DEF_ BO_  "GenMsgCycleTime" INT 0 3600000;
+BA_DEF_ SG_  "SPN" INT 0 524287;
+BA_DEF_  "DBName" STRING ;
+BA_DEF_  "BusType" STRING ;
+BA_DEF_  "ProtocolType" STRING ;
+BA_DEF_ BO_  "VFrameFormat" ENUM  "StandardCAN","ExtendedCAN","reserved","J1939PG","reserved","reserved","reserved","reserved","reserved","reserved","reserved","reserved","reserved","reserved","StandardCAN_FD","ExtendedCAN_FD";
+BA_DEF_DEF_  "TpJ1939VarDlc" "No";
+BA_DEF_DEF_  "SigType" "Default";
+BA_DEF_DEF_  "GenSigEVName" "Env@Nodename_@Signame";
+BA_DEF_DEF_  "GenSigILSupport" "Yes";
+BA_DEF_DEF_  "GenSigSendType" "NoSigSendType";
+BA_DEF_DEF_  "GenMsgFastOnStart" 0;
+BA_DEF_DEF_  "GenSigInactiveValue" 0;
+BA_DEF_DEF_  "GenMsgCycleTimeFast" 0;
+BA_DEF_DEF_  "GenMsgNrOfRepetition" 0;
+BA_DEF_DEF_  "GenSigStartValue" 0;
+BA_DEF_DEF_  "GenMsgDelayTime" 0;
+BA_DEF_DEF_  "GenMsgILSupport" "Yes";
+BA_DEF_DEF_  "GenMsgStartDelayTime" 0;
+BA_DEF_DEF_  "NodeLayerModules" "";
+BA_DEF_DEF_  "ECU" "";
+BA_DEF_DEF_  "NmJ1939SystemInstance" 0;
+BA_DEF_DEF_  "NmJ1939System" 0;
+BA_DEF_DEF_  "NmJ1939ManufacturerCode" 0;
+BA_DEF_DEF_  "NmJ1939IndustryGroup" 0;
+BA_DEF_DEF_  "NmJ1939IdentityNumber" 0;
+BA_DEF_DEF_  "NmJ1939FunctionInstance" 0;
+BA_DEF_DEF_  "NmJ1939Function" 0;
+BA_DEF_DEF_  "NmJ1939ECUInstance" 0;
+BA_DEF_DEF_  "NmJ1939AAC" 0;
+BA_DEF_DEF_  "NmStationAddress" 254;
+BA_DEF_DEF_  "GenMsgSendType" "noMsgSendType";
+BA_DEF_DEF_  "GenMsgRequestable" 1;
+BA_DEF_DEF_  "GenMsgCycleTime" 0;
+BA_DEF_DEF_  "SPN" 0;
+BA_DEF_DEF_  "DBName" "";
+BA_DEF_DEF_  "BusType" "CAN";
+BA_DEF_DEF_  "ProtocolType" "J1939";
+BA_DEF_DEF_  "VFrameFormat" "J1939PG";
+BA_ "DBName" "InventusBMS";
+BA_ "NmStationAddress" BU_ Charger 73;
+BA_ "NmStationAddress" BU_ BMS 243;
+BA_ "NmStationAddress" BU_ Hub 176;
+BA_ "VFrameFormat" BO_ 1481 0;
+BA_ "VFrameFormat" BO_ 1410 0;
+BA_ "VFrameFormat" BO_ 1409 0;
+BA_ "VFrameFormat" BO_ 2633959667 3;
+BA_ "GenMsgCycleTime" BO_ 2364577523 100;
+BA_ "VFrameFormat" BO_ 2364577523 3;
+BA_ "VFrameFormat" BO_ 2633785075 3;
+BA_ "VFrameFormat" BO_ 2566675955 3;
+BA_ "GenMsgCycleTime" BO_ 2364580083 100;
+BA_ "VFrameFormat" BO_ 2364580083 3;
+BA_ "GenMsgCycleTime" BO_ 2364577267 100;
+BA_ "VFrameFormat" BO_ 2364577267 3;
+BA_ "GenMsgCycleTime" BO_ 2364577011 20;
+BA_ "VFrameFormat" BO_ 2364577011 3;
+BA_ "GenMsgCycleTime" BO_ 2364576755 100;
+BA_ "VFrameFormat" BO_ 2364576755 3;
+BA_ "GenMsgCycleTime" BO_ 2364576499 20;
+BA_ "VFrameFormat" BO_ 2364576499 3;
+BA_ "GenMsgCycleTime" BO_ 2364576243 20;
+BA_ "VFrameFormat" BO_ 2364576243 3;
+BA_ "GenMsgCycleTime" BO_ 2364575987 20;
+BA_ "VFrameFormat" BO_ 2364575987 3;
+BA_ "GenMsgCycleTime" BO_ 2566722889 1000;
+BA_ "VFrameFormat" BO_ 2566722889 3;
+BA_ "GenMsgCycleTime" BO_ 2350642096 20;
+BA_ "VFrameFormat" BO_ 2350642096 3;
+BA_ "GenSigStartValue" SG_ 2633959667 P6CellNTC21 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P6CellNTC20 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P6CellNTC19 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P6CellNTC18 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P6CellNTC17 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P6CellNTC16 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P6CellNTC15 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P6CellNTC14 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P6CellNTC13 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P6CellNTC12 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P6CellNTC11 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P6CellNTC10 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P6CellNTC09 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P6CellNTC08 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P6CellNTC07 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P6CellNTC06 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P6CellNTC05 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P6CellNTC04 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P6CellNTC03 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P6CellNTC02 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P6CellNTC01 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P5CellNTC21 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P5CellNTC20 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P5CellNTC19 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P5CellNTC18 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P5CellNTC17 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P5CellNTC16 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P5CellNTC15 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P5CellNTC14 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P5CellNTC13 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P5CellNTC12 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P5CellNTC11 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P5CellNTC10 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P5CellNTC09 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P5CellNTC08 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P5CellNTC07 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P5CellNTC06 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P5CellNTC05 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P5CellNTC04 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P5CellNTC03 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P5CellNTC02 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P5CellNTC01 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P4CellNTC21 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P4CellNTC20 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P4CellNTC19 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P4CellNTC18 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P4CellNTC17 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P4CellNTC16 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P4CellNTC15 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P4CellNTC14 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P4CellNTC13 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P4CellNTC12 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P4CellNTC11 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P4CellNTC10 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P4CellNTC09 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P4CellNTC08 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P4CellNTC07 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P4CellNTC06 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P4CellNTC05 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P4CellNTC04 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P4CellNTC03 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P4CellNTC02 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P4CellNTC01 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P3CellNTC21 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P3CellNTC20 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P3CellNTC19 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P3CellNTC18 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P3CellNTC17 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P3CellNTC16 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P3CellNTC15 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P3CellNTC14 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P3CellNTC13 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P3CellNTC12 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P3CellNTC11 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P3CellNTC10 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P3CellNTC09 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P3CellNTC08 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P3CellNTC07 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P3CellNTC06 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P3CellNTC05 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P3CellNTC04 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P3CellNTC03 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P3CellNTC02 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P3CellNTC01 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P2CellNTC21 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P2CellNTC20 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P2CellNTC19 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P2CellNTC18 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P2CellNTC17 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P2CellNTC16 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P2CellNTC15 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P2CellNTC14 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P2CellNTC13 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P2CellNTC12 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P2CellNTC11 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P2CellNTC10 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P2CellNTC09 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P2CellNTC08 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P2CellNTC07 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P2CellNTC06 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P2CellNTC05 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P2CellNTC04 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P2CellNTC03 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P2CellNTC02 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P2CellNTC01 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P1CellNTC21 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P1CellNTC20 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P1CellNTC19 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P1CellNTC18 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P1CellNTC17 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P1CellNTC16 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P1CellNTC15 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P1CellNTC14 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P1CellNTC13 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P1CellNTC12 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P1CellNTC11 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P1CellNTC10 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P1CellNTC09 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P1CellNTC08 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P1CellNTC07 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P1CellNTC06 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P1CellNTC05 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P1CellNTC04 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P1CellNTC03 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P1CellNTC02 40;
+BA_ "GenSigStartValue" SG_ 2633959667 P1CellNTC01 40;
+

@@ -1,0 +1,147 @@
+VERSION ""
+
+
+NS_ : 
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+	BO_TX_BU_
+	BA_DEF_REL_
+	BA_REL_
+	BA_DEF_DEF_REL_
+	BU_SG_REL_
+	BU_EV_REL_
+	BU_BO_REL_
+	SG_MUL_VAL_
+
+BS_:
+
+BU_:
+
+
+BO_ 1461 SDO_Node35: 8 Vector__XXX
+ SG_ Version_C21_Pack5 m1124126752 : 32|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ Version_BQ_Pack5 m1124126755 : 32|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ MinCellVolt_BQ_Pack5 m1258310121 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ MaxCellVolt_BQ_Pack5 m1258310120 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ MaxCellVolt_C21_Pack5 m1259030528 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ MinCellVolt_C21_Pack5 m1258964992 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ FCC_BQ_Pack5 m1258309904 : 32|16@1+ (0.01,0) [0|0] "Ah" Vector__XXX
+ SG_ RemCap_BQ_Pack5 m1258309903 : 32|16@1+ (0.01,0) [0|0] "Ah" Vector__XXX
+ SG_ RSOC_BQ_Pack5 m1258309901 : 32|16@1+ (1,0) [0|0] "%" Vector__XXX
+ SG_ Current_C21_Pack5 m1258571776 : 32|16@1- (0.1,0) [0|0] "A" Vector__XXX
+ SG_ Current_BQ_Pack5 m1258309898 : 32|16@1- (0.01,0) [0|0] "A" Vector__XXX
+ SG_ Volt_BQ_Pack5 m1258309897 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ Volt_C21_Pack5 m1258344544 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ selector_Pack5 M : 7|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ Temperature_BQ_Pack5 m1258309896 : 32|16@1+ (0.1,-272) [0|0] "°C" Vector__XXX
+
+BO_ 1460 SDO_Node34: 8 Vector__XXX
+ SG_ Version_C21_Pack4 m1124126752 : 32|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ Version_BQ_Pack4 m1124126755 : 32|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ MinCellVolt_BQ_Pack4 m1258310121 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ MaxCellVolt_BQ_Pack4 m1258310120 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ MaxCellVolt_C21_Pack4 m1259030528 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ MinCellVolt_C21_Pack4 m1258964992 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ FCC_BQ_Pack4 m1258309904 : 32|16@1+ (0.01,0) [0|0] "Ah" Vector__XXX
+ SG_ RemCap_BQ_Pack4 m1258309903 : 32|16@1+ (0.01,0) [0|0] "Ah" Vector__XXX
+ SG_ RSOC_BQ_Pack4 m1258309901 : 32|16@1+ (1,0) [0|0] "%" Vector__XXX
+ SG_ Current_C21_Pack4 m1258571776 : 32|16@1- (0.1,0) [0|0] "A" Vector__XXX
+ SG_ Current_BQ_Pack4 m1258309898 : 32|16@1- (0.01,0) [0|0] "A" Vector__XXX
+ SG_ Volt_BQ_Pack4 m1258309897 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ Volt_C21_Pack4 m1258344544 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ selector_Pack4 M : 7|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ Temperature_BQ_Pack4 m1258309896 : 32|16@1+ (0.1,-272) [0|0] "°C" Vector__XXX
+
+BO_ 1459 SDO_Node33: 8 Vector__XXX
+ SG_ Version_C21_Pack3 m1124126752 : 32|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ Version_BQ_Pack3 m1124126755 : 32|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ MinCellVolt_BQ_Pack3 m1258310121 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ MaxCellVolt_BQ_Pack3 m1258310120 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ MaxCellVolt_C21_Pack3 m1259030528 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ MinCellVolt_C21_Pack3 m1258964992 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ FCC_BQ_Pack3 m1258309904 : 32|16@1+ (0.01,0) [0|0] "Ah" Vector__XXX
+ SG_ RemCap_BQ_Pack3 m1258309903 : 32|16@1+ (0.01,0) [0|0] "Ah" Vector__XXX
+ SG_ RSOC_BQ_Pack3 m1258309901 : 32|16@1+ (1,0) [0|0] "%" Vector__XXX
+ SG_ Current_C21_Pack3 m1258571776 : 32|16@1- (0.1,0) [0|0] "A" Vector__XXX
+ SG_ Current_BQ_Pack3 m1258309898 : 32|16@1- (0.01,0) [0|0] "A" Vector__XXX
+ SG_ Volt_BQ_Pack3 m1258309897 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ Volt_C21_Pack3 m1258344544 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ selector_Pack3 M : 7|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ Temperature_BQ_Pack3 m1258309896 : 32|16@1+ (0.1,-272) [0|0] "°C" Vector__XXX
+
+BO_ 1462 SDO_Node36: 8 Vector__XXX
+ SG_ Version_C21_Pack6 m1124126752 : 32|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ Version_BQ_Pack6 m1124126755 : 32|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ MinCellVolt_BQ_Pack6 m1258310121 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ MaxCellVolt_BQ_Pack6 m1258310120 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ MaxCellVolt_C21_Pack6 m1259030528 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ MinCellVolt_C21_Pack6 m1258964992 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ FCC_BQ_Pack6 m1258309904 : 32|16@1+ (0.01,0) [0|0] "Ah" Vector__XXX
+ SG_ RemCap_BQ_Pack6 m1258309903 : 32|16@1+ (0.01,0) [0|0] "Ah" Vector__XXX
+ SG_ RSOC_BQ_Pack6 m1258309901 : 32|16@1+ (1,0) [0|0] "%" Vector__XXX
+ SG_ Current_C21_Pack6 m1258571776 : 32|16@1- (0.1,0) [0|0] "A" Vector__XXX
+ SG_ Current_BQ_Pack6 m1258309898 : 32|16@1- (0.01,0) [0|0] "A" Vector__XXX
+ SG_ Volt_BQ_Pack6 m1258309897 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ Volt_C21_Pack6 m1258344544 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ selector_Pack6 M : 7|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ Temperature_BQ_Pack6 m1258309896 : 32|16@1+ (0.1,-272) [0|0] "°C" Vector__XXX
+
+BO_ 1458 SDO_Node32: 8 Vector__XXX
+ SG_ Version_C21_Pack2 m1124126752 : 32|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ Version_BQ_Pack2 m1124126755 : 32|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ MinCellVolt_BQ_Pack2 m1258310121 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ MaxCellVolt_BQ_Pack2 m1258310120 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ MaxCellVolt_C21_Pack2 m1259030528 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ MinCellVolt_C21_Pack2 m1258964992 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ FCC_BQ_Pack2 m1258309904 : 32|16@1+ (0.01,0) [0|0] "Ah" Vector__XXX
+ SG_ RemCap_BQ_Pack2 m1258309903 : 32|16@1+ (0.01,0) [0|0] "Ah" Vector__XXX
+ SG_ RSOC_BQ_Pack2 m1258309901 : 32|16@1+ (1,0) [0|0] "%" Vector__XXX
+ SG_ Current_C21_Pack2 m1258571776 : 32|16@1- (0.1,0) [0|0] "A" Vector__XXX
+ SG_ Current_BQ_Pack2 m1258309898 : 32|16@1- (0.01,0) [0|0] "A" Vector__XXX
+ SG_ Volt_BQ_Pack2 m1258309897 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ Volt_C21_Pack2 m1258344544 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ selector_Pack2 M : 7|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ Temperature_BQ_Pack2 m1258309896 : 32|16@1+ (0.1,-272) [0|0] "°C" Vector__XXX
+
+BO_ 1457 SDO_Node31: 8 Vector__XXX
+ SG_ Version_C21_Pack1 m1124126752 : 32|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ Version_BQ_Pack1 m1124126755 : 32|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ MinCellVolt_BQ_Pack1 m1258310121 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ MaxCellVolt_BQ_Pack1 m1258310120 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ MaxCellVolt_C21_Pack1 m1259030528 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ MinCellVolt_C21_Pack1 m1258964992 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ FCC_BQ_Pack1 m1258309904 : 32|16@1+ (0.01,0) [0|0] "Ah" Vector__XXX
+ SG_ RemCap_BQ_Pack1 m1258309903 : 32|16@1+ (0.01,0) [0|0] "Ah" Vector__XXX
+ SG_ RSOC_BQ_Pack1 m1258309901 : 32|16@1+ (1,0) [0|0] "%" Vector__XXX
+ SG_ Current_C21_Pack1 m1258571776 : 32|16@1- (0.1,0) [0|0] "A" Vector__XXX
+ SG_ Current_BQ_Pack1 m1258309898 : 32|16@1- (0.01,0) [0|0] "A" Vector__XXX
+ SG_ Volt_BQ_Pack1 m1258309897 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ Volt_C21_Pack1 m1258344544 : 32|16@1+ (0.001,0) [0|0] "V" Vector__XXX
+ SG_ selector_Pack1 M : 7|32@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ Temperature_BQ_Pack1 m1258309896 : 32|16@1+ (0.1,-272) [0|0] "°C" Vector__XXX
+
+
+
+BA_DEF_  "MultiplexExtEnabled" ENUM  "No","Yes";
+BA_DEF_  "BusType" STRING ;
+BA_DEF_DEF_  "MultiplexExtEnabled" "No";
+BA_DEF_DEF_  "BusType" "CAN";
+

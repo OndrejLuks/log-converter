@@ -1,0 +1,565 @@
+VERSION ""
+
+
+NS_ : 
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+	BO_TX_BU_
+	BA_DEF_REL_
+	BA_REL_
+	BA_DEF_DEF_REL_
+	BU_SG_REL_
+	BU_EV_REL_
+	BU_BO_REL_
+	SG_MUL_VAL_
+
+BS_:
+
+BU_:
+
+
+BO_ 2566615794 MG5IT: 8 Vector__XXX
+ SG_ InverterTemperature1 : 0|8@1+ (1,-40) [-40|210] "C" Vector__XXX
+
+BO_ 2365289714 MG5IS1: 8 Vector__XXX
+ SG_ DcSideCurrent : 40|12@1+ (0.0625,-125) [-125|125.9375] "A" Vector__XXX
+ SG_ Torque : 12|12@1+ (0.0625,-125) [-125|125.9375] "Nm" Vector__XXX
+ SG_ Speed : 24|16@1+ (0.00390625,-125) [-125|125.99609375] "%" Vector__XXX
+
+BO_ 2365289458 MG5IR2: 8 Vector__XXX
+ SG_ ReferenceVoltage : 48|16@1+ (0.125,0) [0|8031.875] "V" Vector__XXX
+ SG_ ReferenceCurrent : 32|16@1+ (0.125,0) [0|8031.875] "A" Vector__XXX
+
+BO_ 2365289970 MG5IR1: 8 Vector__XXX
+ SG_ ReferenceSpeed : 32|16@1+ (4,0) [0|257020] "RPM" Vector__XXX
+ SG_ ReferenceTorque : 16|16@1+ (0.5,0) [0|32127.5] "Nm" Vector__XXX
+
+BO_ 2566615538 MG5IMT: 8 Vector__XXX
+ SG_ MotorTemperature1 : 0|8@1+ (1,-40) [-40|210] "C" Vector__XXX
+
+BO_ 2364637682 MG5IMF1: 8 Vector__XXX
+ SG_ HVILStatus : 21|2@1+ (1,0) [0|3] "" Vector__XXX
+
+BO_ 2565965298 MG5ILV: 8 Vector__XXX
+ SG_ CapacitorBankVoltage : 16|16@1+ (0.05,0) [0|3212.75] "V" Vector__XXX
+ SG_ KsiVoltage : 0|16@1+ (0.05,0) [0|3212.75] "V" Vector__XXX
+
+BO_ 2556424880 MG5ILRM: 8 Vector__XXX
+
+BO_ 2556359344 MG5ILRDC: 8 Vector__XXX
+
+BO_ 2565964786 MG5ILAM: 8 Vector__XXX
+
+BO_ 2565965042 MG5ILADC: 8 Vector__XXX
+ SG_ LimitActiveDcSideCurrentMaximum : 36|12@1+ (0.0625,-125) [-125|125.9375] "%" Vector__XXX
+
+BO_ 2351362736 MG5IC: 8 Vector__XXX
+
+BO_ 2365289713 MG4IS1: 8 Vector__XXX
+ SG_ DcSideCurrent : 40|12@1+ (0.0625,-125) [-125|125.9375] "A" Vector__XXX
+ SG_ Torque : 12|12@1+ (0.0625,-125) [-125|125.9375] "Nm" Vector__XXX
+ SG_ Speed : 24|16@1+ (0.00390625,-125) [-125|125.99609375] "%" Vector__XXX
+
+BO_ 2365289457 MG4IR2: 8 Vector__XXX
+ SG_ ReferenceVoltage : 48|16@1+ (0.125,0) [0|8031.875] "V" Vector__XXX
+ SG_ ReferenceCurrent : 32|16@1+ (0.125,0) [0|8031.875] "A" Vector__XXX
+
+BO_ 2365289969 MG4IR1: 8 Vector__XXX
+ SG_ ReferenceSpeed : 32|16@1+ (4,0) [0|257020] "RPM" Vector__XXX
+ SG_ ReferenceTorque : 16|16@1+ (0.5,0) [0|32127.5] "Nm" Vector__XXX
+
+BO_ 2566615537 MG4IMT: 8 Vector__XXX
+ SG_ MotorTemperature1 : 0|8@1+ (1,-40) [-40|210] "C" Vector__XXX
+
+BO_ 2364637681 MG4IMF1: 8 Vector__XXX
+ SG_ HVILStatus : 21|2@1+ (1,0) [0|3] "" Vector__XXX
+
+BO_ 2565965297 MG4ILV: 8 Vector__XXX
+ SG_ CapacitorBankVoltage : 16|16@1+ (0.05,0) [0|3212.75] "V" Vector__XXX
+ SG_ KsiVoltage : 0|16@1+ (0.05,0) [0|3212.75] "V" Vector__XXX
+
+BO_ 2556424624 MG4ILRM: 8 Vector__XXX
+
+BO_ 2556359088 MG4ILRDC: 8 Vector__XXX
+
+BO_ 2565964785 MG4ILAM: 8 Vector__XXX
+
+BO_ 2565965041 MG4ILADC: 8 Vector__XXX
+ SG_ LimitActiveDcSideCurrentMaximum : 36|12@1+ (0.0625,-125) [-125|125.9375] "%" Vector__XXX
+
+BO_ 2351362480 MG4IC: 8 Vector__XXX
+
+BO_ 2566615793 MG4IT: 8 Vector__XXX
+ SG_ InverterTemperature1 : 0|8@1+ (1,-40) [-40|210] "C" Vector__XXX
+
+BO_ 2566615709 MG3IT: 8 Vector__XXX
+ SG_ InverterTemperature1 : 0|8@1+ (1,-40) [-40|210] "C" Vector__XXX
+
+BO_ 2566615792 MG2IT: 8 Vector__XXX
+ SG_ InverterTemperature1 : 0|8@1+ (1,-40) [-40|210] "C" Vector__XXX
+
+BO_ 2365289629 MG3IS1: 8 Vector__XXX
+ SG_ DcSideCurrent : 40|12@1+ (0.0625,-125) [-125|125.9375] "A" Vector__XXX
+ SG_ Torque : 12|12@1+ (0.0625,-125) [-125|125.9375] "Nm" Vector__XXX
+ SG_ Speed : 24|16@1+ (0.00390625,-125) [-125|125.99609375] "%" Vector__XXX
+
+BO_ 2365289712 MG2IS1: 8 Vector__XXX
+ SG_ DcSideCurrent : 40|12@1+ (0.0625,-125) [-125|125.9375] "A" Vector__XXX
+ SG_ Torque : 12|12@1+ (0.0625,-125) [-125|125.9375] "Nm" Vector__XXX
+ SG_ Speed : 24|16@1+ (0.00390625,-125) [-125|125.99609375] "%" Vector__XXX
+
+BO_ 2365289373 MG3IR2: 8 Vector__XXX
+ SG_ ReferenceVoltage : 48|16@1+ (0.125,0) [0|8031.875] "V" Vector__XXX
+ SG_ ReferenceCurrent : 32|16@1+ (0.125,0) [0|8031.875] "A" Vector__XXX
+
+BO_ 2365289456 MG2IR2: 8 Vector__XXX
+ SG_ ReferenceVoltage : 48|16@1+ (0.125,0) [0|8031.875] "V" Vector__XXX
+ SG_ ReferenceCurrent : 32|16@1+ (0.125,0) [0|8031.875] "A" Vector__XXX
+
+BO_ 2365289885 MG3IR1: 8 Vector__XXX
+ SG_ ReferenceSpeed : 32|16@1+ (4,0) [0|257020] "RPM" Vector__XXX
+ SG_ ReferenceTorque : 16|16@1+ (0.5,0) [0|32127.5] "Nm" Vector__XXX
+
+BO_ 2365289968 MG2IR1: 8 Vector__XXX
+ SG_ ReferenceSpeed : 32|16@1+ (4,0) [0|257020] "RPM" Vector__XXX
+ SG_ ReferenceTorque : 16|16@1+ (0.5,0) [0|32127.5] "Nm" Vector__XXX
+
+BO_ 2566615453 MG3IMT: 8 Vector__XXX
+ SG_ MotorTemperature1 : 0|8@1+ (1,-40) [-40|210] "C" Vector__XXX
+
+BO_ 2566615536 MG2IMT: 8 Vector__XXX
+ SG_ MotorTemperature1 : 0|8@1+ (1,-40) [-40|210] "C" Vector__XXX
+
+BO_ 2364637597 MG3IMF1: 8 Vector__XXX
+ SG_ HVILStatus : 21|2@1+ (1,0) [0|3] "" Vector__XXX
+
+BO_ 2364637680 MG2IMF1: 8 Vector__XXX
+ SG_ HVILStatus : 21|2@1+ (1,0) [0|3] "" Vector__XXX
+
+BO_ 2565965213 MG3ILV: 8 Vector__XXX
+ SG_ CapacitorBankVoltage : 16|16@1+ (0.05,0) [0|3212.75] "V" Vector__XXX
+ SG_ KsiVoltage : 0|16@1+ (0.05,0) [0|3212.75] "V" Vector__XXX
+
+BO_ 2565965296 MG2ILV: 8 Vector__XXX
+ SG_ CapacitorBankVoltage : 16|16@1+ (0.05,0) [0|3212.75] "V" Vector__XXX
+ SG_ KsiVoltage : 0|16@1+ (0.05,0) [0|3212.75] "V" Vector__XXX
+
+BO_ 2556403120 MG3ILRM: 8 Vector__XXX
+
+BO_ 2556424368 MG2ILRM: 8 Vector__XXX
+
+BO_ 2556337584 MG3ILRDC: 8 Vector__XXX
+
+BO_ 2556358832 MG2ILRDC: 8 Vector__XXX
+
+BO_ 2565964701 MG3ILAM: 8 Vector__XXX
+
+BO_ 2565964784 MG2ILAM: 8 Vector__XXX
+
+BO_ 2565964957 MG3ILADC: 8 Vector__XXX
+ SG_ LimitActiveDcSideCurrentMaximum : 36|12@1+ (0.0625,-125) [-125|125.9375] "%" Vector__XXX
+
+BO_ 2565965040 MG2ILADC: 8 Vector__XXX
+ SG_ LimitActiveDcSideCurrentMaximum : 36|12@1+ (0.0625,-125) [-125|125.9375] "%" Vector__XXX
+
+BO_ 2351340976 MG3IC: 8 Vector__XXX
+
+BO_ 2351362224 MG2IC: 8 Vector__XXX
+
+BO_ 2565965295 MG1ILV: 8 Vector__XXX
+ SG_ CapacitorBankVoltage : 16|16@1+ (0.05,0) [0|3212.75] "V" Vector__XXX
+ SG_ KsiVoltage : 0|16@1+ (0.05,0) [0|3212.75] "V" Vector__XXX
+
+BO_ 2364637679 MG1IMF1: 8 Vector__XXX
+ SG_ HVILStatus : 21|2@1+ (1,0) [0|3] "" Vector__XXX
+
+BO_ 2365289711 MG1IS1: 8 Vector__XXX
+ SG_ DcSideCurrent : 40|12@1+ (0.0625,-125) [-125|125.9375] "A" Vector__XXX
+ SG_ Torque : 12|12@1+ (0.0625,-125) [-125|125.9375] "Nm" Vector__XXX
+ SG_ Speed : 24|16@1+ (0.00390625,-125) [-125|125.99609375] "%" Vector__XXX
+
+BO_ 2365289455 MG1IR2: 8 Vector__XXX
+ SG_ ReferenceVoltage : 48|16@1+ (0.125,0) [0|8031.875] "V" Vector__XXX
+ SG_ ReferenceCurrent : 32|16@1+ (0.125,0) [0|8031.875] "A" Vector__XXX
+
+BO_ 2365289967 MG1IR1: 8 Vector__XXX
+ SG_ ReferenceSpeed : 32|16@1+ (4,0) [0|257020] "RPM" Vector__XXX
+ SG_ ReferenceTorque : 16|16@1+ (0.5,0) [0|32127.5] "Nm" Vector__XXX
+
+BO_ 2566615535 MG1IMT: 8 Vector__XXX
+ SG_ MotorTemperature1 : 0|8@1+ (1,-40) [-40|210] "C" Vector__XXX
+
+BO_ 2566615791 MG1IT: 8 Vector__XXX
+ SG_ InverterTemperature1 : 0|8@1+ (1,-40) [-40|210] "C" Vector__XXX
+
+BO_ 2565965039 MG1ILADC: 8 Vector__XXX
+ SG_ LimitActiveDcSideCurrentMaximum : 36|12@1+ (0.0625,-125) [-125|125.9375] "%" Vector__XXX
+
+BO_ 2565964783 MG1ILAM: 8 Vector__XXX
+
+BO_ 2556358576 MG1ILRDC: 8 Vector__XXX
+
+BO_ 2556424112 MG1ILRM: 8 Vector__XXX
+
+BO_ 2351361968 MG1IC: 8 Vector__XXX
+
+
+
+CM_ SG_ 2365289458 ReferenceVoltage "This value is used for converting inverter voltage in percent to units of Volts (RMS or DC).
+
+(Value in Volts) = (Percent Value)/(100%) * (Reference Voltage)
+";
+CM_ SG_ 2365289458 ReferenceCurrent "This value is used for converting inverter current in percent to units of Amps (RMS or DC).
+
+(Value in Amps) = (Percent Value)/(100%) * (Reference Current)
+";
+CM_ SG_ 2365289970 ReferenceSpeed "This value is used for converting Speed in percent to units of rpm.
+
+Value in rpm = (Percent Value)/(100%) * (Reference Speed)
+";
+CM_ SG_ 2365289970 ReferenceTorque "This value is used for converting torque in percent to units of Nm.
+
+Value in Nm = (Percent Value)/(100%) * (Reference Torque)
+";
+CM_ SG_ 2364637682 HVILStatus "Reports the High Voltage Interlock Loop (HVIL) state.";
+CM_ SG_ 2565965042 LimitActiveDcSideCurrentMaximum "The inverter keeps the DC side current below this value.  This limit may be set in response to a Limits Request or determined by the inverter based on operating conditions. 
+
+Refer to SPN 10202 [Reference Current] to convert % to Amps.
+";
+CM_ SG_ 2365289457 ReferenceVoltage "This value is used for converting inverter voltage in percent to units of Volts (RMS or DC).
+
+(Value in Volts) = (Percent Value)/(100%) * (Reference Voltage)
+";
+CM_ SG_ 2365289457 ReferenceCurrent "This value is used for converting inverter current in percent to units of Amps (RMS or DC).
+
+(Value in Amps) = (Percent Value)/(100%) * (Reference Current)
+";
+CM_ SG_ 2365289969 ReferenceSpeed "This value is used for converting Speed in percent to units of rpm.
+
+Value in rpm = (Percent Value)/(100%) * (Reference Speed)
+";
+CM_ SG_ 2365289969 ReferenceTorque "This value is used for converting torque in percent to units of Nm.
+
+Value in Nm = (Percent Value)/(100%) * (Reference Torque)
+";
+CM_ SG_ 2364637681 HVILStatus "Reports the High Voltage Interlock Loop (HVIL) state.";
+CM_ SG_ 2565965041 LimitActiveDcSideCurrentMaximum "The inverter keeps the DC side current below this value.  This limit may be set in response to a Limits Request or determined by the inverter based on operating conditions. 
+
+Refer to SPN 10202 [Reference Current] to convert % to Amps.
+";
+CM_ SG_ 2365289373 ReferenceVoltage "This value is used for converting inverter voltage in percent to units of Volts (RMS or DC).
+
+(Value in Volts) = (Percent Value)/(100%) * (Reference Voltage)
+";
+CM_ SG_ 2365289373 ReferenceCurrent "This value is used for converting inverter current in percent to units of Amps (RMS or DC).
+
+(Value in Amps) = (Percent Value)/(100%) * (Reference Current)
+";
+CM_ SG_ 2365289456 ReferenceVoltage "This value is used for converting inverter voltage in percent to units of Volts (RMS or DC).
+
+(Value in Volts) = (Percent Value)/(100%) * (Reference Voltage)
+";
+CM_ SG_ 2365289456 ReferenceCurrent "This value is used for converting inverter current in percent to units of Amps (RMS or DC).
+
+(Value in Amps) = (Percent Value)/(100%) * (Reference Current)
+";
+CM_ SG_ 2365289885 ReferenceSpeed "This value is used for converting Speed in percent to units of rpm.
+
+Value in rpm = (Percent Value)/(100%) * (Reference Speed)
+";
+CM_ SG_ 2365289885 ReferenceTorque "This value is used for converting torque in percent to units of Nm.
+
+Value in Nm = (Percent Value)/(100%) * (Reference Torque)
+";
+CM_ SG_ 2365289968 ReferenceSpeed "This value is used for converting Speed in percent to units of rpm.
+
+Value in rpm = (Percent Value)/(100%) * (Reference Speed)
+";
+CM_ SG_ 2365289968 ReferenceTorque "This value is used for converting torque in percent to units of Nm.
+
+Value in Nm = (Percent Value)/(100%) * (Reference Torque)
+";
+CM_ SG_ 2364637597 HVILStatus "Reports the High Voltage Interlock Loop (HVIL) state.";
+CM_ SG_ 2364637680 HVILStatus "Reports the High Voltage Interlock Loop (HVIL) state.";
+CM_ SG_ 2565964957 LimitActiveDcSideCurrentMaximum "The inverter keeps the DC side current below this value.  This limit may be set in response to a Limits Request or determined by the inverter based on operating conditions. 
+
+Refer to SPN 10202 [Reference Current] to convert % to Amps.
+";
+CM_ SG_ 2565965040 LimitActiveDcSideCurrentMaximum "The inverter keeps the DC side current below this value.  This limit may be set in response to a Limits Request or determined by the inverter based on operating conditions. 
+
+Refer to SPN 10202 [Reference Current] to convert % to Amps.
+";
+CM_ SG_ 2364637679 HVILStatus "Reports the High Voltage Interlock Loop (HVIL) state.";
+CM_ SG_ 2365289455 ReferenceVoltage "This value is used for converting inverter voltage in percent to units of Volts (RMS or DC).
+
+(Value in Volts) = (Percent Value)/(100%) * (Reference Voltage)
+";
+CM_ SG_ 2365289455 ReferenceCurrent "This value is used for converting inverter current in percent to units of Amps (RMS or DC).
+
+(Value in Amps) = (Percent Value)/(100%) * (Reference Current)
+";
+CM_ SG_ 2365289967 ReferenceSpeed "This value is used for converting Speed in percent to units of rpm.
+
+Value in rpm = (Percent Value)/(100%) * (Reference Speed)
+";
+CM_ SG_ 2365289967 ReferenceTorque "This value is used for converting torque in percent to units of Nm.
+
+Value in Nm = (Percent Value)/(100%) * (Reference Torque)
+";
+CM_ SG_ 2565965039 LimitActiveDcSideCurrentMaximum "The inverter keeps the DC side current below this value.  This limit may be set in response to a Limits Request or determined by the inverter based on operating conditions. 
+
+Refer to SPN 10202 [Reference Current] to convert % to Amps.
+";
+BA_DEF_  "BusType" STRING ;
+BA_DEF_  "ProtocolType" STRING ;
+BA_DEF_ BO_  "VFrameFormat" ENUM  "StandardCAN","ExtendedCAN","reserved","J1939PG","reserved","reserved","reserved","reserved","reserved","reserved","reserved","reserved","reserved","reserved","StandardCAN_FD","ExtendedCAN_FD";
+BA_DEF_ BO_  "GenMsgCycleTime" INT 0 65535;
+BA_DEF_ SG_  "GenSigStartValue" FLOAT -3.4E+038 3.4E+038;
+BA_DEF_ SG_  "SPN" INT -3.4E+038 3.4E+038;
+BA_DEF_DEF_  "BusType" "CAN";
+BA_DEF_DEF_  "ProtocolType" "J1939";
+BA_DEF_DEF_  "VFrameFormat" "J1939PG";
+BA_DEF_DEF_  "GenMsgCycleTime" 0;
+BA_DEF_DEF_  "GenSigStartValue" 0;
+BA_DEF_DEF_  "SPN" 0;
+BA_ "ProtocolType" "J1939";
+BA_ "BusType" "CAN";
+BA_ "GenMsgCycleTime" BO_ 2566615794 1000;
+BA_ "VFrameFormat" BO_ 2566615794 3;
+BA_ "GenMsgCycleTime" BO_ 2365289714 10;
+BA_ "VFrameFormat" BO_ 2365289714 3;
+BA_ "GenMsgCycleTime" BO_ 2365289458 1000;
+BA_ "VFrameFormat" BO_ 2365289458 3;
+BA_ "GenMsgCycleTime" BO_ 2365289970 1000;
+BA_ "VFrameFormat" BO_ 2365289970 3;
+BA_ "GenMsgCycleTime" BO_ 2566615538 1000;
+BA_ "VFrameFormat" BO_ 2566615538 3;
+BA_ "GenMsgCycleTime" BO_ 2364637682 100;
+BA_ "VFrameFormat" BO_ 2364637682 3;
+BA_ "GenMsgCycleTime" BO_ 2565965298 100;
+BA_ "VFrameFormat" BO_ 2565965298 3;
+BA_ "GenMsgCycleTime" BO_ 2556424880 1000;
+BA_ "VFrameFormat" BO_ 2556424880 3;
+BA_ "GenMsgCycleTime" BO_ 2556359344 1000;
+BA_ "VFrameFormat" BO_ 2556359344 3;
+BA_ "GenMsgCycleTime" BO_ 2565964786 100;
+BA_ "VFrameFormat" BO_ 2565964786 3;
+BA_ "GenMsgCycleTime" BO_ 2565965042 100;
+BA_ "VFrameFormat" BO_ 2565965042 3;
+BA_ "GenMsgCycleTime" BO_ 2351362736 10;
+BA_ "VFrameFormat" BO_ 2351362736 3;
+BA_ "GenMsgCycleTime" BO_ 2365289713 10;
+BA_ "VFrameFormat" BO_ 2365289713 3;
+BA_ "GenMsgCycleTime" BO_ 2365289457 1000;
+BA_ "VFrameFormat" BO_ 2365289457 3;
+BA_ "GenMsgCycleTime" BO_ 2365289969 1000;
+BA_ "VFrameFormat" BO_ 2365289969 3;
+BA_ "GenMsgCycleTime" BO_ 2566615537 1000;
+BA_ "VFrameFormat" BO_ 2566615537 3;
+BA_ "GenMsgCycleTime" BO_ 2364637681 100;
+BA_ "VFrameFormat" BO_ 2364637681 3;
+BA_ "GenMsgCycleTime" BO_ 2565965297 100;
+BA_ "VFrameFormat" BO_ 2565965297 3;
+BA_ "GenMsgCycleTime" BO_ 2556424624 1000;
+BA_ "VFrameFormat" BO_ 2556424624 3;
+BA_ "GenMsgCycleTime" BO_ 2556359088 1000;
+BA_ "VFrameFormat" BO_ 2556359088 3;
+BA_ "GenMsgCycleTime" BO_ 2565964785 100;
+BA_ "VFrameFormat" BO_ 2565964785 3;
+BA_ "GenMsgCycleTime" BO_ 2565965041 100;
+BA_ "VFrameFormat" BO_ 2565965041 3;
+BA_ "GenMsgCycleTime" BO_ 2351362480 10;
+BA_ "VFrameFormat" BO_ 2351362480 3;
+BA_ "GenMsgCycleTime" BO_ 2566615793 1000;
+BA_ "VFrameFormat" BO_ 2566615793 3;
+BA_ "GenMsgCycleTime" BO_ 2566615709 1000;
+BA_ "VFrameFormat" BO_ 2566615709 3;
+BA_ "GenMsgCycleTime" BO_ 2566615792 1000;
+BA_ "VFrameFormat" BO_ 2566615792 3;
+BA_ "GenMsgCycleTime" BO_ 2365289629 10;
+BA_ "VFrameFormat" BO_ 2365289629 3;
+BA_ "GenMsgCycleTime" BO_ 2365289712 10;
+BA_ "VFrameFormat" BO_ 2365289712 3;
+BA_ "GenMsgCycleTime" BO_ 2365289373 1000;
+BA_ "VFrameFormat" BO_ 2365289373 3;
+BA_ "GenMsgCycleTime" BO_ 2365289456 1000;
+BA_ "VFrameFormat" BO_ 2365289456 3;
+BA_ "GenMsgCycleTime" BO_ 2365289885 1000;
+BA_ "VFrameFormat" BO_ 2365289885 3;
+BA_ "GenMsgCycleTime" BO_ 2365289968 1000;
+BA_ "VFrameFormat" BO_ 2365289968 3;
+BA_ "GenMsgCycleTime" BO_ 2566615453 1000;
+BA_ "VFrameFormat" BO_ 2566615453 3;
+BA_ "GenMsgCycleTime" BO_ 2566615536 1000;
+BA_ "VFrameFormat" BO_ 2566615536 3;
+BA_ "GenMsgCycleTime" BO_ 2364637597 100;
+BA_ "VFrameFormat" BO_ 2364637597 3;
+BA_ "GenMsgCycleTime" BO_ 2364637680 100;
+BA_ "VFrameFormat" BO_ 2364637680 3;
+BA_ "GenMsgCycleTime" BO_ 2565965213 100;
+BA_ "VFrameFormat" BO_ 2565965213 3;
+BA_ "GenMsgCycleTime" BO_ 2565965296 100;
+BA_ "VFrameFormat" BO_ 2565965296 3;
+BA_ "GenMsgCycleTime" BO_ 2556403120 1000;
+BA_ "VFrameFormat" BO_ 2556403120 3;
+BA_ "GenMsgCycleTime" BO_ 2556424368 1000;
+BA_ "VFrameFormat" BO_ 2556424368 3;
+BA_ "GenMsgCycleTime" BO_ 2556337584 1000;
+BA_ "VFrameFormat" BO_ 2556337584 3;
+BA_ "GenMsgCycleTime" BO_ 2556358832 1000;
+BA_ "VFrameFormat" BO_ 2556358832 3;
+BA_ "GenMsgCycleTime" BO_ 2565964701 100;
+BA_ "VFrameFormat" BO_ 2565964701 3;
+BA_ "GenMsgCycleTime" BO_ 2565964784 100;
+BA_ "VFrameFormat" BO_ 2565964784 3;
+BA_ "GenMsgCycleTime" BO_ 2565964957 100;
+BA_ "VFrameFormat" BO_ 2565964957 3;
+BA_ "GenMsgCycleTime" BO_ 2565965040 100;
+BA_ "VFrameFormat" BO_ 2565965040 3;
+BA_ "GenMsgCycleTime" BO_ 2351340976 10;
+BA_ "VFrameFormat" BO_ 2351340976 3;
+BA_ "GenMsgCycleTime" BO_ 2351362224 10;
+BA_ "VFrameFormat" BO_ 2351362224 3;
+BA_ "GenMsgCycleTime" BO_ 2565965295 100;
+BA_ "VFrameFormat" BO_ 2565965295 3;
+BA_ "GenMsgCycleTime" BO_ 2364637679 100;
+BA_ "VFrameFormat" BO_ 2364637679 3;
+BA_ "GenMsgCycleTime" BO_ 2365289711 10;
+BA_ "VFrameFormat" BO_ 2365289711 3;
+BA_ "GenMsgCycleTime" BO_ 2365289455 1000;
+BA_ "VFrameFormat" BO_ 2365289455 3;
+BA_ "GenMsgCycleTime" BO_ 2365289967 1000;
+BA_ "VFrameFormat" BO_ 2365289967 3;
+BA_ "GenMsgCycleTime" BO_ 2566615535 1000;
+BA_ "VFrameFormat" BO_ 2566615535 3;
+BA_ "GenMsgCycleTime" BO_ 2566615791 1000;
+BA_ "VFrameFormat" BO_ 2566615791 3;
+BA_ "GenMsgCycleTime" BO_ 2565965039 100;
+BA_ "VFrameFormat" BO_ 2565965039 3;
+BA_ "GenMsgCycleTime" BO_ 2565964783 100;
+BA_ "VFrameFormat" BO_ 2565964783 3;
+BA_ "GenMsgCycleTime" BO_ 2556358576 1000;
+BA_ "VFrameFormat" BO_ 2556358576 3;
+BA_ "GenMsgCycleTime" BO_ 2556424112 1000;
+BA_ "VFrameFormat" BO_ 2556424112 3;
+BA_ "GenMsgCycleTime" BO_ 2351361968 10;
+BA_ "VFrameFormat" BO_ 2351361968 3;
+BA_ "SPN" SG_ 2566615794 InverterTemperature1 10216;
+BA_ "GenSigStartValue" SG_ 2566615794 InverterTemperature1 40;
+BA_ "SPN" SG_ 2365289714 DcSideCurrent 10175;
+BA_ "GenSigStartValue" SG_ 2365289714 DcSideCurrent 2000;
+BA_ "SPN" SG_ 2365289714 Torque 9061;
+BA_ "GenSigStartValue" SG_ 2365289714 Torque 2000;
+BA_ "SPN" SG_ 2365289714 Speed 9057;
+BA_ "GenSigStartValue" SG_ 2365289714 Speed 32000;
+BA_ "SPN" SG_ 2365289458 ReferenceVoltage 10203;
+BA_ "SPN" SG_ 2365289458 ReferenceCurrent 10202;
+BA_ "SPN" SG_ 2365289970 ReferenceSpeed 10171;
+BA_ "SPN" SG_ 2365289970 ReferenceTorque 10170;
+BA_ "SPN" SG_ 2566615538 MotorTemperature1 9059;
+BA_ "GenSigStartValue" SG_ 2566615538 MotorTemperature1 40;
+BA_ "SPN" SG_ 2364637682 HVILStatus 9103;
+BA_ "SPN" SG_ 2565965298 CapacitorBankVoltage 9117;
+BA_ "SPN" SG_ 2565965298 KsiVoltage 9105;
+BA_ "SPN" SG_ 2565965042 LimitActiveDcSideCurrentMaximum 10214;
+BA_ "GenSigStartValue" SG_ 2565965042 LimitActiveDcSideCurrentMaximum 2000;
+BA_ "SPN" SG_ 2365289713 DcSideCurrent 10175;
+BA_ "GenSigStartValue" SG_ 2365289713 DcSideCurrent 2000;
+BA_ "SPN" SG_ 2365289713 Torque 9061;
+BA_ "GenSigStartValue" SG_ 2365289713 Torque 2000;
+BA_ "SPN" SG_ 2365289713 Speed 9057;
+BA_ "GenSigStartValue" SG_ 2365289713 Speed 32000;
+BA_ "SPN" SG_ 2365289457 ReferenceVoltage 10203;
+BA_ "SPN" SG_ 2365289457 ReferenceCurrent 10202;
+BA_ "SPN" SG_ 2365289969 ReferenceSpeed 10171;
+BA_ "SPN" SG_ 2365289969 ReferenceTorque 10170;
+BA_ "SPN" SG_ 2566615537 MotorTemperature1 9059;
+BA_ "GenSigStartValue" SG_ 2566615537 MotorTemperature1 40;
+BA_ "SPN" SG_ 2364637681 HVILStatus 9103;
+BA_ "SPN" SG_ 2565965297 CapacitorBankVoltage 9117;
+BA_ "SPN" SG_ 2565965297 KsiVoltage 9105;
+BA_ "SPN" SG_ 2565965041 LimitActiveDcSideCurrentMaximum 10214;
+BA_ "GenSigStartValue" SG_ 2565965041 LimitActiveDcSideCurrentMaximum 2000;
+BA_ "SPN" SG_ 2566615793 InverterTemperature1 10216;
+BA_ "GenSigStartValue" SG_ 2566615793 InverterTemperature1 40;
+BA_ "SPN" SG_ 2566615709 InverterTemperature1 10216;
+BA_ "GenSigStartValue" SG_ 2566615709 InverterTemperature1 40;
+BA_ "SPN" SG_ 2566615792 InverterTemperature1 10216;
+BA_ "GenSigStartValue" SG_ 2566615792 InverterTemperature1 40;
+BA_ "SPN" SG_ 2365289629 DcSideCurrent 10175;
+BA_ "GenSigStartValue" SG_ 2365289629 DcSideCurrent 2000;
+BA_ "SPN" SG_ 2365289629 Torque 9061;
+BA_ "GenSigStartValue" SG_ 2365289629 Torque 2000;
+BA_ "SPN" SG_ 2365289629 Speed 9057;
+BA_ "GenSigStartValue" SG_ 2365289629 Speed 32000;
+BA_ "SPN" SG_ 2365289712 DcSideCurrent 10175;
+BA_ "GenSigStartValue" SG_ 2365289712 DcSideCurrent 2000;
+BA_ "SPN" SG_ 2365289712 Torque 9061;
+BA_ "GenSigStartValue" SG_ 2365289712 Torque 2000;
+BA_ "SPN" SG_ 2365289712 Speed 9057;
+BA_ "GenSigStartValue" SG_ 2365289712 Speed 32000;
+BA_ "SPN" SG_ 2365289373 ReferenceVoltage 10203;
+BA_ "SPN" SG_ 2365289373 ReferenceCurrent 10202;
+BA_ "SPN" SG_ 2365289456 ReferenceVoltage 10203;
+BA_ "SPN" SG_ 2365289456 ReferenceCurrent 10202;
+BA_ "SPN" SG_ 2365289885 ReferenceSpeed 10171;
+BA_ "SPN" SG_ 2365289885 ReferenceTorque 10170;
+BA_ "SPN" SG_ 2365289968 ReferenceSpeed 10171;
+BA_ "SPN" SG_ 2365289968 ReferenceTorque 10170;
+BA_ "SPN" SG_ 2566615453 MotorTemperature1 9059;
+BA_ "GenSigStartValue" SG_ 2566615453 MotorTemperature1 40;
+BA_ "SPN" SG_ 2566615536 MotorTemperature1 9059;
+BA_ "GenSigStartValue" SG_ 2566615536 MotorTemperature1 40;
+BA_ "SPN" SG_ 2364637597 HVILStatus 9103;
+BA_ "SPN" SG_ 2364637680 HVILStatus 9103;
+BA_ "SPN" SG_ 2565965213 CapacitorBankVoltage 9117;
+BA_ "SPN" SG_ 2565965213 KsiVoltage 9105;
+BA_ "SPN" SG_ 2565965296 CapacitorBankVoltage 9117;
+BA_ "SPN" SG_ 2565965296 KsiVoltage 9105;
+BA_ "SPN" SG_ 2565964957 LimitActiveDcSideCurrentMaximum 10214;
+BA_ "GenSigStartValue" SG_ 2565964957 LimitActiveDcSideCurrentMaximum 2000;
+BA_ "SPN" SG_ 2565965040 LimitActiveDcSideCurrentMaximum 10214;
+BA_ "GenSigStartValue" SG_ 2565965040 LimitActiveDcSideCurrentMaximum 2000;
+BA_ "SPN" SG_ 2565965295 CapacitorBankVoltage 9117;
+BA_ "SPN" SG_ 2565965295 KsiVoltage 9105;
+BA_ "SPN" SG_ 2364637679 HVILStatus 9103;
+BA_ "SPN" SG_ 2365289711 DcSideCurrent 10175;
+BA_ "GenSigStartValue" SG_ 2365289711 DcSideCurrent 2000;
+BA_ "SPN" SG_ 2365289711 Torque 9061;
+BA_ "GenSigStartValue" SG_ 2365289711 Torque 2000;
+BA_ "SPN" SG_ 2365289711 Speed 9057;
+BA_ "GenSigStartValue" SG_ 2365289711 Speed 32000;
+BA_ "SPN" SG_ 2365289455 ReferenceVoltage 10203;
+BA_ "SPN" SG_ 2365289455 ReferenceCurrent 10202;
+BA_ "SPN" SG_ 2365289967 ReferenceSpeed 10171;
+BA_ "SPN" SG_ 2365289967 ReferenceTorque 10170;
+BA_ "SPN" SG_ 2566615535 MotorTemperature1 9059;
+BA_ "GenSigStartValue" SG_ 2566615535 MotorTemperature1 40;
+BA_ "SPN" SG_ 2566615791 InverterTemperature1 10216;
+BA_ "GenSigStartValue" SG_ 2566615791 InverterTemperature1 40;
+BA_ "SPN" SG_ 2565965039 LimitActiveDcSideCurrentMaximum 10214;
+BA_ "GenSigStartValue" SG_ 2565965039 LimitActiveDcSideCurrentMaximum 2000;
+VAL_ 2364637682 HVILStatus 3 "Not Used" 2 "Error" 1 "Open" 0 "Closed" ;
+VAL_ 2364637681 HVILStatus 3 "Not Used" 2 "Error" 1 "Open" 0 "Closed" ;
+VAL_ 2364637597 HVILStatus 3 "Not Used" 2 "Error" 1 "Open" 0 "Closed" ;
+VAL_ 2364637680 HVILStatus 3 "Not Used" 2 "Error" 1 "Open" 0 "Closed" ;
+VAL_ 2364637679 HVILStatus 3 "Not Used" 2 "Error" 1 "Open" 0 "Closed" ;
+
