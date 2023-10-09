@@ -163,7 +163,15 @@ class ProcessFrame(customtkinter.CTkFrame):
 
         for entry in self.entries:
             val = str(entry[0].get())
+
             if not len(val) == 0:
+                # try to convert numbers from entries into string
+                try:
+                    val = int(val)
+
+                except ValueError:
+                    val = str(entry[0].get())
+                # save
                 self.my_config["settings"][entry[1]] = val
 
         # write to the file:
@@ -181,7 +189,7 @@ class TextboxFrame(customtkinter.CTkFrame):
 
         # frame title
         self.title = customtkinter.CTkLabel(self, text="Feedback prompt", fg_color="transparent")
-        self.title.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="we")
+        self.title.grid(row=0, column=0, columnspan=2, padx=10, pady=5, sticky="we")
         
         # define textbox
         self.textbox = customtkinter.CTkTextbox(master=self, corner_radius=0, activate_scrollbars=True, wrap="word")
@@ -240,19 +248,19 @@ class ButtonsFrame(customtkinter.CTkFrame):
         self.configure(fg_color="transparent")
         
         # define Discard changes button
-        self.btn_discard = customtkinter.CTkButton(self, text="Discard changes", command=self.btn_callback_discard)
+        self.btn_discard = customtkinter.CTkButton(self, text="Discard changes", text_color_disabled="orange", command=self.btn_callback_discard)
         self.btn_discard.grid(row=0, column=0, padx=5, pady=5, sticky="nswe")
 
         # define Start button
-        self.btn_start = customtkinter.CTkButton(self, text="Start", command=self.btn_callback_start)
+        self.btn_start = customtkinter.CTkButton(self, text="Start", text_color_disabled="orange", command=self.btn_callback_start)
         self.btn_start.grid(row=0, column=1, padx=5, pady=5, sticky="nswe")
 
         # define Save button
-        self.btn_save = customtkinter.CTkButton(self, text="Save", command=self.btn_callback_save)
+        self.btn_save = customtkinter.CTkButton(self, text="Save", text_color_disabled="orange", command=self.btn_callback_save)
         self.btn_save.grid(row=0, column=2, padx=5, pady=5, sticky="nswe")
 
         # define Save and Start button
-        self.btn_save_start = customtkinter.CTkButton(self, text="Save and Start", command=self.btn_callback_savestart)
+        self.btn_save_start = customtkinter.CTkButton(self, text="Save and Start", text_color_disabled="orange", command=self.btn_callback_savestart)
         self.btn_save_start.grid(row=0, column=3, padx=5, pady=5, sticky="nswe")
 
 
@@ -276,6 +284,7 @@ class ButtonsFrame(customtkinter.CTkFrame):
     def start_process(self) -> None:
         self.disable_buttons()
         # check if clean upload is selected
+
 
         # start process
         self.progress_bar.show()
@@ -315,8 +324,6 @@ class ButtonsFrame(customtkinter.CTkFrame):
         # delete the window
         self.toplevel_warning.destroy()
         self.toplevel_warning.update()
-
-
 
 
 
