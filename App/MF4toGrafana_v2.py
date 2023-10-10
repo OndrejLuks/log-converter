@@ -32,13 +32,13 @@ import canedge_browser
 def open_config():
     """Loads configure json file (config.json) from root directory. Returns json object."""
     try:
-        file = open("config.json", "r")
+        file = open(os.path.join("src", "config.json"), "r")
         data = json.load(file)
         file.close()
 
     except FileNotFoundError:
         print()
-        print("ERROR while reading config.json file. Check for file existance.")
+        print("ERROR while reading src\config.json file. Check for file existance.")
         sys.exit(1)
     
     return data
@@ -322,7 +322,7 @@ def prompt_warning(schema_name) -> None:
             print()
             break
         elif resp == 'n' or resp == 'N':
-            print('   Change the settings.clean_upload to "false" in config.json file')
+            print('   Change the settings.clean_upload to "false" in src\config.json file')
             print()
             sys.exit(0)
         else:

@@ -74,7 +74,7 @@ NOVÉ INFO
 	- pořád to ale bude proces od MF4+dbc do Grafany
 	
 	- VIZUALIZACE
-		- v grafaně bude 10 grafů, které všechny budou umět porovnávat všechny signály
+		- v grafaně bude 5 grafů, které všechny budou umět porovnávat všechny signály
 		- nejlépe více Y os (pro každý zvolený signál)
 		- je třeba mít ve všech grafech čas začínající na tom samém místě
 			- např. když je moc velká legenda na straně, graf se smrskne a hned je jiný než ten pod tím
@@ -109,3 +109,7 @@ Byla tam myšlenka na vytvoření portálu pro správu strojů, generování aut
 ČASOVÝ TEST
 	- nová data jsem na starém skriptu nemohl pustit, jelikož to padá na omezení řádků pro excelový sheet. Záznamů v signálu je více jak 1048575,
 	  a tak to i s hlavičkou dává 2048576, což už je limit. Celkem F, není to ošetřené pro haldu záznamů.
+	  
+	  
+IMPLEMENTAČNÍ INFO
+	- zvažoval jsem metodu Observer, nakonec nepoužita, protože nepotřebuju dynamicky měnit a nastavovat subscribery
