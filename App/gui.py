@@ -18,32 +18,30 @@ class TopWindowYesNo(customtkinter.CTkToplevel):
         self.after(50, self.lift)
 
         # Message
-        self.label = customtkinter.CTkLabel(self, text=msg, fg_color="white", corner_radius=6)
-        self.label.grid(row=0, column=0, columnspan=2, padx=10, pady=(20, 0), sticky="nswe")
+        self.msg = customtkinter.CTkLabel(self, text=msg, fg_color="white", corner_radius=6)
+        self.msg.grid(row=0, column=0, columnspan=2, padx=10, pady=(20, 0), sticky="nswe")
 
         # Do you really want to proceed?
-        self.label = customtkinter.CTkLabel(self, text="Do you really want to proceed?")
-        self.label.grid(row=1, column=0, columnspan=2, padx=10, pady=20, sticky="nswe")
+        self.question = customtkinter.CTkLabel(self, text="Do you really want to proceed?")
+        self.question.grid(row=1, column=0, columnspan=2, padx=10, pady=20, sticky="nswe")
 
         # YES button
-        self.btn_start = customtkinter.CTkButton(self, text="Yes", command=btn_callback_yes)
-        self.btn_start.grid(row=2, column=0, padx=10, pady=10, sticky="nswe")
+        self.btn_yes = customtkinter.CTkButton(self, text="Yes", command=btn_callback_yes)
+        self.btn_yes.grid(row=2, column=0, padx=10, pady=10, sticky="nswe")
 
         # NO button
-        self.btn_start = customtkinter.CTkButton(self, text="No", command=btn_callback_no)
-        self.btn_start.grid(row=2, column=1, padx=10, pady=10, sticky="nswe")
+        self.btn_no = customtkinter.CTkButton(self, text="No", command=btn_callback_no)
+        self.btn_no.grid(row=2, column=1, padx=10, pady=10, sticky="nswe")
         
         
 
 class DatabaseFrame(customtkinter.CTkFrame):
-    def __init__(self, master, config):
+    def __init__(self, master):
         super().__init__(master)
 
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=2)
         
-        self.my_config = config
-
         # Frame title
         self.title = customtkinter.CTkLabel(self, text="Database configuration", fg_color="orange", corner_radius=6)
         self.title.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="we")
@@ -62,7 +60,7 @@ class DatabaseFrame(customtkinter.CTkFrame):
         for i, name in enumerate(self.entry_names):
             label = customtkinter.CTkLabel(self, text=name[0], fg_color="transparent")
             label.grid(row=i+1, column=0, padx=15, pady=10, sticky="w")
-            entry = customtkinter.CTkEntry(self, placeholder_text=self.my_config["database"][name[1]])
+            entry = customtkinter.CTkEntry(self, placeholder_text=self.master.my_config["database"][name[1]])
             entry.grid(row=i+1, column=1, padx=10, pady=10, sticky="we")
 
             self.labels.append(label)
@@ -78,7 +76,7 @@ class DatabaseFrame(customtkinter.CTkFrame):
 
     def refresh(self) -> None:
         for entry in self.entries:
-            entry[0].configure(placeholder_text=self.my_config["database"][entry[1]])
+            entry[0].configure(placeholder_text=self.master.my_config["database"][entry[1]])
     
     
     def save_to_json(self) -> None:
@@ -86,21 +84,20 @@ class DatabaseFrame(customtkinter.CTkFrame):
         for entry in self.entries:
             val = str(entry[0].get())
             if not len(val) == 0:
-                self.my_config["database"][entry[1]] = val
+                self.master.my_config["database"][entry[1]] = val
 
         # write to the file:
         with open("config.json", "w") as file:
-            json.dump(self.my_config, file, indent=4)
+            json.dump(self.master.my_config, file, indent=4)
 
     
 
 class ProcessFrame(customtkinter.CTkFrame):
-    def __init__(self, master, config):
+    def __init__(self, master):
         super().__init__(master)
 
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=2)
-        self.my_config = config
 
         # Frame title
         self.title = customtkinter.CTkLabel(self, text="Process configuration", fg_color="orange", corner_radius=6)
@@ -118,7 +115,7 @@ class ProcessFrame(customtkinter.CTkFrame):
             switch = customtkinter.CTkSwitch(self, text=name[0])
             switch.grid(row=i+1, column=0, columnspan=2, padx=10, pady=10, sticky="w")
 
-            if self.my_config["settings"][name[1]]:
+            if self.master.my_config["settings"][name[1]]:
                 switch.select()
 
             self.switches.append((switch, name[1]))
@@ -131,7 +128,7 @@ class ProcessFrame(customtkinter.CTkFrame):
         for i, name in enumerate(entry_names):
             label = customtkinter.CTkLabel(self, text=name[0], fg_color="transparent")
             label.grid(row=i+1+len(self.switches), column=0, padx=10, pady=10, sticky="w")
-            entry = customtkinter.CTkEntry(self, placeholder_text=self.my_config["settings"][name[1]])
+            entry = customtkinter.CTkEntry(self, placeholder_text=self.master.my_config["settings"][name[1]])
             entry.grid(row=i+1+len(self.switches), column=1, padx=10, pady=10, sticky="we")
 
             self.labels.append(label)
@@ -149,7 +146,7 @@ class ProcessFrame(customtkinter.CTkFrame):
     
     def refresh(self) -> None:
         for entry in self.entries:
-            entry[0].configure(placeholder_text=self.my_config["settings"][entry[1]])
+            entry[0].configure(placeholder_text=self.master.my_config["settings"][entry[1]])
     
 
     def save_to_json(self) -> None:
@@ -157,9 +154,9 @@ class ProcessFrame(customtkinter.CTkFrame):
         for switch in self.switches:
             val = int(switch[0].get())
             if val == 1:
-                self.my_config["settings"][switch[1]] = True
+                self.master.my_config["settings"][switch[1]] = True
             if val == 0:
-                self.my_config["settings"][switch[1]] = False
+                self.master.my_config["settings"][switch[1]] = False
 
         for entry in self.entries:
             val = str(entry[0].get())
@@ -172,11 +169,11 @@ class ProcessFrame(customtkinter.CTkFrame):
                 except ValueError:
                     val = str(entry[0].get())
                 # save
-                self.my_config["settings"][entry[1]] = val
+                self.master.my_config["settings"][entry[1]] = val
 
         # write to the file:
         with open("config.json", "w") as file:
-            json.dump(self.my_config, file, indent=4)
+            json.dump(self.master.my_config, file, indent=4)
 
 
 
@@ -235,14 +232,9 @@ class ProgressFrame(customtkinter.CTkFrame):
 
 
 class ButtonsFrame(customtkinter.CTkFrame):
-    def __init__(self, master, db_frame, proc_frame, txt_box, top_window, progress):
+    def __init__(self, master):
         super().__init__(master)
-
-        self.database_frame = db_frame
-        self.process_frame = proc_frame
-        self.text_box = txt_box
-        self.toplevel_warning = top_window
-        self.progress_bar = progress
+        self.toplevel_warning = self.master.toplevel_window
 
         self.grid_columnconfigure((0, 1, 2, 3), weight=1)
         self.configure(fg_color="transparent")
@@ -260,7 +252,7 @@ class ButtonsFrame(customtkinter.CTkFrame):
         self.btn_save.grid(row=0, column=2, padx=5, pady=5, sticky="nswe")
 
         # define Save and Start button
-        self.btn_save_start = customtkinter.CTkButton(self, text="Save and Start", text_color_disabled="orange", command=self.btn_callback_savestart)
+        self.btn_save_start = customtkinter.CTkButton(self, text="Save and Start", text_color_disabled="orange", command=self.btn_callback_save_start)
         self.btn_save_start.grid(row=0, column=3, padx=5, pady=5, sticky="nswe")
 
 
@@ -276,7 +268,7 @@ class ButtonsFrame(customtkinter.CTkFrame):
         self.save()
         return
     
-    def btn_callback_savestart(self) -> None:
+    def btn_callback_save_start(self) -> None:
         self.save()
         self.start_process()
         return
@@ -285,22 +277,21 @@ class ButtonsFrame(customtkinter.CTkFrame):
         self.disable_buttons()
         # check if clean upload is selected
 
-
         # start process
-        self.progress_bar.show()
+        self.master.progress_bar.show()
 
         return 
 
     def save(self) -> None:
         # save json file
-        self.database_frame.save_to_json()
-        self.process_frame.save_to_json()
+        self.master.database_frame.save_to_json()
+        self.master.process_frame.save_to_json()
 
         # redraw 
-        self.database_frame.refresh()
-        self.process_frame.refresh()
+        self.master.database_frame.refresh()
+        self.master.process_frame.refresh()
 
-        self.text_box.write(f"Successfully saved!\n")
+        self.master.text_box.write(f"Successfully saved!\n")
 
     
     def disable_buttons(self) -> None:
@@ -341,10 +332,10 @@ class App(customtkinter.CTk):
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=1)
 
-        self.database_frame = DatabaseFrame(self, self.my_config)
+        self.database_frame = DatabaseFrame(self)
         self.database_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nswe")
         
-        self.process_frame = ProcessFrame(self, self.my_config)
+        self.process_frame = ProcessFrame(self)
         self.process_frame.grid(row=0, column=1, padx=10, pady=10, sticky="nswe")
 
         self.text_box = TextboxFrame(self)
@@ -353,14 +344,9 @@ class App(customtkinter.CTk):
         self.progress_bar = ProgressFrame(self)
         self.progress_bar.grid(row=2, column=0, columnspan=2, padx=0, pady=0, sticky="nswe")
 
-        self.button_frame = ButtonsFrame(self, self.database_frame, self.process_frame, self.text_box, self.toplevel_window, self.progress_bar)
+        self.button_frame = ButtonsFrame(self)
         self.button_frame.grid(row=3, column=0, padx=10, pady=10, columnspan=2, sticky="nswe")
 
-
-    def btn_callback(self):
-        self.text_box.write(f"You selected: {self.process_frame.get()}\n")
-        print("Database: ", self.database_frame.get())
-        print("Process: ", self.process_frame.get())
 
     def open_config(self):
         """Loads configure json file (config.json) from root directory. Returns json object."""
