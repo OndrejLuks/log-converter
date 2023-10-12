@@ -2,14 +2,38 @@ import customtkinter
 import json
 import sys
 
+# ================================================================================================================================
 
 class AppInterface():
+    """Interface for the App class.
+    
+    Attributes
+    ----------
+    - app
+        - reference to an instance of the App class
+        - required upon construction
+        
+    Methods
+    -------
+    - generate_pop_up (type, message, question, callback_yes, callback_no)
+    - kill_pop_up ()
+    - print_to_box (message)
+    - set_start_function (function)
+    - save_changes ()
+    - disable_buttons ()
+    - enable_buttons ()
+    - show_progress_bar ()
+    - hide_progress_bar ()
+    - update_progress_bar ()
+    """
+
     def __init__(self, app):
+        """Constructior of AppInterface"""
         self.app = app
 
     
     def generate_pop_up(self, type: str, message: str, question: str, callback_yes, callback_no) -> None:
-        """Generates a desired popup window with YES and NO buttons
+        """Generates a desired popup window with YES and NO buttons.
         
         Parametres
         ----------
@@ -39,7 +63,7 @@ class AppInterface():
     
 
     def print_to_box(self, message: str) -> None:
-        """Prints the given message into the GUI textbox
+        """Prints the given message into the GUI textbox.
         
         Parametres
         ----------
@@ -55,7 +79,7 @@ class AppInterface():
     
 
     def set_start_function(self, function) -> None:
-        """Sets desired callback start function to the Start and SaveStart button
+        """Sets desired callback start function to the Start and SaveStart button.
         
         Parametres
         ----------
@@ -74,7 +98,7 @@ class AppInterface():
     
 
     def save_changes(self) -> None:
-        """Saves changes made in the GUI to src\config.json file
+        """Saves changes made in the GUI to src\config.json file.
         
         Returns
         -------
@@ -85,7 +109,7 @@ class AppInterface():
     
 
     def disable_buttons(self) -> None:
-        """Disables following buttons: btn_save_start, btn_discard, btn_start
+        """Disables following buttons: btn_save_start, btn_discard, btn_start.
         
         Returns
         -------
@@ -96,7 +120,7 @@ class AppInterface():
     
 
     def enable_buttons(self) -> None:
-        """Enables following buttons: btn_save_start, btn_discard, btn_start
+        """Enables following buttons: btn_save_start, btn_discard, btn_start.
         
         Returns
         -------
@@ -107,7 +131,7 @@ class AppInterface():
     
     
     def show_progress_bar(self) -> None:
-        """Shows the progress bar under the textbox
+        """Shows the progress bar under the textbox.
         
         Returns
         -------
@@ -118,7 +142,7 @@ class AppInterface():
     
 
     def hide_progress_bar(self) -> None:
-        """Hides the progress bar under the textbox
+        """Hides the progress bar under the textbox.
         
         Returns
         -------
@@ -129,7 +153,7 @@ class AppInterface():
     
 
     def update_progress_bar(self, value) -> None:
-        """Updates the progress bar to the given value
+        """Updates the progress bar to the given value.
         
         Parametres
         ----------
@@ -143,9 +167,21 @@ class AppInterface():
         self.app.progress_bar.set_value(value)
         return
 
-
+# ================================================================================================================================
 
 class TopWindowYesNo(customtkinter.CTkToplevel):
+    """Class representing a yes/no pop-up window.
+    
+    Child of customtkinter.CTkToplevel.
+    
+    Attributes
+    ----------
+    - msg : customtkinter.CTkLabel
+    - question : customtkinter.CTkLabel
+    - btn_yes : customtkinter.CTkButton
+    - btn_no : customtkinter.CTkButton
+    """
+
     def __init__(self, type: str, msg: str, question: str, btn_callback_yes=None, btn_callback_no=None):
         super().__init__()
 
@@ -175,9 +211,25 @@ class TopWindowYesNo(customtkinter.CTkToplevel):
         self.btn_no = customtkinter.CTkButton(self, text="No", command=btn_callback_no)
         self.btn_no.grid(row=2, column=1, padx=10, pady=10, sticky="nswe")
         
-        
+# ================================================================================================================================        
 
 class DatabaseFrame(customtkinter.CTkFrame):
+    """Class representing the frame for database settings.
+    
+    Child of customtkinter.CTkFrame.
+    
+    Attributes
+    ----------
+    - title : customtkinter.CTkLabel
+    - entries : customtkinter.CTkEntry []
+    - labels : customtkinter.CTkLabel []
+        
+    Methods
+    -------
+    - refresh()
+    - save_to_json()
+    """
+
     def __init__(self, master):
         super().__init__(master)
 
@@ -209,19 +261,16 @@ class DatabaseFrame(customtkinter.CTkFrame):
             self.entries.append((entry, name[1]))
 
 
-    def get(self) -> list:
-        result = []
-        for entry in self.entries:
-            result.append(entry[0].get())
-        return result
-    
-
     def refresh(self) -> None:
+        """Updates dynamic elements of the GUI based on config.json content."""
         for entry in self.entries:
             entry[0].configure(placeholder_text=self.master.my_config["database"][entry[1]])
+
+        return
     
     
     def save_to_json(self) -> None:
+        """Saves database settings changes into the config.json file"""
         # update config
         for entry in self.entries:
             val = str(entry[0].get())
@@ -232,9 +281,28 @@ class DatabaseFrame(customtkinter.CTkFrame):
         with open("config.json", "w") as file:
             json.dump(self.master.my_config, file, indent=4)
 
-    
+        return
+
+# ================================================================================================================================   
 
 class ProcessFrame(customtkinter.CTkFrame):
+    """Class representing the frame for process settings.
+    
+    Child of customtkinter.CTkFrame.
+    
+    Attributes
+    ----------
+    - title : customtkinter.CTkLabel
+    - switches : customtkinter.CTkSwitch []
+    - entries : customtkinter.CTkEntry []
+    - labels : customtkinter.CTkLabel []
+        
+    Methods
+    -------
+    - refresh()
+    - save_to_json()
+    """
+    
     def __init__(self, master):
         super().__init__(master)
 
@@ -257,6 +325,7 @@ class ProcessFrame(customtkinter.CTkFrame):
             switch = customtkinter.CTkSwitch(self, text=name[0])
             switch.grid(row=i+1, column=0, columnspan=2, padx=10, pady=10, sticky="w")
 
+            # set default switch position
             if self.master.my_config["settings"][name[1]]:
                 switch.select()
 
@@ -275,23 +344,18 @@ class ProcessFrame(customtkinter.CTkFrame):
 
             self.labels.append(label)
             self.entries.append((entry, name[1]))
-
-
-    def get(self) -> list:
-        result = []
-        for switch in self.switches:
-            result.append(switch[0].get())
-        for entry in self.entries:
-            result.append(entry[0].get())
-        return result
     
     
     def refresh(self) -> None:
+        """Updates dynamic elements of the GUI based on config.json content."""
         for entry in self.entries:
             entry[0].configure(placeholder_text=self.master.my_config["settings"][entry[1]])
+
+        return
     
 
     def save_to_json(self) -> None:
+        """Saves process settings changes into the config.json file"""
         # update config
         for switch in self.switches:
             val = int(switch[0].get())
@@ -302,7 +366,6 @@ class ProcessFrame(customtkinter.CTkFrame):
 
         for entry in self.entries:
             val = str(entry[0].get())
-
             if not len(val) == 0:
                 # try to convert numbers from entries into string
                 try:
@@ -316,10 +379,26 @@ class ProcessFrame(customtkinter.CTkFrame):
         # write to the file:
         with open("config.json", "w") as file:
             json.dump(self.master.my_config, file, indent=4)
+        
+        return
 
-
+# ================================================================================================================================
 
 class TextboxFrame(customtkinter.CTkFrame):
+    """Class representing the frame for textbox.
+    
+    Child of customtkinter.CTkFrame.
+    
+    Attributes
+    ----------
+    - title : customtkinter.CTkLabel
+    - textbox : customtkinter.CTkTextbox
+        
+    Methods
+    -------
+    - write(msg)
+    """
+
     def __init__(self, master):
         super().__init__(master)
 
@@ -337,14 +416,42 @@ class TextboxFrame(customtkinter.CTkFrame):
 
 
     def write(self, msg: str) -> None:
+        """Prints the given message to the GUI's textbox.
+        
+        Parameters
+        ----------
+        - msg : str
+            - message to be printed
+        """
+        # make the textbox writeable
         self.textbox.configure(state="normal")
+        # insert message at the end
         self.textbox.insert("end", msg)
+        # scroll to the end
         self.textbox.see("end")
+        # make the textbox non-writeable
         self.textbox.configure(state="disabled")
+        return
 
-
+# ================================================================================================================================
 
 class ProgressFrame(customtkinter.CTkFrame):
+    """Class representing the frame for progress bar.
+    
+    Child of customtkinter.CTkFrame.
+    
+    Attributes
+    ----------
+    - title : customtkinter.CTkLabel
+    - progress : customtkinter.CTkProgressBar
+        
+    Methods
+    -------
+    - show()
+    - hide()
+    - set_value()
+    """
+
     def __init__(self, master):
         super().__init__(master)
 
@@ -361,25 +468,58 @@ class ProgressFrame(customtkinter.CTkFrame):
         self.progress.grid_forget()
 
     def show(self) -> None:
+        """Shows this object inside the master window."""
         self.title.grid(row=0, column=0, padx=10, pady=0, sticky="w")
         self.progress.grid(row=0, column=1, padx=10, pady=0, sticky="nsew")
+        return
 
     def hide(self) -> None:
+        """Hides this object within the master window."""
         self.title.grid_forget()
         self.progress.grid_forget()
+        return
 
-    def set_value(self, val) -> None:
+    def set_value(self, val: float) -> None:
+        """Sets given value to the progress bar.
+
+        Parameters
+        ----------
+        - val : float
+            - only numbers from closed interval <0 to 1>
+        """
         self.progress.set(val)
+        return
 
-
+# ================================================================================================================================
 
 class ButtonsFrame(customtkinter.CTkFrame):
+    """Class representing the frame for buttons.
+    
+    Child of customtkinter.CTkFrame.
+    
+    Attributes
+    ----------
+    - start_function : callable
+    - btn_discard : customtkinter.CTkButton
+    - btn_start : customtkinter.CTkButton
+    - btn_save : customtkinter.CTkButton
+    - btn_save_start : customtkinter.CTkButton
+        
+    Methods
+    -------
+    - btn_callback_discard()
+    - btn_callback_start()
+    - btn_callback_save_start()
+    - disable_buttons()
+    - enable_buttons()
+    - exit_program()
+    """
+
     def __init__(self, master):
         super().__init__(master)
-        self.toplevel_warning = self.master.toplevel_window
+        self.start_function = None
 
         self.grid_columnconfigure((0, 1, 2, 3), weight=1)
-        self.start_function = None
         self.configure(fg_color="transparent")
         
         # define Discard changes button
@@ -400,6 +540,7 @@ class ButtonsFrame(customtkinter.CTkFrame):
 
 
     def btn_callback_discard(self) -> None:
+        """Callback function for the discard button. Opens a new toplevel window."""
         tpe = "WARNING!"
         msge = "All changes you made will not be saved."
         ques = "Do you really want to proceed?"
@@ -408,6 +549,7 @@ class ButtonsFrame(customtkinter.CTkFrame):
     
 
     def btn_callback_start(self) -> None:
+        """Callback function for the start button. Defined via AppInterface."""
         # runtime-defined
         if self.start_function is not None:
             self.start_function()
@@ -416,6 +558,7 @@ class ButtonsFrame(customtkinter.CTkFrame):
     
 
     def btn_callback_save_start(self) -> None:
+        """Callback function for the Save and Start button. Defined via AppInterface."""
         self.master.save()
         # runtime-defined
         if self.start_function is not None:
@@ -424,23 +567,49 @@ class ButtonsFrame(customtkinter.CTkFrame):
 
 
     def disable_buttons(self) -> None:
+        """Makes several buttons unclickable"""
         self.btn_discard.configure(state="disabled")
         self.btn_start.configure(state="disabled")
         self.btn_save_start.configure(state="disabled")
+        return
     
 
     def enable_buttons(self) -> None:
+        """Restores buttons to be clickable again"""
         self.btn_discard.configure(state="normal")
         self.btn_start.configure(state="normal")
         self.btn_save_start.configure(state="normal")
+        return
 
 
     def exit_program(self) -> None:
         sys.exit(0)
 
-
+# ================================================================================================================================
 
 class App(customtkinter.CTk):
+    """Main GUI window class. Container for all of the frames.
+    
+    Child of customtkinter.CTk.
+    
+    Attributes
+    ----------
+    - my_config : json
+    - toplevel_window
+    - database_frame : DatabaseFrame
+    - process_frame : ProcessFrame
+    - text_box : TextboxFrame
+    - progress_bar : ProgressFrame
+    - button_frame : ButtonsFrame
+        
+    Methods
+    -------
+    - open_config()
+    - open_toplevel(type, mesage, question, callback_yes, callback_no)
+    - kill_toplevel()
+    - save()
+    """
+
     def __init__(self):
         super().__init__()
 
@@ -485,6 +654,25 @@ class App(customtkinter.CTk):
     
     
     def open_toplevel(self, type: str, message: str, question: str, callback_yes, callback_no) -> None:
+        """Opens a toplevel window over the main window with given parameters and YES/NO buttons.
+        
+        Parametres
+        ----------
+        - type : str
+            - Name of the window
+        - message : str
+            - Displayed message in the white box
+        - question : str
+            - Displayed question under the message
+        - callback_yes
+            - Function assigned to the YES button
+        - callback_no
+            - Function assigned to the NO button
+            
+        Returns
+        -------
+        None"""
+
         # check for window existance
         if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
             # create toplevel window
@@ -496,6 +684,7 @@ class App(customtkinter.CTk):
     
 
     def save(self) -> None:
+        """Saves all possible changes into the config.json file."""
         self.database_frame.save_to_json()
         self.process_frame.save_to_json()
 
@@ -508,10 +697,12 @@ class App(customtkinter.CTk):
     
 
     def kill_toplevel(self) -> None:
+        """Destroyes the toplevel window"""
         self.toplevel_window.destroy()
         self.toplevel_window.update()
         return
 
+# ================================================================================================================================
 
 app = App()
 app.mainloop()
