@@ -3,8 +3,150 @@ import json
 import sys
 
 
+class AppInterface():
+    def __init__(self, app):
+        self.app = app
+
+    
+    def generate_pop_up(self, type: str, message: str, question: str, callback_yes, callback_no) -> None:
+        """Generates a desired popup window with YES and NO buttons
+        
+        Parametres
+        ----------
+        - type : str
+            - Name of the window
+        - message : str
+            - Displayed message in the white box
+        - question : str
+            - Displayed question under the message
+        - callback_yes
+            - Function assigned to the YES button
+        - callback_no
+            - Function assigned to the NO button
+            
+        Returns
+        -------
+        None"""
+
+        self.app.open_toplevel(type, message, question, callback_yes, callback_no)
+        return
+    
+
+    def kill_pop_up(self) -> None:
+        """Closes the currently open toplevel pop-up"""
+        app.kill_toplevel()
+        return
+    
+
+    def print_to_box(self, message: str) -> None:
+        """Prints the given message into the GUI textbox
+        
+        Parametres
+        ----------
+        - message : str
+            - Message to be printed
+        
+        Returns
+        -------
+        None"""
+        
+        self.app.text_box.write(message)
+        return
+    
+
+    def set_start_function(self, function) -> None:
+        """Sets desired callback start function to the Start and SaveStart button
+        
+        Parametres
+        ----------
+        - function
+            - This function will be assigned as a callback to the buttons
+            
+        Returns
+        -------
+        None"""
+
+        if not callable(function):
+            raise ValueError("The provided parameter is not a function!")
+
+        self.app.button_frame.start_function = function
+        return
+    
+
+    def save_changes(self) -> None:
+        """Saves changes made in the GUI to src\config.json file
+        
+        Returns
+        -------
+        None"""
+
+        self.app.save()
+        return
+    
+
+    def disable_buttons(self) -> None:
+        """Disables following buttons: btn_save_start, btn_discard, btn_start
+        
+        Returns
+        -------
+        None"""
+
+        self.app.button_frame.disable_buttons()
+        return
+    
+
+    def enable_buttons(self) -> None:
+        """Enables following buttons: btn_save_start, btn_discard, btn_start
+        
+        Returns
+        -------
+        None"""
+
+        self.app.button_frame.enable_buttons()
+        return
+    
+    
+    def show_progress_bar(self) -> None:
+        """Shows the progress bar under the textbox
+        
+        Returns
+        -------
+        None"""
+
+        self.app.progress_bar.show()
+        return
+    
+
+    def hide_progress_bar(self) -> None:
+        """Hides the progress bar under the textbox
+        
+        Returns
+        -------
+        None"""  
+
+        self.app.progress_bar.hide()
+        return
+    
+
+    def update_progress_bar(self, value) -> None:
+        """Updates the progress bar to the given value
+        
+        Parametres
+        ----------
+        - value
+            - float value of progress, between 0 and 1
+            
+        Returns
+        -------
+        None"""
+
+        self.app.progress_bar.set_value(value)
+        return
+
+
+
 class TopWindowYesNo(customtkinter.CTkToplevel):
-    def __init__(self, type: str, msg: str, btn_callback_yes=None, btn_callback_no=None):
+    def __init__(self, type: str, msg: str, question: str, btn_callback_yes=None, btn_callback_no=None):
         super().__init__()
 
         self.minsize(300, 150)
@@ -22,7 +164,7 @@ class TopWindowYesNo(customtkinter.CTkToplevel):
         self.msg.grid(row=0, column=0, columnspan=2, padx=10, pady=(20, 0), sticky="nswe")
 
         # Do you really want to proceed?
-        self.question = customtkinter.CTkLabel(self, text="Do you really want to proceed?")
+        self.question = customtkinter.CTkLabel(self, text=question)
         self.question.grid(row=1, column=0, columnspan=2, padx=10, pady=20, sticky="nswe")
 
         # YES button
@@ -237,6 +379,7 @@ class ButtonsFrame(customtkinter.CTkFrame):
         self.toplevel_warning = self.master.toplevel_window
 
         self.grid_columnconfigure((0, 1, 2, 3), weight=1)
+        self.start_function = None
         self.configure(fg_color="transparent")
         
         # define Discard changes button
@@ -248,7 +391,7 @@ class ButtonsFrame(customtkinter.CTkFrame):
         self.btn_start.grid(row=0, column=1, padx=5, pady=5, sticky="nswe")
 
         # define Save button
-        self.btn_save = customtkinter.CTkButton(self, text="Save", text_color_disabled="orange", command=self.btn_callback_save)
+        self.btn_save = customtkinter.CTkButton(self, text="Save", text_color_disabled="orange", command=self.master.save)
         self.btn_save.grid(row=0, column=2, padx=5, pady=5, sticky="nswe")
 
         # define Save and Start button
@@ -257,64 +400,43 @@ class ButtonsFrame(customtkinter.CTkFrame):
 
 
     def btn_callback_discard(self) -> None:
-        self.open_toplevel("WARNING!", "Any changes you made will not be saved.", yes_fc=self.exit_program, no_fc=self.kill_toplevel_window)
+        tpe = "WARNING!"
+        msge = "All changes you made will not be saved."
+        ques = "Do you really want to proceed?"
+        self.master.open_toplevel(tpe, msge, ques, self.exit_program, self.master.kill_toplevel)
         return
     
+
     def btn_callback_start(self) -> None:
-        self.start_process()
+        # runtime-defined
+        if self.start_function is not None:
+            self.start_function()
+
         return
     
-    def btn_callback_save(self) -> None:
-        self.save()
-        return
-    
+
     def btn_callback_save_start(self) -> None:
-        self.save()
-        self.start_process()
+        self.master.save()
+        # runtime-defined
+        if self.start_function is not None:
+            self.start_function()
         return
-    
-    def start_process(self) -> None:
-        self.disable_buttons()
-        # check if clean upload is selected
 
-        # start process
-        self.master.progress_bar.show()
 
-        return 
-
-    def save(self) -> None:
-        # save json file
-        self.master.database_frame.save_to_json()
-        self.master.process_frame.save_to_json()
-
-        # redraw 
-        self.master.database_frame.refresh()
-        self.master.process_frame.refresh()
-
-        self.master.text_box.write(f"Successfully saved!\n")
-
-    
     def disable_buttons(self) -> None:
         self.btn_discard.configure(state="disabled")
         self.btn_start.configure(state="disabled")
         self.btn_save_start.configure(state="disabled")
     
-    def restore_buttons(self) -> None:
+
+    def enable_buttons(self) -> None:
         self.btn_discard.configure(state="normal")
         self.btn_start.configure(state="normal")
         self.btn_save_start.configure(state="normal")
 
-    def open_toplevel(self,type: str, msg: str, yes_fc=None, no_fc=None) -> None:
-        if self.toplevel_warning is None or not self.toplevel_warning.winfo_exists():
-            self.toplevel_warning = TopWindowYesNo(type, msg, yes_fc, no_fc)
 
     def exit_program(self) -> None:
         sys.exit(0)
-    
-    def kill_toplevel_window(self) -> None:
-        # delete the window
-        self.toplevel_warning.destroy()
-        self.toplevel_warning.update()
 
 
 
@@ -360,6 +482,30 @@ class App(customtkinter.CTk):
             sys.exit(1)
     
         return data
+    
+    
+    def open_toplevel(self, type: str, message: str, question: str, callback_yes, callback_no) -> None:
+        if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
+            self.toplevel_window = TopWindowYesNo(type, message, question, callback_yes, callback_no)
+        return
+    
+
+    def save(self) -> None:
+        self.database_frame.save_to_json()
+        self.process_frame.save_to_json()
+
+        # redraw 
+        self.database_frame.refresh()
+        self.process_frame.refresh()
+
+        self.text_box.write(f"Successfully saved!\n")
+        return
+    
+
+    def kill_toplevel(self) -> None:
+        self.toplevel_window.destroy()
+        self.toplevel_window.update()
+        return
 
 
 app = App()
