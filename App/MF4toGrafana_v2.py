@@ -21,6 +21,7 @@ import sys
 import json
 import pytz
 import shutil
+import warnings
 import threading
 import can_decoder
 import canedge_browser
@@ -72,7 +73,9 @@ def convert_mf4(mf4_file: os.path, dbc_list: list, write_info: bool) -> list:
     # write time info if required
     if write_info:
         print("   - writing time information into MF4-info.csv... ")
-        write_time_info(mf4_file, df_phys.index[0], df_phys.index[-1])
+        # check if df is not empty
+        if df_phys.shape[0] > 0:
+            write_time_info(mf4_file, df_phys.index[0], df_phys.index[-1])
 
     print("   - extracting individual signals... ")
     return split_df_by_cols(df_phys)
@@ -133,6 +136,7 @@ def split_df_by_cols(df) -> list:
 
 def write_time_info(file: str, start_time, end_time) -> None:
     """Writes start and end timestamp information about inputted file into MF4-info.csv"""
+
     try:
         file_name = os.path.relpath(file, "SourceMF4")
         prg_timezone = pytz.timezone('Europe/Prague')
@@ -328,9 +332,16 @@ def prompt_warning(schema_name) -> None:
         else:
             print('   Unknown response. Try again, please:  ', end='')
 
+# -----------------------------------------------------------------------------------------------------------
+
+def warning_handler(message, category, filename, lineo, file=None, line=None) -> None:
+    """Handles warnings for more compact vizualization. Mostly only because of blank signal convertion."""
+    print(f"     - warning: {message}")
+
 # ===========================================================================================================
 
 def main():
+    warnings.showwarning = warning_handler
     print()
     # read configuration
     print("Reading config file ...  ", end="")
