@@ -485,8 +485,13 @@ class App(customtkinter.CTk):
     
     
     def open_toplevel(self, type: str, message: str, question: str, callback_yes, callback_no) -> None:
+        # check for window existance
         if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
+            # create toplevel window
             self.toplevel_window = TopWindowYesNo(type, message, question, callback_yes, callback_no)
+            # position the toplevel window relatively to the main window
+            self.toplevel_window.geometry("+%d+%d" %(self.winfo_x()+200, self.winfo_y()+200))
+
         return
     
 
