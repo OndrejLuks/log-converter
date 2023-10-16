@@ -21,7 +21,8 @@ class AppInterface():
         
     Methods
     -------
-    - generate_pop_up (type, message, question, callback_yes, callback_no)
+    - generate_pop_up_yn (type, message, question, callback_yes, callback_no)
+    - generate_pop_up_ok (type, message)
     - kill_pop_up ()
     - print_to_box (message)
     - set_start_function (function)
@@ -38,7 +39,7 @@ class AppInterface():
         self.app = app
 
     
-    def generate_pop_up(self, type: str, message: str, question: str, callback_yes, callback_no) -> None:
+    def generate_pop_up_yn(self, type: str, message: str, question: str, callback_yes, callback_no) -> None:
         """Generates a desired popup window with YES and NO buttons.
         
         Parametres
@@ -58,7 +59,25 @@ class AppInterface():
         -------
         None"""
 
-        self.app.open_toplevel(type, message, question, callback_yes, callback_no)
+        self.app.open_toplevel_yn(type, message, question, callback_yes, callback_no)
+        return
+    
+
+    def generate_pop_up_ok(self, type: str, message: str) -> None:
+        """Generates a message popup window with OK button.
+        
+        Parametres
+        ----------
+        - type : str
+            - Name of the window
+        - message : str
+            - Displayed message in the white box
+            
+        Returns
+        -------
+        None"""
+
+        self.app.open_toplevel_ok(type, message)
         return
     
 
@@ -217,7 +236,52 @@ class TopWindowYesNo(customtkinter.CTkToplevel):
         self.btn_no = customtkinter.CTkButton(self, text="No", command=btn_callback_no)
         self.btn_no.grid(row=2, column=1, padx=10, pady=10, sticky="nswe")
         
-# ================================================================================================================================        
+# ================================================================================================================================
+
+class TopWindowOk(customtkinter.CTkToplevel):
+    """Class representing a warning pop-up window.
+    
+    Child of customtkinter.CTkToplevel.
+    
+    Attributes
+    ----------
+    - msg : customtkinter.CTkLabel
+    - question : customtkinter.CTkLabel
+    - btn_ok : customtkinter.CTkButton
+
+    Methods
+    -------
+    - close()
+    """
+
+    def __init__(self, type: str, msg: str):
+        super().__init__()
+
+        self.minsize(300, 120)
+        self.resizable(False, False)
+        self.title(type)
+        self.configure(fg_color="orange")
+        self.grid_columnconfigure(0, weight=1)
+       
+        # bring the window into the foregroud
+        self.after(50, self.lift)
+
+        # Message
+        self.msg = customtkinter.CTkLabel(self, text=msg, fg_color="white", corner_radius=6)
+        self.msg.grid(row=0, column=0, padx=10, pady=(20, 0), sticky="nswe")
+
+        # OK button
+        self.btn_ok = customtkinter.CTkButton(self, text="Okay", command=self.close)
+        self.btn_ok.grid(row=1, column=0, padx=10, pady=10, sticky="swe")
+
+
+    def close(self) -> None:
+        """Destroys the toplevel window"""
+        self.destroy()
+        self.update()
+        return
+        
+# ================================================================================================================================         
 
 class DatabaseFrame(customtkinter.CTkFrame):
     """Class representing the frame for database settings.
@@ -275,7 +339,7 @@ class DatabaseFrame(customtkinter.CTkFrame):
         return
     
     
-    def save_to_json(self) -> None:
+    def save_to_json(self) -> bool:
         """Saves database settings changes into the config.json file"""
         # update config
         for entry in self.entries:
@@ -287,7 +351,7 @@ class DatabaseFrame(customtkinter.CTkFrame):
         with open("config.json", "w") as file:
             json.dump(self.master.my_config, file, indent=4)
 
-        return
+        return True
 
 # ================================================================================================================================   
 
@@ -360,7 +424,7 @@ class ProcessFrame(customtkinter.CTkFrame):
         return
     
 
-    def save_to_json(self) -> None:
+    def save_to_json(self) -> bool:
         """Saves process settings changes into the config.json file"""
         # update config
         for switch in self.switches:
@@ -378,7 +442,9 @@ class ProcessFrame(customtkinter.CTkFrame):
                     val = int(val)
 
                 except ValueError:
-                    val = str(entry[0].get())
+                    self.master.open_toplevel_ok("WARNING", f'"{val}" is not a number!')
+                    return False
+                
                 # save
                 self.master.my_config["settings"][entry[1]] = val
 
@@ -386,7 +452,7 @@ class ProcessFrame(customtkinter.CTkFrame):
         with open("config.json", "w") as file:
             json.dump(self.master.my_config, file, indent=4)
         
-        return
+        return True
 
 # ================================================================================================================================
 
@@ -550,7 +616,7 @@ class ButtonsFrame(customtkinter.CTkFrame):
         tpe = "WARNING!"
         msge = "All changes you made will not be saved."
         ques = "Do you really want to proceed?"
-        self.master.open_toplevel(tpe, msge, ques, self.exit_program, self.master.kill_toplevel)
+        self.master.open_toplevel_yn(tpe, msge, ques, self.exit_program, self.master.kill_toplevel)
         return
     
 
@@ -611,7 +677,8 @@ class App(customtkinter.CTk):
     Methods
     -------
     - open_config()
-    - open_toplevel(type, mesage, question, callback_yes, callback_no)
+    - open_toplevel_yn(type, mesage, question, callback_yes, callback_no)
+    - open_toplevel_ok(type, message)
     - kill_toplevel()
     - save()
     """
@@ -659,7 +726,7 @@ class App(customtkinter.CTk):
         return data
     
     
-    def open_toplevel(self, type: str, message: str, question: str, callback_yes, callback_no) -> None:
+    def open_toplevel_yn(self, type: str, message: str, question: str, callback_yes, callback_no) -> None:
         """Opens a toplevel window over the main window with given parameters and YES/NO buttons.
         
         Parametres
@@ -689,21 +756,46 @@ class App(customtkinter.CTk):
         return
     
 
+    def open_toplevel_ok(self, type: str, message: str) -> None:
+        """Opens a toplevel window over the main window with given message and OK button.
+        
+        Parametres
+        ----------
+        - type : str
+            - Name of the window
+        - message : str
+            - Displayed message in the white box
+            
+        Returns
+        -------
+        None"""
+
+        # check for window existance
+        if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
+            # create toplevel window
+            self.toplevel_window = TopWindowOk(type, message)
+            # position the toplevel window relatively to the main window
+            self.toplevel_window.geometry("+%d+%d" %(self.winfo_x()+200, self.winfo_y()+200))
+
+        return
+    
+
     def save(self) -> None:
         """Saves all possible changes into the config.json file."""
-        self.database_frame.save_to_json()
-        self.process_frame.save_to_json()
+        if self.database_frame.save_to_json() and self.process_frame.save_to_json():
+            self.text_box.write(f"Successfully saved!\n")
+        else:
+            self.text_box.write(f"Failed to save.\n")
 
         # redraw 
         self.database_frame.refresh()
         self.process_frame.refresh()
 
-        self.text_box.write(f"Successfully saved!\n")
         return
     
 
     def kill_toplevel(self) -> None:
-        """Destroyes the toplevel window"""
+        """Destroys the toplevel window"""
         self.toplevel_window.destroy()
         self.toplevel_window.update()
         return
