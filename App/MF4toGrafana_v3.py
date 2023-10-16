@@ -25,12 +25,17 @@ import warnings
 import threading
 import can_decoder
 import canedge_browser
+import multiprocessing
 
 
 # ==========================================================================================================================
 # ==========================================================================================================================
 
 class Utils():
+    def __init__(self, interface):
+        self.gui_interface = interface
+
+    
     def write_time_info(self, file: str, start_time, end_time) -> None:
         """Writes start and end timestamp information about inputted file into MF4-info.csv"""
 
@@ -50,8 +55,8 @@ class Utils():
                 f.write(file_name + "," + str(start_time) + "," + str(end_time) + "\n")
 
         except Exception as e:
-            print()
-            print(f"INFO RECORDING WARNING:  {e}") 
+            self.gui_interface.print_to_box()
+            self.gui_interface.print_to_box(f"INFO RECORDING WARNING:  {e}\n") 
 
 
     def get_MF4_files(self, top_level: str) -> list:
@@ -68,14 +73,14 @@ class Utils():
                         out.append(mf4_file)
 
         except Exception as e:
-            print()
-            print(f"MF4 READING WARNING:  {e}") 
+            self.gui_interface.print_to_box()
+            self.gui_interface.print_to_box(f"MF4 READING WARNING:  {e}\n") 
             sys.exit(1)
 
         if len(out) == 0:
-            print()
-            print("WARNING: No MF4 files found!")
-            print()
+            self.gui_interface.print_to_box()
+            self.gui_interface.print_to_box("WARNING: No MF4 files found!\n")
+            self.gui_interface.print_to_box()
 
         return out, len(out)
 
@@ -89,8 +94,8 @@ class Utils():
                     if not os.listdir(dir_path):
                         os.rmdir(dir_path)
         except OSError:
-            print()
-            print(f"ERROR: Failed to remove empty subdirs of root {top_level}")
+            self.gui_interface.print_to_box()
+            self.gui_interface.print_to_box(f"ERROR: Failed to remove empty subdirs of root {top_level}\n")
             sys.exit(1)
 
 
@@ -107,11 +112,11 @@ class Utils():
             shutil.move(file, target_file)
 
         except Exception as e:
-            print()
-            print(f"FILE MOVING WARNING:  {e}")
+            self.gui_interface.print_to_box()
+            self.gui_interface.print_to_box(f"FILE MOVING WARNING:  {e}\n")
 
         # remove empty source folders
-        self.utils.rm_empty_subdirs("SourceMF4")
+        self.rm_empty_subdirs("SourceMF4")
 
 
     def create_dir(self, target_dir: str) -> None:
@@ -121,8 +126,8 @@ class Utils():
                 os.makedirs(target_dir)
 
         except Exception as e:
-            print()
-            print(f"DIR CREATION WARNING:  {e}") 
+            self.gui_interface.print_to_box()
+            self.gui_interface.print_to_box(f"DIR CREATION WARNING:  {e}\n") 
 
 # ==========================================================================================================================
 
@@ -133,23 +138,28 @@ class Process():
         self.config = None
         self.dbc_list = self.create_dbc_list()
 
-        # TODO: Assign the start function into the start button
+        self.gui_interface.set_start_function(self.run_process_handle)
 
 
+    def run(self) -> None:
+        self.gui_interface.run()
+        return
+    
+    
     def open_config(self):
         """Loads configure json file (config.json) from root directory. Returns json object."""
-        print("Reading config file ...  ", end="")
+        self.gui_interface.print_to_box("Reading config file ...  ")
 
         try:
             with open(os.path.join("src", "config.json"), "r") as file:
                 data = json.load(file)
 
         except FileNotFoundError:
-            print()
-            print("ERROR while reading src\config.json file. Check for file existance.")
+            self.gui_interface.print_to_box()
+            self.gui_interface.print_to_box("ERROR while reading src\config.json file. Check for file existance.\n")
             sys.exit(1)
 
-        print("done!")
+        self.gui_interface.print_to_box("done!\n")
         return data
     
 
@@ -168,8 +178,8 @@ class Process():
                     db_list.append(db)
 
         except OSError:
-            print()
-            print("ERROR while loading DBC files. Check for file existance.")
+            self.gui_interface.print_to_box()
+            self.gui_interface.print_to_box("ERROR while loading DBC files. Check for file existance.\n")
             sys.exit(1)
 
         return db_list
@@ -202,12 +212,12 @@ class Process():
 
         # write time info if required
         if self.config["settings"]["write_time_info"]:
-            print("   - writing time information into MF4-info.csv... ")
+            self.gui_interface.print_to_box("   - writing time information into MF4-info.csv... \n")
             # check if df is not empty
             if df_phys.shape[0] > 0:
                 self.utils.write_time_info(mf4_file, df_phys.index[0], df_phys.index[-1])
 
-        print("   - extracting individual signals... ")
+        self.gui_interface.print_to_box("   - extracting individual signals... \n")
         return self.split_df_by_cols(df_phys)
 
 
@@ -218,7 +228,7 @@ class Process():
         if num_rows > 0:
             sig_name = df.columns.values[0]
             with lock:
-                print(f"     > started aggregating signal: {sig_name}")
+                self.gui_interface.print_to_box(f"     > started aggregating signal: {sig_name}\n")
             # create an array of indexes to use as a mask for the dataframe
             idx_array = []
             # insert first index into the array
@@ -244,7 +254,7 @@ class Process():
             # safely store the aggregated signal
             with lock:
                 dfs.append(result_df)
-                print(f"     = finished agg. signal: {sig_name}")
+                self.gui_interface.print_to_box(f"     = finished agg. signal: {sig_name}\n")
                 
 
     def split_df_by_cols(self, df) -> list:
@@ -264,8 +274,17 @@ class Process():
 
 # -----------------------------------------------------------------------------------------------------------
 
+    def run_process_handle(self) -> None:    
+        thread = threading.Thread(target=self.process_handle)
+        thread.start()
+        return
+
+
     def process_handle(self) -> None:
         """Function that handles MF4 files process from conversion to upload"""
+
+        self.gui_interface.disable_buttons()
+        self.gui_interface.show_progress_bar()
         
         # TODO: Load and check configuration
         self.config = self.open_config()
@@ -273,7 +292,7 @@ class Process():
         if self.config["settings"]["clean_upload"]:
             # if not popup(yes/no)
                 # return
-            print("OOF, THE WHOLE DB IS GONE!")
+            self.gui_interface.print_to_box("OOF, THE WHOLE DB IS GONE!\n")
 
         # prepare the database
         db = myDB.DatabaseHandle(self.config)
@@ -287,7 +306,7 @@ class Process():
         try: 
             for file in mf4_file_list:
                 # CONVERT FILE into Signal files
-                print(f" - Converting: {file}")
+                self.gui_interface.print_to_box(f" - Converting: {file}\n")
             
                 dfs_to_upload = []
                 converted_files = self.convert_mf4(file)
@@ -295,7 +314,7 @@ class Process():
                 # AGGREGATE if requested
                 if self.config["settings"]["aggregate"]:
                     threads = []
-                    print("   - aggregating... ")
+                    self.gui_interface.print_to_box("   - aggregating... \n")
                     # run each signal in a different thread
                     lock = Lock()
                     for signal_df in converted_files:
@@ -311,46 +330,51 @@ class Process():
                     dfs_to_upload = converted_files
 
                 # UPLOAD TO DB
-                print("   - uploading... ")
+                self.gui_interface.print_to_box("   - uploading... \n")
                 db.upload_data(dfs_to_upload)
     
                 # MOVE DONE FILES if requested
                 if self.config["settings"]["move_done_files"]:
-                    print("   - moving the file... ")
+                    self.gui_interface.print_to_box("   - moving the file... \n")
                     self.utils.move_done_file(file)
 
                 num_of_done_mf4_files += 1
-                print(f"   - DONE!     Overall progress:  {round((num_of_done_mf4_files / num_of_mf4_files)*100, 2)} %")
-                print()
+                self.gui_interface.print_to_box(f"   - DONE!     Overall progress:  {round((num_of_done_mf4_files / num_of_mf4_files)*100, 2)} %\n")
+                self.gui_interface.update_progress_bar(round((num_of_done_mf4_files / num_of_mf4_files), 2))
+                self.gui_interface.print_to_box()
 
         except Exception as e:
-            print()
-            print(f"Process ERROR:  {e}")
+            self.gui_interface.print_to_box()
+            self.gui_interface.enable_buttons()
+            self.gui_interface.print_to_box(f"Process ERROR:  {e}\n")
             sys.exit(1)
+
+        self.gui_interface.enable_buttons()
+        self.gui_interface.hide_progress_bar()
+
+        self.gui_interface.print_to_box()
+        self.gui_interface.print_to_box("                                      ~ \n")           
+        self.gui_interface.print_to_box("Everything completed successfully!  c[_]\n")
+        self.gui_interface.print_to_box()
+        return
 
 # ==========================================================================================================================
 
 def warning_handler(message, category, filename, lineo, file=None, line=None) -> None:
     """Handles warnings for more compact vizualization. Mostly only because of blank signal convertion."""
-    print(f"     - warning: {message}")
+    return
 
 # ==========================================================================================================================
 
 def main():
     warnings.showwarning = warning_handler
 
-
     app_gui = gui.App()
     app_interface = gui.AppInterface(app_gui)
-    app_utilities = Utils()
+    app_utilities = Utils(app_interface)
 
     app = Process(app_interface, app_utilities)
-    app.process_handle()
-
-    print()
-    print("                                      ~ ")           
-    print("Everything completed successfully!  c[_]")
-    print()
+    app.run()
 
 # ==========================================================================================================================
 

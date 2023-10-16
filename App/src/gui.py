@@ -100,7 +100,7 @@ class AppInterface():
         return
     
 
-    def print_to_box(self, message: str) -> None:
+    def print_to_box(self, message: str = '\n') -> None:
         """Prints the given message into the GUI textbox.
         
         Parametres
@@ -361,7 +361,7 @@ class DatabaseFrame(customtkinter.CTkFrame):
                 self.master.my_config["database"][entry[1]] = val
 
         # write to the file:
-        with open("config.json", "w") as file:
+        with open(os.path.join("src", "config.json"), "w") as file:
             json.dump(self.master.my_config, file, indent=4)
 
         return True
@@ -462,7 +462,7 @@ class ProcessFrame(customtkinter.CTkFrame):
                 self.master.my_config["settings"][entry[1]] = val
 
         # write to the file:
-        with open("config.json", "w") as file:
+        with open(os.path.join("src", "config.json"), "w") as file:
             json.dump(self.master.my_config, file, indent=4)
         
         return True
@@ -497,7 +497,7 @@ class TextboxFrame(customtkinter.CTkFrame):
         # define textbox
         self.textbox = customtkinter.CTkTextbox(master=self, corner_radius=0, activate_scrollbars=True, wrap="word")
         self.textbox.grid(row=1, column=0, sticky="nsew")
-        self.textbox.configure(state="disabled")
+        self.textbox.configure(state="disabled", font=("Courier New", 12))
 
 
     def write(self, msg: str = "\n") -> None:
