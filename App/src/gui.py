@@ -7,6 +7,7 @@
 import customtkinter
 import json
 import sys
+import os
 
 # ================================================================================================================================
 
@@ -38,6 +39,18 @@ class AppInterface():
         """Constructior of AppInterface"""
         self.app = app
 
+    
+    def run(self) -> None:
+        """Runs and shows the GUI application
+        
+        Returns
+        -------
+        None
+        """
+
+        self.app.mainloop()
+        return
+    
     
     def generate_pop_up_yn(self, type: str, message: str, question: str, callback_yes, callback_no) -> None:
         """Generates a desired popup window with YES and NO buttons.
@@ -83,7 +96,7 @@ class AppInterface():
 
     def kill_pop_up(self) -> None:
         """Closes the currently open toplevel pop-up"""
-        app.kill_toplevel()
+        self.app.kill_toplevel()
         return
     
 
@@ -487,7 +500,7 @@ class TextboxFrame(customtkinter.CTkFrame):
         self.textbox.configure(state="disabled")
 
 
-    def write(self, msg: str) -> None:
+    def write(self, msg: str = "\n") -> None:
         """Prints the given message to the GUI's textbox.
         
         Parameters
@@ -715,12 +728,12 @@ class App(customtkinter.CTk):
     def open_config(self):
         """Loads configure json file (config.json) from root directory. Returns json object."""
         try:
-            with open("config.json", "r") as file:
+            with open(os.path.join("src", "config.json"), "r") as file:
                 data = json.load(file)
 
         except FileNotFoundError:
             print()
-            print("ERROR while reading config.json file. Check for file existance.")
+            print("ERROR while reading src\config.json file. Check for file existance.")
             sys.exit(1)
     
         return data
@@ -799,8 +812,3 @@ class App(customtkinter.CTk):
         self.toplevel_window.destroy()
         self.toplevel_window.update()
         return
-
-# ================================================================================================================================
-
-app = App()
-app.mainloop()
