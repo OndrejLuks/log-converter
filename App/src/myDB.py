@@ -7,7 +7,7 @@ import sys
 # ===========================================================================================================
 
 class DatabaseHandle:
-    def __init__(self, config):
+    def __init__(self, config, interface):
         self.schema_name = config["database"]["schema_name"]
         self.host = config["database"]["host"]
         self.port = config["database"]["port"]
@@ -18,6 +18,8 @@ class DatabaseHandle:
         self.hasPkey = False
 
         self.conn_string = "postgresql://" + self.user + ":" + self.password + "@" + self.host + "/" + self.database
+
+        self.gui_interface = interface
 
 # -----------------------------------------------------------------------------------------------------------
 
@@ -38,8 +40,8 @@ class DatabaseHandle:
             pass
 
         except Exception as e:
-            print()
-            print(f"WARNING - querry:  {e}")
+            self.gui_interface.print_to_box()
+            self.gui_interface.print_to_box(f"WARNING - querry:  {e}\n")
 
 # -----------------------------------------------------------------------------------------------------------
 
@@ -50,9 +52,9 @@ class DatabaseHandle:
             self.connection = self.engine.connect()
 
         except Exception as e:
-            print()
-            print(f"DB CONNECTION ERROR:  {e}")
-            sys.exit(1)
+            self.gui_interface.print_to_box()
+            self.gui_interface.print_to_box(f"DB CONNECTION ERROR:  {e}\n")
+            self.gui_interface.exit()
 
 # -----------------------------------------------------------------------------------------------------------    
 
@@ -62,19 +64,19 @@ class DatabaseHandle:
             if self.clean:
                 # clean upload is selected
                 if self.connection.dialect.has_schema(self.connection, self.schema_name):
-                    print(f" - Dropping schema {self.schema_name}")
+                    self.gui_interface.print_to_box(f" - Dropping schema {self.schema_name}\n")
                     self._querry(f"DROP SCHEMA {self.schema_name} CASCADE")
 
             if not self.connection.dialect.has_schema(self.connection, self.schema_name):
-                print(f" - Creating schema {self.schema_name}")
+                self.gui_interface.print_to_box(f" - Creating schema {self.schema_name}\n")
                 self.connection.execute(schema.CreateSchema(self.schema_name))
                 self.connection.commit()
 
                 
         except Exception as e:
-            print()
-            print(f"ERROR - schema:  {e}")
-            sys.exit(1)
+            self.gui_interface.print_to_box()
+            self.gui_interface.print_to_box(f"ERROR - schema:  {e}\n")
+            self.gui_interface.exit()
     
 # -----------------------------------------------------------------------------------------------------------
 
@@ -83,7 +85,7 @@ class DatabaseHandle:
         for df in data:
             try:
                 table_name = f"{df.columns.values[0]}"
-                print(f"     > uploading signal: {table_name}")
+                self.gui_interface.print_to_box(f"     > uploading signal: {table_name}\n")
                 df.to_sql(name=table_name,
                             con=self.engine,
                             schema=self.schema_name,
@@ -95,22 +97,22 @@ class DatabaseHandle:
                 self._querry(f'ALTER TABLE {self.schema_name}."{table_name}" ADD PRIMARY KEY (time_stamp)')
 
             except IntegrityError:
-                print("       - WARNING: Skipping signal upload due to unique violation. This record already exists in the DB.")
+                self.gui_interface.print_to_box("       - WARNING: Skipping signal upload due to unique violation. This record already exists in the DB.\n")
             
             except Exception as e:
-                print()
-                print(f"DB UPLOAD WARNING:  {e}")
+                self.gui_interface.print_to_box()
+                self.gui_interface.print_to_box(f"DB UPLOAD WARNING:  {e}\n")
     
 # -----------------------------------------------------------------------------------------------------------
 
     def finish(self) -> None:
         """Function to handle database connection closing"""
         try:
-            print("Closing database connection ...  ", end="")
+            self.gui_interface.print_to_box("Closing database connection ...  ")
             self.connection.close()
-            print("done!")
+            self.gui_interface.print_to_box("done!\n")
             
         except Exception as e:
-            print()
-            print(f"DB CLOSING ERROR:  {e}")
+            self.gui_interface.print_to_box()
+            self.gui_interface.print_to_box(f"DB CLOSING ERROR:  {e}\n")
 

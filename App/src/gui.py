@@ -223,7 +223,18 @@ class AppInterface():
 
         self.app.progress_bar.set_value(value)
         return
+    
 
+    def exit(self) -> None:
+        """Exists the process on given thread
+        
+        Returns
+        -------
+        None
+        """
+        self.enable_buttons()
+        sys.exit(0)
+        
 # ================================================================================================================================
 
 class TopWindowYesNo(customtkinter.CTkToplevel):
@@ -383,7 +394,7 @@ class DatabaseFrame(customtkinter.CTkFrame):
         with open(os.path.join("src", "config.json"), "w") as file:
             json.dump(self.master.my_config, file, indent=4)
 
-        return True
+        return True        
 
 # ================================================================================================================================   
 

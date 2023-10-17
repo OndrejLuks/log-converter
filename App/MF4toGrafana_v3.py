@@ -25,7 +25,6 @@ import warnings
 import threading
 import can_decoder
 import canedge_browser
-import multiprocessing
 
 
 # ==========================================================================================================================
@@ -75,7 +74,7 @@ class Utils():
         except Exception as e:
             self.gui_interface.print_to_box()
             self.gui_interface.print_to_box(f"MF4 READING WARNING:  {e}\n") 
-            sys.exit(1)
+            self.gui_interface.exit()
 
         if len(out) == 0:
             self.gui_interface.print_to_box()
@@ -96,7 +95,7 @@ class Utils():
         except OSError:
             self.gui_interface.print_to_box()
             self.gui_interface.print_to_box(f"ERROR: Failed to remove empty subdirs of root {top_level}\n")
-            sys.exit(1)
+            self.gui_interface.exit()
 
 
     def move_done_file(self, file: os.path) -> None:
@@ -157,7 +156,7 @@ class Process():
         except FileNotFoundError:
             self.gui_interface.print_to_box()
             self.gui_interface.print_to_box("ERROR while reading src\config.json file. Check for file existance.\n")
-            sys.exit(1)
+            self.gui_interface.exit()
 
         self.gui_interface.print_to_box("done!\n")
         return data
@@ -180,7 +179,7 @@ class Process():
         except OSError:
             self.gui_interface.print_to_box()
             self.gui_interface.print_to_box("ERROR while loading DBC files. Check for file existance.\n")
-            sys.exit(1)
+            self.gui_interface.exit()
 
         return db_list
 
@@ -304,7 +303,7 @@ class Process():
         self.gui_interface.show_progress_bar()
 
         # prepare the database
-        db = myDB.DatabaseHandle(self.config)
+        db = myDB.DatabaseHandle(self.config, self.gui_interface)
         db.connect()
         db.create_schema()        
 
@@ -356,7 +355,7 @@ class Process():
             self.gui_interface.print_to_box()
             self.gui_interface.enable_buttons()
             self.gui_interface.print_to_box(f"Process ERROR:  {e}\n")
-            sys.exit(1)
+            self.gui_interface.exit()
 
         self.gui_interface.enable_buttons()
         self.gui_interface.hide_progress_bar()
