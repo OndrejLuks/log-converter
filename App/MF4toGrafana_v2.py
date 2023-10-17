@@ -255,7 +255,7 @@ def process_handle(dbc_list: set, config) -> None:
     """Function that handles MF4 files process from conversion to upload"""
     
     # prepare the database
-    db = myDB.DatabaseHandle(config)
+    db = myDB.DatabaseHandle(config, None)
     db.connect()
     db.create_schema()
     

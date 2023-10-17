@@ -197,9 +197,10 @@ class Process():
 
 # -----------------------------------------------------------------------------------------------------------
 
-    def run_process_handle(self) -> None:    
+    def run_process_handle(self) -> None:
         thread = threading.Thread(target=self.process_handle)
         thread.start()
+
         return
 
 # -----------------------------------------------------------------------------------------------------------
