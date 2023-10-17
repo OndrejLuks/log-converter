@@ -138,7 +138,7 @@ class Process():
         self.config = None
         self.dbc_list = self.create_dbc_list()
 
-        self.gui_interface.set_start_function(self.run_process_handle)
+        self.gui_interface.set_start_function(self.safe_run_process_handle)
 
 
     def run(self) -> None:
@@ -273,7 +273,25 @@ class Process():
         return column_df
 
 # -----------------------------------------------------------------------------------------------------------
+    
+    def safe_run_process_handle(self) -> None:
+        # load config
+        self.config = self.open_config()
+        
+        # check DB override
+        if self.config["settings"]["clean_upload"]:
+            type = "WARNING!"
+            msg = 'With "Clean upload" enabled, the whole current database will be erased!'
+            ques = "Do you really want to proceed?"
+            self.gui_interface.generate_pop_up_yn(type, msg, ques, lambda: self.gui_interface.callback_w_toplevel_kill(self.run_process_handle), self.gui_interface.kill_pop_up)
+        
+        else:
+            # run the process
+            self.run_process_handle()
 
+        return
+
+    
     def run_process_handle(self) -> None:    
         thread = threading.Thread(target=self.process_handle)
         thread.start()
@@ -282,17 +300,8 @@ class Process():
 
     def process_handle(self) -> None:
         """Function that handles MF4 files process from conversion to upload"""
-
         self.gui_interface.disable_buttons()
         self.gui_interface.show_progress_bar()
-        
-        # TODO: Load and check configuration
-        self.config = self.open_config()
-
-        if self.config["settings"]["clean_upload"]:
-            # if not popup(yes/no)
-                # return
-            self.gui_interface.print_to_box("OOF, THE WHOLE DB IS GONE!\n")
 
         # prepare the database
         db = myDB.DatabaseHandle(self.config)

@@ -51,8 +51,27 @@ class AppInterface():
         self.app.mainloop()
         return
     
+
+    def callback_w_toplevel_kill(self, callback_fn: callable) -> None:
+        """Runs the given callback function and kills toplevel window.
+        
+        Parameters
+        ----------
+        - callback_fn
+            - function to call
+            
+        Returns
+        -------
+        None
+        """
+        if callback_fn is not None:
+            callback_fn()
+
+        self.kill_pop_up()
+        return
     
-    def generate_pop_up_yn(self, type: str, message: str, question: str, callback_yes, callback_no) -> None:
+    
+    def generate_pop_up_yn(self, type: str, message: str, question: str, callback_yes: callable, callback_no: callable) -> None:
         """Generates a desired popup window with YES and NO buttons.
         
         Parametres
@@ -70,8 +89,8 @@ class AppInterface():
             
         Returns
         -------
-        None"""
-
+        None
+        """
         self.app.open_toplevel_yn(type, message, question, callback_yes, callback_no)
         return
     
