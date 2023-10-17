@@ -13,14 +13,11 @@
 
 from datetime import timedelta
 from threading import Lock
-from src import procData, mfd, myDB, gui
+from src import procData, mfd, myDB, gui, utils
 from pathlib import Path
 import pandas as pd
 import os
-import sys
 import json
-import pytz
-import shutil
 import warnings
 import threading
 import can_decoder
@@ -30,108 +27,9 @@ import canedge_browser
 # ==========================================================================================================================
 # ==========================================================================================================================
 
-class Utils():
-    def __init__(self, interface):
-        self.gui_interface = interface
-
-    
-    def write_time_info(self, file: str, start_time, end_time) -> None:
-        """Writes start and end timestamp information about inputted file into MF4-info.csv"""
-
-        try:
-            file_name = os.path.relpath(file, "SourceMF4")
-            prg_timezone = pytz.timezone('Europe/Prague')
-            start_time = start_time.astimezone(prg_timezone)
-            end_time = end_time.astimezone(prg_timezone)
-
-            # create header if file does not exist
-            if not os.path.exists("MF4-info.csv"):
-                with open('MF4-info.csv', 'a') as f:
-                    f.write("file_name,recorded_from,recorded_to\n")
-
-            # write file informatin
-            with open('MF4-info.csv', 'a') as f:
-                f.write(file_name + "," + str(start_time) + "," + str(end_time) + "\n")
-
-        except Exception as e:
-            self.gui_interface.print_to_box()
-            self.gui_interface.print_to_box(f"INFO RECORDING WARNING:  {e}\n") 
-
-
-    def get_MF4_files(self, top_level: str) -> list:
-        """Generates a list of paths to all found MF4 files in the SourceMF4 folder. Returns also the number of found files."""
-        out = []
-        try:
-            # search for MF4 files
-            for root, dirs, files in os.walk(top_level):
-                # mostly "files" consists of only 1 file
-                for file in files:
-                    if file.endswith(".MF4"):
-                        # found MF4 file
-                        mf4_file = os.path.join(root, file)
-                        out.append(mf4_file)
-
-        except Exception as e:
-            self.gui_interface.print_to_box()
-            self.gui_interface.print_to_box(f"MF4 READING WARNING:  {e}\n") 
-            self.gui_interface.exit()
-
-        if len(out) == 0:
-            self.gui_interface.print_to_box()
-            self.gui_interface.print_to_box("WARNING: No MF4 files found!\n")
-            self.gui_interface.print_to_box()
-
-        return out, len(out)
-
-
-    def rm_empty_subdirs(self, top_level: str) -> None:
-        """Removes empty directories in given root"""
-        try:
-            for root, dirs, files in os.walk(top_level, topdown=False):
-                for dir_name in dirs:
-                    dir_path = os.path.join(root, dir_name)
-                    if not os.listdir(dir_path):
-                        os.rmdir(dir_path)
-        except OSError:
-            self.gui_interface.print_to_box()
-            self.gui_interface.print_to_box(f"ERROR: Failed to remove empty subdirs of root {top_level}\n")
-            self.gui_interface.exit()
-
-
-    def move_done_file(self, file: os.path) -> None:
-        """Moves given file from SourceMF4 folder to DoneMF4 folder"""
-        # get target file path
-        target_file = file.replace("SourceMF4", "DoneMF4")
-        # get and create target directory
-        target_dir = os.path.dirname(target_file)
-        self.create_dir(target_dir)
-
-        try:
-            # move the file
-            shutil.move(file, target_file)
-
-        except Exception as e:
-            self.gui_interface.print_to_box()
-            self.gui_interface.print_to_box(f"FILE MOVING WARNING:  {e}\n")
-
-        # remove empty source folders
-        self.rm_empty_subdirs("SourceMF4")
-
-
-    def create_dir(self, target_dir: str) -> None:
-        """Creates given directory if it doesn't exist"""
-        try:
-            if not os.path.exists(target_dir):
-                os.makedirs(target_dir)
-
-        except Exception as e:
-            self.gui_interface.print_to_box()
-            self.gui_interface.print_to_box(f"DIR CREATION WARNING:  {e}\n") 
-
-# ==========================================================================================================================
 
 class Process():
-    def __init__(self, gui_interface: gui.AppInterface, utilities: Utils):
+    def __init__(self, gui_interface: gui.AppInterface, utilities: utils.Utils):
         self.gui_interface = gui_interface
         self.utils = utilities
         self.config = None
@@ -139,12 +37,14 @@ class Process():
 
         self.gui_interface.set_start_function(self.safe_run_process_handle)
 
+# -----------------------------------------------------------------------------------------------------------
 
     def run(self) -> None:
         self.gui_interface.run()
         return
-    
-    
+
+# -----------------------------------------------------------------------------------------------------------    
+
     def open_config(self):
         """Loads configure json file (config.json) from root directory. Returns json object."""
         self.gui_interface.print_to_box("Reading config file ...  ")
@@ -161,6 +61,7 @@ class Process():
         self.gui_interface.print_to_box("done!\n")
         return data
     
+# -----------------------------------------------------------------------------------------------------------
 
     def create_dbc_list(self) -> list:
         """""Creates a list of loaded DBC files via can_decoder"""""
@@ -183,12 +84,14 @@ class Process():
 
         return db_list
 
+# -----------------------------------------------------------------------------------------------------------
 
     def setup_fs(self) -> canedge_browser.LocalFileSystem:
         """Sets up a filesystem required for signal extraxtion from raw MF4"""
         base_path = Path(__file__).parent
         return canedge_browser.LocalFileSystem(base_path=base_path)
 
+# -----------------------------------------------------------------------------------------------------------
 
     def convert_mf4(self, mf4_file: os.path) -> list:
         """Converts and decodes MF4 files to a dataframe using DBC files."""
@@ -219,6 +122,7 @@ class Process():
         self.gui_interface.print_to_box("   - extracting individual signals... \n")
         return self.split_df_by_cols(df_phys)
 
+# -----------------------------------------------------------------------------------------------------------
 
     def aggregate(self, df, lock: threading.Lock, dfs: list) -> None:
         """Aggregates input signal dataframe by removing redundant values"""
@@ -254,7 +158,8 @@ class Process():
             with lock:
                 dfs.append(result_df)
                 self.gui_interface.print_to_box(f"     = finished agg. signal: {sig_name}\n")
-                
+
+# -----------------------------------------------------------------------------------------------------------                
 
     def split_df_by_cols(self, df) -> list:
         """Extracts and returns individual signals from given converted physica-value-dataframe"""
@@ -290,12 +195,14 @@ class Process():
 
         return
 
-    
+# -----------------------------------------------------------------------------------------------------------
+
     def run_process_handle(self) -> None:    
         thread = threading.Thread(target=self.process_handle)
         thread.start()
         return
 
+# -----------------------------------------------------------------------------------------------------------
 
     def process_handle(self) -> None:
         """Function that handles MF4 files process from conversion to upload"""
@@ -344,7 +251,7 @@ class Process():
                 # MOVE DONE FILES if requested
                 if self.config["settings"]["move_done_files"]:
                     self.gui_interface.print_to_box("   - moving the file... \n")
-                    self.utils.move_done_file(file)
+                    self.utils.move_done_file(file, "SourceMF4")
 
                 num_of_done_mf4_files += 1
                 self.gui_interface.print_to_box(f"   - DONE!     Overall progress:  {round((num_of_done_mf4_files / num_of_mf4_files)*100, 2)} %\n")
@@ -379,7 +286,7 @@ def main():
 
     app_gui = gui.App()
     app_interface = gui.AppInterface(app_gui)
-    app_utilities = Utils(app_interface)
+    app_utilities = utils.Utils(app_interface)
 
     app = Process(app_interface, app_utilities)
     app.run()

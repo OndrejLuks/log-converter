@@ -1,15 +1,20 @@
 # Made by Ondrej Luks, 2023
 # ondrej.luks@doosan.com
 
+
 # ================================================================================================================================
 # ================================================================================================================================
+
 
 import customtkinter
 import json
 import sys
 import os
 
-# ================================================================================================================================
+
+# ==========================================================================================================================
+# ==========================================================================================================================
+
 
 class AppInterface():
     """Interface for the App class.
@@ -39,6 +44,7 @@ class AppInterface():
         """Constructior of AppInterface"""
         self.app = app
 
+# -----------------------------------------------------------------------------------------------------------
     
     def run(self) -> None:
         """Runs and shows the GUI application
@@ -50,7 +56,8 @@ class AppInterface():
 
         self.app.mainloop()
         return
-    
+
+# -----------------------------------------------------------------------------------------------------------
 
     def callback_w_toplevel_kill(self, callback_fn: callable) -> None:
         """Runs the given callback function and kills toplevel window.
@@ -69,7 +76,8 @@ class AppInterface():
 
         self.kill_pop_up()
         return
-    
+
+# -----------------------------------------------------------------------------------------------------------
     
     def generate_pop_up_yn(self, type: str, message: str, question: str, callback_yes: callable, callback_no: callable) -> None:
         """Generates a desired popup window with YES and NO buttons.
@@ -93,7 +101,8 @@ class AppInterface():
         """
         self.app.open_toplevel_yn(type, message, question, callback_yes, callback_no)
         return
-    
+
+# -----------------------------------------------------------------------------------------------------------
 
     def generate_pop_up_ok(self, type: str, message: str) -> None:
         """Generates a message popup window with OK button.
@@ -112,12 +121,14 @@ class AppInterface():
         self.app.open_toplevel_ok(type, message)
         return
     
+# -----------------------------------------------------------------------------------------------------------
 
     def kill_pop_up(self) -> None:
         """Closes the currently open toplevel pop-up"""
         self.app.kill_toplevel()
         return
-    
+
+# -----------------------------------------------------------------------------------------------------------
 
     def print_to_box(self, message: str = '\n') -> None:
         """Prints the given message into the GUI textbox.
@@ -133,7 +144,8 @@ class AppInterface():
         
         self.app.text_box.write(message)
         return
-    
+
+# -----------------------------------------------------------------------------------------------------------
 
     def set_start_function(self, function) -> None:
         """Sets desired callback start function to the Start and SaveStart button.
@@ -152,7 +164,8 @@ class AppInterface():
 
         self.app.button_frame.start_function = function
         return
-    
+
+# -----------------------------------------------------------------------------------------------------------
 
     def save_changes(self) -> None:
         """Saves changes made in the GUI to src\config.json file.
@@ -163,7 +176,8 @@ class AppInterface():
 
         self.app.save()
         return
-    
+
+# -----------------------------------------------------------------------------------------------------------
 
     def disable_buttons(self) -> None:
         """Disables following buttons: btn_save_start, btn_discard, btn_start.
@@ -174,7 +188,8 @@ class AppInterface():
 
         self.app.button_frame.disable_buttons()
         return
-    
+
+# -----------------------------------------------------------------------------------------------------------
 
     def enable_buttons(self) -> None:
         """Enables following buttons: btn_save_start, btn_discard, btn_start.
@@ -185,7 +200,8 @@ class AppInterface():
 
         self.app.button_frame.enable_buttons()
         return
-    
+
+# -----------------------------------------------------------------------------------------------------------
     
     def show_progress_bar(self) -> None:
         """Shows the progress bar under the textbox.
@@ -196,7 +212,8 @@ class AppInterface():
 
         self.app.progress_bar.show()
         return
-    
+
+# -----------------------------------------------------------------------------------------------------------
 
     def hide_progress_bar(self) -> None:
         """Hides the progress bar under the textbox.
@@ -207,7 +224,8 @@ class AppInterface():
 
         self.app.progress_bar.hide()
         return
-    
+
+# -----------------------------------------------------------------------------------------------------------
 
     def update_progress_bar(self, value) -> None:
         """Updates the progress bar to the given value.
@@ -223,7 +241,8 @@ class AppInterface():
 
         self.app.progress_bar.set_value(value)
         return
-    
+
+# -----------------------------------------------------------------------------------------------------------
 
     def exit(self) -> None:
         """Exists the process on given thread
@@ -380,7 +399,7 @@ class DatabaseFrame(customtkinter.CTkFrame):
             entry[0].configure(placeholder_text=self.master.my_config["database"][entry[1]])
 
         return
-    
+
     
     def save_to_json(self) -> bool:
         """Saves database settings changes into the config.json file"""
@@ -457,7 +476,7 @@ class ProcessFrame(customtkinter.CTkFrame):
 
             self.labels.append(label)
             self.entries.append((entry, name[1]))
-    
+
     
     def refresh(self) -> None:
         """Updates dynamic elements of the GUI based on config.json content."""
@@ -465,7 +484,7 @@ class ProcessFrame(customtkinter.CTkFrame):
             entry[0].configure(placeholder_text=self.master.my_config["settings"][entry[1]])
 
         return
-    
+
 
     def save_to_json(self) -> bool:
         """Saves process settings changes into the config.json file"""
@@ -582,17 +601,20 @@ class ProgressFrame(customtkinter.CTkFrame):
         self.progress.set(0)
         self.progress.grid_forget()
 
+
     def show(self) -> None:
         """Shows this object inside the master window."""
         self.title.grid(row=0, column=0, padx=10, pady=0, sticky="w")
         self.progress.grid(row=0, column=1, padx=10, pady=0, sticky="nsew")
         return
 
+
     def hide(self) -> None:
         """Hides this object within the master window."""
         self.title.grid_forget()
         self.progress.grid_forget()
         return
+
 
     def set_value(self, val: float) -> None:
         """Sets given value to the progress bar.
