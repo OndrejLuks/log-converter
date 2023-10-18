@@ -269,13 +269,13 @@ class TopWindowYesNo(customtkinter.CTkToplevel):
     - btn_no : customtkinter.CTkButton
     """
 
-    def __init__(self, type: str, msg: str, question: str, btn_callback_yes=None, btn_callback_no=None):
-        super().__init__()
+    def __init__(self, master, type: str, msg: str, question: str, btn_callback_yes=None, btn_callback_no=None):
+        super().__init__(master)
 
         self.minsize(300, 150)
         self.resizable(False, False)
         self.title(type)
-        self.configure(fg_color="orange")
+        self.configure(fg_color=self.master.col_popup_yn_bg)
 
         self.grid_columnconfigure((0, 1), weight=1)
         
@@ -283,19 +283,19 @@ class TopWindowYesNo(customtkinter.CTkToplevel):
         self.after(50, self.lift)
 
         # Message
-        self.msg = customtkinter.CTkLabel(self, text=msg, fg_color="white", corner_radius=6)
+        self.msg = customtkinter.CTkLabel(self, text=msg, fg_color=self.master.col_popup_yn_lab, text_color=self.master.col_popup_yn_tx, corner_radius=6)
         self.msg.grid(row=0, column=0, columnspan=2, padx=10, pady=(20, 0), sticky="nswe")
 
-        # Do you really want to proceed?
-        self.question = customtkinter.CTkLabel(self, text=question)
+        # Question
+        self.question = customtkinter.CTkLabel(self, text=question, text_color=self.master.col_popup_yn_tx)
         self.question.grid(row=1, column=0, columnspan=2, padx=10, pady=20, sticky="nswe")
 
         # YES button
-        self.btn_yes = customtkinter.CTkButton(self, text="Yes", command=btn_callback_yes)
+        self.btn_yes = customtkinter.CTkButton(self, text="Yes", text_color=self.master.col_btn_tx, command=btn_callback_yes)
         self.btn_yes.grid(row=2, column=0, padx=10, pady=10, sticky="nswe")
 
         # NO button
-        self.btn_no = customtkinter.CTkButton(self, text="No", command=btn_callback_no)
+        self.btn_no = customtkinter.CTkButton(self, text="No", text_color=self.master.col_btn_tx, command=btn_callback_no)
         self.btn_no.grid(row=2, column=1, padx=10, pady=10, sticky="nswe")
         
 # ================================================================================================================================
@@ -316,24 +316,24 @@ class TopWindowOk(customtkinter.CTkToplevel):
     - close()
     """
 
-    def __init__(self, type: str, msg: str):
-        super().__init__()
+    def __init__(self, master, type: str, msg: str):
+        super().__init__(master)
 
         self.minsize(300, 120)
         self.resizable(False, False)
         self.title(type)
-        self.configure(fg_color="orange")
+        self.configure(fg_color=self.master.col_popup_ok_bg)
         self.grid_columnconfigure(0, weight=1)
        
         # bring the window into the foregroud
         self.after(50, self.lift)
 
         # Message
-        self.msg = customtkinter.CTkLabel(self, text=msg, fg_color="white", corner_radius=6)
+        self.msg = customtkinter.CTkLabel(self, text=msg, fg_color=self.master.col_popup_ok_lab, text_color=self.master.col_popup_ok_tx, corner_radius=6)
         self.msg.grid(row=0, column=0, padx=10, pady=(20, 0), sticky="nswe")
 
         # OK button
-        self.btn_ok = customtkinter.CTkButton(self, text="Okay", command=self.close)
+        self.btn_ok = customtkinter.CTkButton(self, text="Okay", text_color=self.master.col_btn_tx, command=self.close)
         self.btn_ok.grid(row=1, column=0, padx=10, pady=10, sticky="swe")
 
 
@@ -369,7 +369,7 @@ class DatabaseFrame(customtkinter.CTkFrame):
         self.grid_columnconfigure(1, weight=2)
         
         # Frame title
-        self.title = customtkinter.CTkLabel(self, text="Database configuration", fg_color="orange", corner_radius=6)
+        self.title = customtkinter.CTkLabel(self, text="Database configuration", fg_color=self.master.col_frame_title_bg, text_color=self.master.col_frame_title_tx, corner_radius=6)
         self.title.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="we")
         
         # define entry names
@@ -442,7 +442,7 @@ class ProcessFrame(customtkinter.CTkFrame):
         self.grid_columnconfigure(1, weight=2)
 
         # Frame title
-        self.title = customtkinter.CTkLabel(self, text="Process configuration", fg_color="orange", corner_radius=6)
+        self.title = customtkinter.CTkLabel(self, text="Process configuration", fg_color=self.master.col_frame_title_bg, text_color=self.master.col_frame_title_tx, corner_radius=6)
         self.title.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="we")
 
         # define switch names
@@ -597,7 +597,7 @@ class ProgressFrame(customtkinter.CTkFrame):
         self.title.grid_forget()
         
         # define progress bar
-        self.progress = customtkinter.CTkProgressBar(master=self, mode="determinate", corner_radius=0, progress_color=("green", "green"), height=1)
+        self.progress = customtkinter.CTkProgressBar(master=self, mode="determinate", corner_radius=0, fg_color=self.master.col_progress_bg, progress_color=self.master.col_progress_bar, height=1)
         self.progress.set(0)
         self.progress.grid_forget()
 
@@ -660,19 +660,19 @@ class ButtonsFrame(customtkinter.CTkFrame):
         self.configure(fg_color="transparent")
         
         # define Discard changes button
-        self.btn_discard = customtkinter.CTkButton(self, text="Discard changes", text_color_disabled="orange", command=self.btn_callback_discard)
+        self.btn_discard = customtkinter.CTkButton(self, text="Discard changes", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self.btn_callback_discard)
         self.btn_discard.grid(row=0, column=0, padx=5, pady=5, sticky="nswe")
 
         # define Start button
-        self.btn_start = customtkinter.CTkButton(self, text="Start", text_color_disabled="orange", command=self.btn_callback_start)
+        self.btn_start = customtkinter.CTkButton(self, text="Start", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self.btn_callback_start)
         self.btn_start.grid(row=0, column=1, padx=5, pady=5, sticky="nswe")
 
         # define Save button
-        self.btn_save = customtkinter.CTkButton(self, text="Save", text_color_disabled="orange", command=self.master.save)
+        self.btn_save = customtkinter.CTkButton(self, text="Save", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self.master.save)
         self.btn_save.grid(row=0, column=2, padx=5, pady=5, sticky="nswe")
 
         # define Save and Start button
-        self.btn_save_start = customtkinter.CTkButton(self, text="Save and Start", text_color_disabled="orange", command=self.btn_callback_save_start)
+        self.btn_save_start = customtkinter.CTkButton(self, text="Save and Start", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self.btn_callback_save_start)
         self.btn_save_start.grid(row=0, column=3, padx=5, pady=5, sticky="nswe")
 
 
@@ -751,6 +751,21 @@ class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
 
+        # set colors
+        customtkinter.set_appearance_mode("system")
+        self.col_frame_title_bg = "#5e5e5e"
+        self.col_frame_title_tx = "white"
+        self.col_popup_yn_bg = "orange"
+        self.col_popup_yn_lab = "white"
+        self.col_popup_yn_tx = "black"
+        self.col_popup_ok_bg = "orange"
+        self.col_popup_ok_lab = "white"
+        self.col_popup_ok_tx = "black"
+        self.col_progress_bg = "#dbdbdb"
+        self.col_progress_bar = "#21cc29"
+        self.col_btn_tx = "white"
+        self.col_btn_dis_tx = "#1d4566"
+
         self.my_config = self.open_config()
         self.toplevel_window = None
 
@@ -814,7 +829,7 @@ class App(customtkinter.CTk):
         # check for window existance
         if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
             # create toplevel window
-            self.toplevel_window = TopWindowYesNo(type, message, question, callback_yes, callback_no)
+            self.toplevel_window = TopWindowYesNo(self, type, message, question, callback_yes, callback_no)
             # position the toplevel window relatively to the main window
             self.toplevel_window.geometry("+%d+%d" %(self.winfo_x()+200, self.winfo_y()+200))
 
@@ -838,7 +853,7 @@ class App(customtkinter.CTk):
         # check for window existance
         if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
             # create toplevel window
-            self.toplevel_window = TopWindowOk(type, message)
+            self.toplevel_window = TopWindowOk(self, type, message)
             # position the toplevel window relatively to the main window
             self.toplevel_window.geometry("+%d+%d" %(self.winfo_x()+200, self.winfo_y()+200))
 
