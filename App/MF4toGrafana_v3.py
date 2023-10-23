@@ -22,7 +22,6 @@ import warnings
 import threading
 import can_decoder
 import canedge_browser
-import multiprocessing
 
 
 # ==========================================================================================================================
@@ -30,34 +29,36 @@ import multiprocessing
 
 
 class Process():
-    def __init__(self, utilities: utils.Utils):
+    def __init__(self, gui_interface: gui.AppInterface, utilities: utils.Utils):
+        self.gui_interface = gui_interface
         self.utils = utilities
         self.config = None
         self.dbc_list = self.create_dbc_list()
 
+        self.gui_interface.set_start_function(self.safe_run_process_handle)
+
 # -----------------------------------------------------------------------------------------------------------
 
-    def await_orders(self, connection) -> None:
-        while(True):
-            event = connection.recv()
-            if event == "run":
-                self.safe_run_process_handle()
-            else:
-                print(event)
+    def run(self) -> None:
+        self.gui_interface.run()
+        return
 
 # -----------------------------------------------------------------------------------------------------------    
 
     def open_config(self):
         """Loads configure json file (config.json) from root directory. Returns json object."""
+        self.gui_interface.print_to_box("Reading config file ...  ")
 
         try:
             with open(os.path.join("src", "config.json"), "r") as file:
                 data = json.load(file)
 
         except FileNotFoundError:
-            print()
-            print("ERROR while reading src\config.json file. Check for file existance.\n")
+            self.gui_interface.print_to_box()
+            self.gui_interface.print_to_box("ERROR while reading src\config.json file. Check for file existance.\n")
+            self.gui_interface.exit()
 
+        self.gui_interface.print_to_box("done!\n")
         return data
     
 # -----------------------------------------------------------------------------------------------------------
@@ -77,8 +78,9 @@ class Process():
                     db_list.append(db)
 
         except OSError:
-            print()
-            print("ERROR while loading DBC files. Check for file existance.\n")
+            self.gui_interface.print_to_box()
+            self.gui_interface.print_to_box("ERROR while loading DBC files. Check for file existance.\n")
+            self.gui_interface.exit()
 
         return db_list
 
@@ -112,12 +114,12 @@ class Process():
 
         # write time info if required
         if self.config["settings"]["write_time_info"]:
-            print("   - writing time information into MF4-info.csv... \n")
+            self.gui_interface.print_to_box("   - writing time information into MF4-info.csv... \n")
             # check if df is not empty
             if df_phys.shape[0] > 0:
                 self.utils.write_time_info(mf4_file, df_phys.index[0], df_phys.index[-1])
 
-        print("   - extracting individual signals... \n")
+        self.gui_interface.print_to_box("   - extracting individual signals... \n")
         return self.split_df_by_cols(df_phys)
 
 # -----------------------------------------------------------------------------------------------------------
@@ -129,7 +131,7 @@ class Process():
         if num_rows > 0:
             sig_name = df.columns.values[0]
             with lock:
-                print(f"     > started aggregating signal: {sig_name}\n")
+                self.gui_interface.print_to_box(f"     > started aggregating signal: {sig_name}\n")
             # create an array of indexes to use as a mask for the dataframe
             idx_array = []
             # insert first index into the array
@@ -155,7 +157,7 @@ class Process():
             # safely store the aggregated signal
             with lock:
                 dfs.append(result_df)
-                print(f"     = finished agg. signal: {sig_name}\n")
+                self.gui_interface.print_to_box(f"     = finished agg. signal: {sig_name}\n")
 
 # -----------------------------------------------------------------------------------------------------------                
 
@@ -185,7 +187,8 @@ class Process():
             type = "WARNING!"
             msg = 'With "Clean upload" enabled, the whole current database will be erased!'
             ques = "Do you really want to proceed?"
-
+            self.gui_interface.generate_pop_up_yn(type, msg, ques, lambda: self.gui_interface.callback_w_toplevel_kill(self.run_process_handle), self.gui_interface.kill_pop_up)
+        
         else:
             # run the process
             self.run_process_handle()
@@ -204,6 +207,8 @@ class Process():
 
     def process_handle(self) -> None:
         """Function that handles MF4 files process from conversion to upload"""
+        self.gui_interface.disable_buttons()
+        self.gui_interface.show_progress_bar()
 
         # prepare the database
         db = myDB.DatabaseHandle(self.config, self.gui_interface)
@@ -217,7 +222,7 @@ class Process():
         try: 
             for file in mf4_file_list:
                 # CONVERT FILE into Signal files
-                print(f" - Converting: {file}\n")
+                self.gui_interface.print_to_box(f" - Converting: {file}\n")
             
                 dfs_to_upload = []
                 converted_files = self.convert_mf4(file)
@@ -225,7 +230,7 @@ class Process():
                 # AGGREGATE if requested
                 if self.config["settings"]["aggregate"]:
                     threads = []
-                    print("   - aggregating... \n")
+                    self.gui_interface.print_to_box("   - aggregating... \n")
                     # run each signal in a different thread
                     lock = Lock()
                     for signal_df in converted_files:
@@ -241,27 +246,32 @@ class Process():
                     dfs_to_upload = converted_files
 
                 # UPLOAD TO DB
-                print("   - uploading... \n")
+                self.gui_interface.print_to_box("   - uploading... \n")
                 db.upload_data(dfs_to_upload)
     
                 # MOVE DONE FILES if requested
                 if self.config["settings"]["move_done_files"]:
-                    print("   - moving the file... \n")
+                    self.gui_interface.print_to_box("   - moving the file... \n")
                     self.utils.move_done_file(file, "SourceMF4")
 
                 num_of_done_mf4_files += 1
-                print(f"   - DONE!     Overall progress:  {round((num_of_done_mf4_files / num_of_mf4_files)*100, 2)} %\n")
-                print()
+                self.gui_interface.print_to_box(f"   - DONE!     Overall progress:  {round((num_of_done_mf4_files / num_of_mf4_files)*100, 2)} %\n")
+                self.gui_interface.update_progress_bar(round((num_of_done_mf4_files / num_of_mf4_files), 2))
+                self.gui_interface.print_to_box()
 
         except Exception as e:
-            print()
-            print(f"Process ERROR:  {e}\n")
+            self.gui_interface.print_to_box()
+            self.gui_interface.enable_buttons()
+            self.gui_interface.print_to_box(f"Process ERROR:  {e}\n")
+            self.gui_interface.exit()
 
+        self.gui_interface.enable_buttons()
+        self.gui_interface.hide_progress_bar()
 
-        print()
-        print("                                      ~ \n")           
-        print("Everything completed successfully!  c[_]\n")
-        print()
+        self.gui_interface.print_to_box()
+        self.gui_interface.print_to_box("                                      ~ \n")           
+        self.gui_interface.print_to_box("Everything completed successfully!  c[_]\n")
+        self.gui_interface.print_to_box()
         return
 
 # ==========================================================================================================================
@@ -275,28 +285,12 @@ def warning_handler(message, category, filename, lineo, file=None, line=None) ->
 def main():
     warnings.showwarning = warning_handler
 
-    # TODO:
-    # create multiprocessing pipes
-    pipe1, pipe2 = multiprocessing.Pipe()
-    
-
-    app_gui = gui.App(pipe2)
+    app_gui = gui.App()
     app_interface = gui.AppInterface(app_gui)
     app_utilities = utils.Utils(app_interface)
 
-    app = Process(app_utilities)
-
-    proc1 = multiprocessing.Process(target=app.await_orders, args=(pipe1, None))
-
-    proc1.start()
-    app_interface.run()
-
-    # create separate processes
-        # run loop in Process
-        # run startup gui from AppInterface, where a new thread will take care of the app.loop()
-
-    # start new processes
-
+    app = Process(app_interface, app_utilities)
+    app.run()
 
 # ==========================================================================================================================
 
