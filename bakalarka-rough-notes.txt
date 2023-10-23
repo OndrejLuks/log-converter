@@ -1,3 +1,12 @@
+ZDROJE
+https://github.com/CSS-Electronics/api-examples/tree/master/examples/data-processing
+https://customtkinter.tomschimansky.com/documentation/
+https://asammdf.readthedocs.io/en/latest/
+https://docs.python.org/3.11/
+https://www.educative.io/answers/pipes-queues-and-lock-in-multiprocessing-in-python
+
+
+
 Zadání
 	- Zpracování syrových dat z CAN trace (data logger) s pomocí DBC souborů
 	- umožnění exportu do XLS v daném časovém rozmezí
