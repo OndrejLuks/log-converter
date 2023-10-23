@@ -281,7 +281,7 @@ class TopWindowYesNo(customtkinter.CTkToplevel):
             self.grid_columnconfigure((0, 1), weight=1)
             
             # bring the window into the foregroud
-            self.after(50, self.lift)
+            self.after(100, self.lift)
 
             # Message
             self.msg = customtkinter.CTkLabel(self, text=msg, fg_color=self.master.col_popup_yn_lab, text_color=self.master.col_popup_yn_tx, corner_radius=6)
@@ -331,7 +331,7 @@ class TopWindowOk(customtkinter.CTkToplevel):
             self.grid_columnconfigure(0, weight=1)
         
             # bring the window into the foregroud
-            self.after(50, self.lift)
+            self.after(100, self.lift)
 
             if function is not None:
                 self.callback = function
@@ -839,45 +839,51 @@ class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
 
-        # set colors
-        customtkinter.set_appearance_mode("system")
-        self.col_frame_title_bg = "#5e5e5e"
-        self.col_frame_title_tx = "white"
-        self.col_popup_yn_bg = "orange"
-        self.col_popup_yn_lab = "white"
-        self.col_popup_yn_tx = "black"
-        self.col_popup_ok_bg = "orange"
-        self.col_popup_ok_lab = "white"
-        self.col_popup_ok_tx = "black"
-        self.col_progress_bg = "#dbdbdb"
-        self.col_progress_bar = "#21cc29"
-        self.col_btn_tx = "white"
-        self.col_btn_dis_tx = "#1d4566"
+        try:
+            # set colors
+            customtkinter.set_appearance_mode("system")
+            self.col_frame_title_bg = "#5e5e5e"
+            self.col_frame_title_tx = "white"
+            self.col_popup_yn_bg = "orange"
+            self.col_popup_yn_lab = "white"
+            self.col_popup_yn_tx = "black"
+            self.col_popup_ok_bg = "orange"
+            self.col_popup_ok_lab = "white"
+            self.col_popup_ok_tx = "black"
+            self.col_progress_bg = "#dbdbdb"
+            self.col_progress_bar = "#21cc29"
+            self.col_btn_tx = "white"
+            self.col_btn_dis_tx = "#1d4566"
 
-        self.my_config = self.open_config()
-        self.toplevel_window = None
+            self.my_config = self.open_config()
+            self.toplevel_window = None
 
-        self.title("MF4 Signal converter")
-        self.minsize(650, 700)
+            self.title("MF4 Signal converter")
+            self.minsize(650, 700)
 
-        self.grid_columnconfigure(1, weight=1)
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(1, weight=1)
+            self.grid_columnconfigure(1, weight=1)
+            self.grid_columnconfigure(0, weight=1)
+            self.grid_rowconfigure(1, weight=1)
 
-        self.database_frame = DatabaseFrame(self)
-        self.database_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nswe")
-        
-        self.process_frame = ProcessFrame(self)
-        self.process_frame.grid(row=0, column=1, padx=10, pady=10, sticky="nswe")
+            self.database_frame = DatabaseFrame(self)
+            self.database_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nswe")
+            
+            self.process_frame = ProcessFrame(self)
+            self.process_frame.grid(row=0, column=1, padx=10, pady=10, sticky="nswe")
 
-        self.text_box = TextboxFrame(self)
-        self.text_box.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="nswe")
+            self.text_box = TextboxFrame(self)
+            self.text_box.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="nswe")
 
-        self.progress_bar = ProgressFrame(self)
-        self.progress_bar.grid(row=2, column=0, columnspan=2, padx=0, pady=0, sticky="nswe")
+            self.progress_bar = ProgressFrame(self)
+            self.progress_bar.grid(row=2, column=0, columnspan=2, padx=0, pady=0, sticky="nswe")
 
-        self.button_frame = ButtonsFrame(self)
-        self.button_frame.grid(row=3, column=0, padx=10, pady=10, columnspan=2, sticky="nswe")
+            self.button_frame = ButtonsFrame(self)
+            self.button_frame.grid(row=3, column=0, padx=10, pady=10, columnspan=2, sticky="nswe")
+
+
+        except Exception as e:
+            print()
+            print(f"ERROR while trying to initialize GUI window: {e}")
 
 
     def open_config(self):
