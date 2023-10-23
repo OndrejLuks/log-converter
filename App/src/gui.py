@@ -688,8 +688,7 @@ class ButtonsFrame(customtkinter.CTkFrame):
     def btn_callback_start(self) -> None:
         """Callback function for the start button. Defined via AppInterface."""
         # runtime-defined
-        if self.start_function is not None:
-            self.start_function()
+        self.master.conn.send("Yolo")
 
         return
     
@@ -748,8 +747,10 @@ class App(customtkinter.CTk):
     - save()
     """
 
-    def __init__(self):
+    def __init__(self, connection):
         super().__init__()
+
+        self.conn = connection
 
         # set colors
         customtkinter.set_appearance_mode("system")
