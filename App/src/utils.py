@@ -7,6 +7,7 @@
 
 
 import os
+import sys
 import pytz
 import shutil
 
@@ -32,9 +33,6 @@ class Utils():
     - move_done_file (file, source_top_level)
     - create_dir (target_dir)
     """
-        
-    def __init__(self, interface):
-        self.gui_interface = interface
 
 # -----------------------------------------------------------------------------------------------------------
     
@@ -57,8 +55,8 @@ class Utils():
                 f.write(file_name + "," + str(start_time) + "," + str(end_time) + "\n")
 
         except Exception as e:
-            self.gui_interface.print_to_box()
-            self.gui_interface.print_to_box(f"INFO RECORDING WARNING:  {e}\n") 
+            print()
+            print(f"INFO RECORDING WARNING:  {e}\n") 
 
 # -----------------------------------------------------------------------------------------------------------
 
@@ -76,14 +74,14 @@ class Utils():
                         out.append(mf4_file)
 
         except Exception as e:
-            self.gui_interface.print_to_box()
-            self.gui_interface.print_to_box(f"MF4 READING WARNING:  {e}\n") 
-            self.gui_interface.exit()
+            print()
+            print(f"MF4 READING WARNING:  {e}\n") 
+            sys.exit(1)
 
         if len(out) == 0:
-            self.gui_interface.print_to_box()
-            self.gui_interface.print_to_box("WARNING: No MF4 files found!\n")
-            self.gui_interface.print_to_box()
+            print()
+            print("WARNING: No MF4 files found!\n")
+            print()
 
         return out, len(out)
 
@@ -98,9 +96,9 @@ class Utils():
                     if not os.listdir(dir_path):
                         os.rmdir(dir_path)
         except OSError:
-            self.gui_interface.print_to_box()
-            self.gui_interface.print_to_box(f"ERROR: Failed to remove empty subdirs of root {top_level}\n")
-            self.gui_interface.exit()
+            print()
+            print(f"ERROR: Failed to remove empty subdirs of root {top_level}\n")
+            sys.exit(1)
 
 # -----------------------------------------------------------------------------------------------------------
 
@@ -117,8 +115,8 @@ class Utils():
             shutil.move(file, target_file)
 
         except Exception as e:
-            self.gui_interface.print_to_box()
-            self.gui_interface.print_to_box(f"FILE MOVING WARNING:  {e}\n")
+            print()
+            print(f"FILE MOVING WARNING:  {e}\n")
 
         # remove empty source folders
         self.rm_empty_subdirs("SourceMF4")
@@ -132,5 +130,5 @@ class Utils():
                 os.makedirs(target_dir)
 
         except Exception as e:
-            self.gui_interface.print_to_box()
-            self.gui_interface.print_to_box(f"DIR CREATION WARNING:  {e}\n")
+            print()
+            print(f"DIR CREATION WARNING:  {e}\n")
