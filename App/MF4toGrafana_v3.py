@@ -42,29 +42,49 @@ class Process():
     def await_orders(self) -> None:
         while True:
             event = self.conn.recv()
-            print(event)
 
-            if event == "YAAAA":
-                print("STARTING")
-                self.safe_run_process_handle()
-                print("ENDDD")
+            match event:
+                case "START":
+                    self.send_command("DISABLE")
+                    self.safe_run_process_handle()
+                    self.send_command("ENABLE")
+
+                case "END":
+                    break
+
+                case _:
+                    print("Unknown command to the process")
+        
+        return
+
+# -----------------------------------------------------------------------------------------------------------
+
+    def send_to_print(self, message='', end='\n') -> None:
+        self.conn.send(f"PRINT#{message}{end}")
+        return
 
 # -----------------------------------------------------------------------------------------------------------    
 
+    def send_command(self, command) -> None:
+        self.conn.send(command)
+        return
+    
+# -----------------------------------------------------------------------------------------------------------
+
     def open_config(self):
         """Loads configure json file (config.json) from root directory. Returns json object."""
-        print("Reading config file ...  ")
+        self.conn.send("Reading config file ...  ")
 
         try:
             with open(os.path.join("src", "config.json"), "r") as file:
                 data = json.load(file)
 
         except FileNotFoundError:
-            print()
-            print("ERROR while reading src\config.json file. Check for file existance.\n")
-            sys.exit(1)()
+            self.send_to_print()
+            self.send_to_print("ERROR while reading src\config.json file. Check for file existance.")
+            sys.exit(1)
 
-        print("done!\n")
+        self.conn.send("done!\n")
         return data
     
 # -----------------------------------------------------------------------------------------------------------
@@ -84,8 +104,8 @@ class Process():
                     db_list.append(db)
 
         except OSError:
-            print()
-            print("ERROR while loading DBC files. Check for file existance.\n")
+            self.send_to_print()
+            self.send_to_print("ERROR while loading DBC files. Check for file existance.")
             sys.exit(1)()
 
         return db_list
@@ -120,12 +140,12 @@ class Process():
 
         # write time info if required
         if self.config["settings"]["write_time_info"]:
-            print("   - writing time information into MF4-info.csv... \n")
+            self.send_to_print("   - writing time information into MF4-info.csv...")
             # check if df is not empty
             if df_phys.shape[0] > 0:
                 self.utils.write_time_info(mf4_file, df_phys.index[0], df_phys.index[-1])
 
-        print("   - extracting individual signals... \n")
+        self.send_to_print("   - extracting individual signals...")
         return self.split_df_by_cols(df_phys)
 
 # -----------------------------------------------------------------------------------------------------------
@@ -137,7 +157,7 @@ class Process():
         if num_rows > 0:
             sig_name = df.columns.values[0]
             with lock:
-                print(f"     > started aggregating signal: {sig_name}\n")
+                self.send_to_print(f"     > started aggregating signal: {sig_name}")
             # create an array of indexes to use as a mask for the dataframe
             idx_array = []
             # insert first index into the array
@@ -163,7 +183,7 @@ class Process():
             # safely store the aggregated signal
             with lock:
                 dfs.append(result_df)
-                print(f"     = finished agg. signal: {sig_name}\n")
+                self.send_to_print(f"     = finished agg. signal: {sig_name}")
 
 # -----------------------------------------------------------------------------------------------------------                
 
@@ -194,6 +214,9 @@ class Process():
             msg = 'With "Clean upload" enabled, the whole current database will be erased!'
             ques = "Do you really want to proceed?"
             print(type + msg + ques)
+
+            # TODO
+
             self.process_handle()
         
         else:
@@ -211,7 +234,7 @@ class Process():
         """Function that handles MF4 files process from conversion to upload"""
 
         # prepare the database
-        db = myDB.DatabaseHandle(self.config)
+        db = myDB.DatabaseHandle(self.config, self.conn)
         db.connect()
         db.create_schema()        
 
@@ -222,7 +245,7 @@ class Process():
         try: 
             for file in mf4_file_list:
                 # CONVERT FILE into Signal files
-                print(f" - Converting: {file}\n")
+                self.send_to_print(f" - Converting: {file}")
             
                 dfs_to_upload = []
                 converted_files = self.convert_mf4(file)
@@ -230,7 +253,7 @@ class Process():
                 # AGGREGATE if requested
                 if self.config["settings"]["aggregate"]:
                     threads = []
-                    print("   - aggregating... \n")
+                    self.send_to_print("   - aggregating...")
                     # run each signal in a different thread
                     lock = Lock()
                     for signal_df in converted_files:
@@ -246,27 +269,27 @@ class Process():
                     dfs_to_upload = converted_files
 
                 # UPLOAD TO DB
-                print("   - uploading... \n")
+                self.send_to_print("   - uploading...")
                 db.upload_data(dfs_to_upload)
     
                 # MOVE DONE FILES if requested
                 if self.config["settings"]["move_done_files"]:
-                    print("   - moving the file... \n")
+                    self.send_to_print("   - moving the file...")
                     self.utils.move_done_file(file, "SourceMF4")
 
                 num_of_done_mf4_files += 1
-                print(f"   - DONE!     Overall progress:  {round((num_of_done_mf4_files / num_of_mf4_files)*100, 2)} %\n")
-                print()
+                self.send_to_print(f"   - DONE!     Overall progress:  {round((num_of_done_mf4_files / num_of_mf4_files)*100, 2)} %")
+                self.send_to_print()
 
         except Exception as e:
-            print()
-            print(f"Process ERROR:  {e}\n")
+            self.send_to_print()
+            self.send_to_print(f"Process ERROR:  {e}")
             sys.exit(1)()
 
-        print()
-        print("                                      ~ \n")           
-        print("Everything completed successfully!  c[_]\n")
-        print()
+        self.send_to_print()
+        self.send_to_print("                                      ~ ")           
+        self.send_to_print("Everything completed successfully!  c[_]")
+        self.send_to_print()
         return
 
 # ==========================================================================================================================
@@ -282,8 +305,11 @@ def main():
 
     conn1, conn2 = multiprocessing.Pipe()
 
-    app_gui = gui.App(conn1)
-    app_interface = gui.AppInterface(app_gui)
+
+    # handle all connection stuff inside AppInterface, pass conn1 to AppInterface, not App
+    # create a function that will set the conn1 into App 
+    app_gui = gui.App()
+    app_interface = gui.AppInterface(app_gui, conn1)
 
     app_utilities = utils.Utils()
 
@@ -292,6 +318,7 @@ def main():
     proc = multiprocessing.Process(target=app.await_orders)
     proc.start()
     
+    # startup function will create a new thread with listening to the pipe
     app_interface.run()
 
 # ==========================================================================================================================

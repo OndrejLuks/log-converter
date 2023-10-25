@@ -7,6 +7,7 @@
 
 
 import customtkinter
+import threading
 import json
 import sys
 import os
@@ -40,9 +41,12 @@ class AppInterface():
     - update_progress_bar ()
     """
 
-    def __init__(self, app):
+    def __init__(self, app, pipe):
         """Constructior of AppInterface"""
         self.app = app
+        self.pipe = pipe
+
+        self.app.set_connection(pipe)
 
 # -----------------------------------------------------------------------------------------------------------
     
@@ -54,9 +58,45 @@ class AppInterface():
         None
         """
 
+        # create a new thread with function that will read from PIPE
+        read_thr = threading.Thread(target=self.read_pipe)
+        read_thr.start()
+
+        # update GUI
         self.app.mainloop()
+
+        # WHAT HAPPENS TO THE THREAD IF THE WINDOW IS KILLED? 
+
         return
 
+# -----------------------------------------------------------------------------------------------------------
+
+    def read_pipe(self) -> None:
+        while True:
+            event = self.pipe.recv()
+
+            # tolekize the message by '#'
+            messages = event.split("#")
+
+            match messages[0]:
+                case "ENABLE":
+                    self.enable_buttons()
+                
+                case "DISABLE":
+                    self.disable_buttons()
+
+                case "PRINT":
+                    if len(messages) == 2:
+                        self.print_to_box(messages[1])
+                    else:
+                        print("No message received to print!")
+                    break
+
+                case _:
+                    print("Can't recognize sent item.")
+
+        return
+    
 # -----------------------------------------------------------------------------------------------------------
 
     def callback_w_toplevel_kill(self, callback_fn: callable) -> None:
@@ -762,8 +802,8 @@ class ButtonsFrame(customtkinter.CTkFrame):
     
 
     def btn_callback_start(self) -> None:
-        """Callback function for the start button. Defined via AppInterface."""
-        self.master.conn.send("YAAAA")
+        """Callback function for the start button."""
+        self.master.conn.send("START")
 
         return
     
@@ -771,9 +811,7 @@ class ButtonsFrame(customtkinter.CTkFrame):
     def btn_callback_save_start(self) -> None:
         """Callback function for the Save and Start button. Defined via AppInterface."""
         self.master.save()
-        # runtime-defined
-        if self.start_function is not None:
-            self.start_function()
+        self.master.conn.send("START")
         return
 
 
@@ -834,10 +872,10 @@ class App(customtkinter.CTk):
     - save()
     """
 
-    def __init__(self, connection):
+    def __init__(self):
         super().__init__()
 
-        self.conn = connection
+        self.conn = None
 
         try:
             # set colors
@@ -965,6 +1003,12 @@ class App(customtkinter.CTk):
         self.database_frame.refresh()
         self.process_frame.refresh()
 
+        return
+    
+
+    def set_connection(self, connection) -> None:
+        """Sets the connection stream"""
+        self.conn = connection
         return
     
 
