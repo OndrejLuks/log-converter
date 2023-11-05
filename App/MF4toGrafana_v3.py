@@ -73,18 +73,18 @@ class Process():
 
     def open_config(self):
         """Loads configure json file (config.json) from root directory. Returns json object."""
-        self.conn.send("Reading config file ...  ")
+        print("Reading config file ... ", end='')
 
         try:
             with open(os.path.join("src", "config.json"), "r") as file:
                 data = json.load(file)
 
         except FileNotFoundError:
-            self.send_to_print()
-            self.send_to_print("ERROR while reading src\config.json file. Check for file existance.")
+            print()
+            print("ERROR while reading src\\config.json file. Check for file existance.")
             sys.exit(1)
 
-        self.conn.send("done!\n")
+        print("done!")
         return data
     
 # -----------------------------------------------------------------------------------------------------------
@@ -104,8 +104,8 @@ class Process():
                     db_list.append(db)
 
         except OSError:
-            self.send_to_print()
-            self.send_to_print("ERROR while loading DBC files. Check for file existance.")
+            print()
+            print("ERROR while loading DBC files. Check for file existance.")
             sys.exit(1)()
 
         return db_list
@@ -140,12 +140,12 @@ class Process():
 
         # write time info if required
         if self.config["settings"]["write_time_info"]:
-            self.send_to_print("   - writing time information into MF4-info.csv...")
+            print("   - writing time information into MF4-info.csv...")
             # check if df is not empty
             if df_phys.shape[0] > 0:
                 self.utils.write_time_info(mf4_file, df_phys.index[0], df_phys.index[-1])
 
-        self.send_to_print("   - extracting individual signals...")
+        print("   - extracting individual signals...")
         return self.split_df_by_cols(df_phys)
 
 # -----------------------------------------------------------------------------------------------------------
@@ -157,7 +157,7 @@ class Process():
         if num_rows > 0:
             sig_name = df.columns.values[0]
             with lock:
-                self.send_to_print(f"     > started aggregating signal: {sig_name}")
+                print(f"     > started aggregating signal: {sig_name}")
             # create an array of indexes to use as a mask for the dataframe
             idx_array = []
             # insert first index into the array
@@ -183,7 +183,7 @@ class Process():
             # safely store the aggregated signal
             with lock:
                 dfs.append(result_df)
-                self.send_to_print(f"     = finished agg. signal: {sig_name}")
+                print(f"     = finished agg. signal: {sig_name}")
 
 # -----------------------------------------------------------------------------------------------------------                
 
@@ -245,7 +245,7 @@ class Process():
         try: 
             for file in mf4_file_list:
                 # CONVERT FILE into Signal files
-                self.send_to_print(f" - Converting: {file}")
+                print(f" - Converting: {file}")
             
                 dfs_to_upload = []
                 converted_files = self.convert_mf4(file)
@@ -253,7 +253,7 @@ class Process():
                 # AGGREGATE if requested
                 if self.config["settings"]["aggregate"]:
                     threads = []
-                    self.send_to_print("   - aggregating...")
+                    print("   - aggregating...")
                     # run each signal in a different thread
                     lock = Lock()
                     for signal_df in converted_files:
@@ -269,27 +269,28 @@ class Process():
                     dfs_to_upload = converted_files
 
                 # UPLOAD TO DB
-                self.send_to_print("   - uploading...")
+                print("   - uploading...")
                 db.upload_data(dfs_to_upload)
     
                 # MOVE DONE FILES if requested
                 if self.config["settings"]["move_done_files"]:
-                    self.send_to_print("   - moving the file...")
+                    print("   - moving the file...")
                     self.utils.move_done_file(file, "SourceMF4")
 
                 num_of_done_mf4_files += 1
-                self.send_to_print(f"   - DONE!     Overall progress:  {round((num_of_done_mf4_files / num_of_mf4_files)*100, 2)} %")
-                self.send_to_print()
+                self.send_command(f"PROG#{round((num_of_done_mf4_files / num_of_mf4_files), 2)}")
+                print(f"   - DONE!     Overall progress:  {round((num_of_done_mf4_files / num_of_mf4_files)*100, 2)} %")
+                print()
 
         except Exception as e:
-            self.send_to_print()
-            self.send_to_print(f"Process ERROR:  {e}")
+            print()
+            print(f"Process ERROR:  {e}")
             sys.exit(1)()
 
-        self.send_to_print()
-        self.send_to_print("                                      ~ ")           
-        self.send_to_print("Everything completed successfully!  c[_]")
-        self.send_to_print()
+        print()
+        print("                                      ~ ")           
+        print("Everything completed successfully!  c[_]")
+        print()
         return
 
 # ==========================================================================================================================

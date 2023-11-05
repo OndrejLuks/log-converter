@@ -78,13 +78,17 @@ class AppInterface():
             # tolekize the message by '#'
             messages = event.split("#")
 
+            print(f"Received messages: {messages}")
+
             match messages[0]:
                 case "ENABLE":
                     self.enable_buttons()
+                    self.hide_progress_bar()
                 
                 case "DISABLE":
                     self.disable_buttons()
-
+                    self.show_progress_bar()
+                    
                 case "PRINT":
                     if len(messages) == 2:
                         self.print_to_box(messages[1])
@@ -92,8 +96,14 @@ class AppInterface():
                         print("No message received to print!")
                     break
 
+                case "PROG":
+                    if len(messages) == 2:
+                        self.update_progress_bar(float(messages[1]))
+                    else:
+                        print("Missing progressbar value to update!")
+
                 case _:
-                    print("Can't recognize sent item.")
+                    print(f"Can't recognize sent item: {messages}")
 
         return
     
@@ -208,7 +218,7 @@ class AppInterface():
 # -----------------------------------------------------------------------------------------------------------
 
     def save_changes(self) -> None:
-        """Saves changes made in the GUI to src\config.json file.
+        """Saves changes made in the GUI to src\\config.json file.
         
         Returns
         -------
@@ -267,7 +277,7 @@ class AppInterface():
 
 # -----------------------------------------------------------------------------------------------------------
 
-    def update_progress_bar(self, value) -> None:
+    def update_progress_bar(self, value: float) -> None:
         """Updates the progress bar to the given value.
         
         Parametres
@@ -932,7 +942,7 @@ class App(customtkinter.CTk):
 
         except FileNotFoundError:
             print()
-            print("ERROR while reading src\config.json file. Check for file existance.")
+            print("ERROR while reading src\\config.json file. Check for file existance.")
             sys.exit(1)
     
         return data
