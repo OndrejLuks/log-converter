@@ -46,11 +46,13 @@ class Process():
             match event:
                 case "RUN-PROP":
                     self.send_command("START")
+                    # TODO: Needs to run in a separate thread so that END can be detected
                     self.check_db_override()
                     self.send_command("FINISH")
 
                 case "RUN-ACK":
                     self.send_command("START")
+                    # TODO: Needs to run in a separate thread so that END can be detected
                     self.process_handle()
                     self.send_command("FINISH")
 
@@ -226,9 +228,6 @@ class Process():
             self.process_handle()
 
         return
-
-# -----------------------------------------------------------------------------------------------------------
-
 
 # -----------------------------------------------------------------------------------------------------------
 
