@@ -46,8 +46,8 @@ class DatabaseHandle:
             pass
 
         except Exception as e:
-            print()
-            print(f"WARNING - querry:  {e}")
+            self.send_to_print()
+            self.send_to_print(f"WARNING - querry:  {e}")
 
 # -----------------------------------------------------------------------------------------------------------
 
@@ -58,8 +58,8 @@ class DatabaseHandle:
             self.connection = self.engine.connect()
 
         except Exception as e:
-            print()
-            print(f"DB CONNECTION ERROR:  {e}")
+            self.send_to_print()
+            self.send_to_print(f"DB CONNECTION ERROR:  {e}")
             sys.exit(1)
 
 # -----------------------------------------------------------------------------------------------------------    
@@ -70,18 +70,18 @@ class DatabaseHandle:
             if self.clean:
                 # clean upload is selected
                 if self.connection.dialect.has_schema(self.connection, self.schema_name):
-                    print(f" - Dropping schema {self.schema_name}")
+                    self.send_to_print(f" - Dropping schema {self.schema_name}")
                     self._querry(f"DROP SCHEMA {self.schema_name} CASCADE")
 
             if not self.connection.dialect.has_schema(self.connection, self.schema_name):
-                print(f" - Creating schema {self.schema_name}")
+                self.send_to_print(f" - Creating schema {self.schema_name}")
                 self.connection.execute(schema.CreateSchema(self.schema_name))
                 self.connection.commit()
 
                 
         except Exception as e:
-            print()
-            print(f"ERROR - schema:  {e}")
+            self.send_to_print()
+            self.send_to_print(f"ERROR - schema:  {e}")
             sys.exit(1)
     
 # -----------------------------------------------------------------------------------------------------------
@@ -91,7 +91,7 @@ class DatabaseHandle:
         for df in data:
             try:
                 table_name = f"{df.columns.values[0]}"
-                print(f"     > uploading signal: {table_name}")
+                self.send_to_print(f"     > uploading signal: {table_name}")
                 df.to_sql(name=table_name,
                             con=self.engine,
                             schema=self.schema_name,
@@ -103,22 +103,22 @@ class DatabaseHandle:
                 self._querry(f'ALTER TABLE {self.schema_name}."{table_name}" ADD PRIMARY KEY (time_stamp)')
 
             except IntegrityError:
-                print("       - WARNING: Skipping signal upload due to unique violation. This record already exists in the DB.")
+                self.send_to_print("       - WARNING: Skipping signal upload due to unique violation. This record already exists in the DB.")
             
             except Exception as e:
-                print()
-                print(f"DB UPLOAD WARNING:  {e}")
+                self.send_to_print()
+                self.send_to_print(f"DB UPLOAD WARNING:  {e}")
     
 # -----------------------------------------------------------------------------------------------------------
 
     def finish(self) -> None:
         """Function to handle database connection closing"""
         try:
-            print("Closing database connection ...  ", end='')
+            self.send_to_print("Closing database connection ...  ", end='')
             self.connection.close()
-            print("done!")
+            self.send_to_print("done!")
             
         except Exception as e:
-            print()
-            print(f"DB CLOSING ERROR:  {e}")
+            self.send_to_print()
+            self.send_to_print(f"DB CLOSING ERROR:  {e}")
 

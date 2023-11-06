@@ -78,8 +78,6 @@ class AppInterface():
             # tolekize the message by '#'
             messages = event.split("#")
 
-            print(f"Received messages: {messages}")
-
             match messages[0]:
                 case "ENABLE":
                     self.enable_buttons()
@@ -93,17 +91,16 @@ class AppInterface():
                     if len(messages) == 2:
                         self.print_to_box(messages[1])
                     else:
-                        print("No message received to print!")
-                    break
+                        self.print_to_box("Warning: blank message print requested!\n")
 
                 case "PROG":
                     if len(messages) == 2:
                         self.update_progress_bar(float(messages[1]))
                     else:
-                        print("Missing progressbar value to update!")
+                        self.print_to_box("Warning: blank progress update requested!\n")
 
                 case _:
-                    print(f"Can't recognize sent item: {messages}")
+                    self.print_to_box(f"Can't recognize received item: {messages}\n")
 
         return
     
