@@ -35,6 +35,17 @@ class Utils():
     """
 
 # -----------------------------------------------------------------------------------------------------------
+
+    def __init__(self, conn) -> None:
+        self.conn = conn
+
+# -----------------------------------------------------------------------------------------------------------
+
+    def send_to_print(self, message='', end='\n') -> None:
+        self.conn.send(f"PRINT#{message}{end}")
+        return
+
+# -----------------------------------------------------------------------------------------------------------
     
     def write_time_info(self, file: str, start_time, end_time) -> None:
         """Writes start and end timestamp information about inputted file into MF4-info.csv"""
@@ -55,8 +66,8 @@ class Utils():
                 f.write(file_name + "," + str(start_time) + "," + str(end_time) + "\n")
 
         except Exception as e:
-            print()
-            print(f"INFO RECORDING WARNING:  {e}\n") 
+            self.send_to_print()
+            self.send_to_print(f"INFO RECORDING WARNING:  {e}\n") 
 
 # -----------------------------------------------------------------------------------------------------------
 
@@ -74,14 +85,14 @@ class Utils():
                         out.append(mf4_file)
 
         except Exception as e:
-            print()
-            print(f"MF4 READING WARNING:  {e}\n") 
+            self.send_to_print()
+            self.send_to_print(f"MF4 READING WARNING:  {e}\n") 
             sys.exit(1)
 
         if len(out) == 0:
-            print()
-            print("WARNING: No MF4 files found!\n")
-            print()
+            self.send_to_print()
+            self.send_to_print("WARNING: No MF4 files found!\n")
+            self.send_to_print()
 
         return out, len(out)
 
@@ -96,8 +107,8 @@ class Utils():
                     if not os.listdir(dir_path):
                         os.rmdir(dir_path)
         except OSError:
-            print()
-            print(f"ERROR: Failed to remove empty subdirs of root {top_level}\n")
+            self.send_to_print()
+            self.send_to_print(f"ERROR: Failed to remove empty subdirs of root {top_level}\n")
             sys.exit(1)
 
 # -----------------------------------------------------------------------------------------------------------
@@ -115,8 +126,8 @@ class Utils():
             shutil.move(file, target_file)
 
         except Exception as e:
-            print()
-            print(f"FILE MOVING WARNING:  {e}\n")
+            self.send_to_print()
+            self.send_to_print(f"FILE MOVING WARNING:  {e}\n")
 
         # remove empty source folders
         self.rm_empty_subdirs("SourceMF4")
@@ -130,5 +141,5 @@ class Utils():
                 os.makedirs(target_dir)
 
         except Exception as e:
-            print()
-            print(f"DIR CREATION WARNING:  {e}\n")
+            self.send_to_print()
+            self.send_to_print(f"DIR CREATION WARNING:  {e}\n")

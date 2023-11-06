@@ -66,6 +66,7 @@ class AppInterface():
         self.app.mainloop()
 
         # WHAT HAPPENS TO THE THREAD IF THE WINDOW IS KILLED? 
+        read_thr.join()
 
         return
 
@@ -79,11 +80,11 @@ class AppInterface():
             messages = event.split("#")
 
             match messages[0]:
-                case "ENABLE":
+                case "FINISH":
                     self.enable_buttons()
                     self.hide_progress_bar()
                 
-                case "DISABLE":
+                case "START":
                     self.disable_buttons()
                     self.show_progress_bar()
                     
@@ -98,6 +99,9 @@ class AppInterface():
                         self.update_progress_bar(float(messages[1]))
                     else:
                         self.print_to_box("Warning: blank progress update requested!\n")
+
+                case "END":
+                    break
 
                 case _:
                     self.print_to_box(f"Can't recognize received item: {messages}\n")
@@ -804,13 +808,13 @@ class ButtonsFrame(customtkinter.CTkFrame):
         tpe = "WARNING!"
         msge = "All changes you made will not be saved."
         ques = "Do you really want to proceed?"
-        self.master.open_toplevel_yn(tpe, msge, ques, self.exit_program, self.master.kill_toplevel)
+        self.master.open_toplevel_yn(tpe, msge, ques, self.master.exit_program, self.master.kill_toplevel)
         return
     
 
     def btn_callback_start(self) -> None:
         """Callback function for the start button."""
-        self.master.conn.send("START")
+        self.master.conn.send("RUN")
 
         return
     
@@ -818,7 +822,7 @@ class ButtonsFrame(customtkinter.CTkFrame):
     def btn_callback_save_start(self) -> None:
         """Callback function for the Save and Start button. Defined via AppInterface."""
         self.master.save()
-        self.master.conn.send("START")
+        self.master.conn.send("RUN")
         return
 
 
@@ -849,9 +853,6 @@ class ButtonsFrame(customtkinter.CTkFrame):
 
         return
 
-
-    def exit_program(self) -> None:
-        sys.exit(0)
 
 # ================================================================================================================================
 
@@ -905,6 +906,7 @@ class App(customtkinter.CTk):
 
             self.title("MF4 Signal converter")
             self.minsize(650, 700)
+            self.protocol("WM_DELETE_WINDOW", self.closing_handle)
 
             self.grid_columnconfigure(1, weight=1)
             self.grid_columnconfigure(0, weight=1)
@@ -931,6 +933,12 @@ class App(customtkinter.CTk):
             print(f"ERROR while trying to initialize GUI window: {e}")
 
 
+    def exit_program(self) -> None:
+        self.conn.send("END")
+        self.kill_toplevel()
+        self.destroy()
+
+    
     def open_config(self):
         """Loads configure json file (config.json) from root directory. Returns json object."""
         try:
@@ -1021,19 +1029,28 @@ class App(customtkinter.CTk):
 
     def kill_toplevel(self) -> None:
         """Destroys the toplevel window"""
-        self.toplevel_window.destroy()
-        self.toplevel_window.update()
+        if self.toplevel_window is not None:
+            self.toplevel_window.destroy()
+            self.toplevel_window.update()
+        return
+    
+
+    def closing_handle(self) -> None:
+        self.open_toplevel_yn("WARNING", "Do you really want to exit?", "", self.exit_program, self.kill_toplevel)
         return
     
 
     def error_handle(self, type: str, message: str, terminate: bool) -> None:
         """Creates an error popup on demand with the possibility of program termination"""
         if terminate:
-            callback = sys.exit
+            callback = self.exit_program
         else:
             callback = None
         
         self.open_toplevel_ok(type, message, callback)
+        return
+
+
 
 
         

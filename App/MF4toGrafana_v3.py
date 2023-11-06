@@ -44,12 +44,13 @@ class Process():
             event = self.conn.recv()
 
             match event:
-                case "START":
-                    self.send_command("DISABLE")
+                case "RUN":
+                    self.send_command("START")
                     self.safe_run_process_handle()
-                    self.send_command("ENABLE")
+                    self.send_command("FINISH")
 
                 case "END":
+                    self.send_command("END")
                     break
 
                 case _:
@@ -312,14 +313,13 @@ def main():
     app_gui = gui.App()
     app_interface = gui.AppInterface(app_gui, conn1)
 
-    app_utilities = utils.Utils()
+    app_utilities = utils.Utils(conn2)
 
     app = Process(app_utilities, conn2)
 
     proc = multiprocessing.Process(target=app.await_orders)
     proc.start()
-    
-    # startup function will create a new thread with listening to the pipe
+
     app_interface.run()
 
 # ==========================================================================================================================
