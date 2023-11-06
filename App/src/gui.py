@@ -100,6 +100,12 @@ class AppInterface():
                     else:
                         self.print_to_box("Warning: blank progress update requested!\n")
 
+                case "POPYN":
+                        if len(messages) == 4:
+                            self.generate_pop_up_yn(messages[1], messages[2], messages[3], self.send_ack, self.kill_pop_up)
+                        else:
+                            self.print_to_box("Warning: requested popup with wrong number of parameters!\n")
+
                 case "END":
                     break
 
@@ -108,6 +114,13 @@ class AppInterface():
 
         return
     
+# -----------------------------------------------------------------------------------------------------------
+
+    def send_ack(self) -> None:
+        self.pipe.send("RUN-ACK")
+        self.kill_pop_up()
+        return
+
 # -----------------------------------------------------------------------------------------------------------
 
     def callback_w_toplevel_kill(self, callback_fn: callable) -> None:
@@ -292,18 +305,7 @@ class AppInterface():
 
         self.app.progress_bar.set_value(value)
         return
-
-# -----------------------------------------------------------------------------------------------------------
-
-    def exit(self) -> None:
-        """Exists the process on given thread
-        
-        Returns
-        -------
-        None
-        """
-        self.enable_buttons()
-        sys.exit(0)
+    
         
 # ================================================================================================================================
 
@@ -814,7 +816,7 @@ class ButtonsFrame(customtkinter.CTkFrame):
 
     def btn_callback_start(self) -> None:
         """Callback function for the start button."""
-        self.master.conn.send("RUN")
+        self.master.conn.send("RUN-PROP")
 
         return
     
@@ -822,7 +824,7 @@ class ButtonsFrame(customtkinter.CTkFrame):
     def btn_callback_save_start(self) -> None:
         """Callback function for the Save and Start button. Defined via AppInterface."""
         self.master.save()
-        self.master.conn.send("RUN")
+        self.master.conn.send("RUN-PROP")
         return
 
 
@@ -925,7 +927,7 @@ class App(customtkinter.CTk):
             self.progress_bar.grid(row=2, column=0, columnspan=2, padx=0, pady=0, sticky="nswe")
 
             self.button_frame = ButtonsFrame(self)
-            self.button_frame.grid(row=3, column=0, padx=10, pady=10, columnspan=2, sticky="nswe")
+            self.button_frame.grid(row=3, column=0, padx=5, pady=10, columnspan=2, sticky="nswe")
 
 
         except Exception as e:

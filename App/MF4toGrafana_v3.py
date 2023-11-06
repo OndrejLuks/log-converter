@@ -44,9 +44,14 @@ class Process():
             event = self.conn.recv()
 
             match event:
-                case "RUN":
+                case "RUN-PROP":
                     self.send_command("START")
-                    self.safe_run_process_handle()
+                    self.check_db_override()
+                    self.send_command("FINISH")
+
+                case "RUN-ACK":
+                    self.send_command("START")
+                    self.process_handle()
                     self.send_command("FINISH")
 
                 case "END":
@@ -107,7 +112,7 @@ class Process():
         except OSError:
             self.send_to_print()
             self.send_to_print("ERROR while loading DBC files. Check for file existance.")
-            sys.exit(1)()
+            sys.exit(1)
 
         return db_list
 
@@ -205,7 +210,7 @@ class Process():
 
 # -----------------------------------------------------------------------------------------------------------
     
-    def safe_run_process_handle(self) -> None:
+    def check_db_override(self) -> None:
         # load config
         self.config = self.open_config()
         
@@ -214,11 +219,7 @@ class Process():
             type = "WARNING!"
             msg = 'With "Clean upload" enabled, the whole current database will be erased!'
             ques = "Do you really want to proceed?"
-            self.send_to_print(type + msg + ques)
-
-            # TODO
-
-            self.process_handle()
+            self.send_command(f"POPYN#{type}#{msg}#{ques}")
         
         else:
             # run the process
