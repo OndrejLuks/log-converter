@@ -36,6 +36,8 @@ class Process():
         self.config = None
         self.dbc_list = self.create_dbc_list()
         self.conn = conn
+        self.threads = []
+        self.stop_event = threading.Event()
 
 # -----------------------------------------------------------------------------------------------------------
 
@@ -45,30 +47,28 @@ class Process():
 
             match event:
                 case "RUN-PROP":
-                    self.send_command("START")
-                    # TODO: Needs to run in a separate thread so that END can be detected
                     self.check_db_override()
-                    self.send_command("FINISH")
 
                 case "RUN-ACK":
-                    self.send_command("START")
-                    # TODO: Needs to run in a separate thread so that END can be detected
-                    self.process_handle()
-                    self.send_command("FINISH")
+                    thr_proc = threading.Thread(target=self.process_handle)
+                    thr_proc.start()
+                    self.threads.append(thr_proc)
 
                 case "END":
-                    self.send_command("END")
+                    self.thread_cleanup()
                     break
 
                 case _:
                     self.send_to_print("Unknown command to the process")
         
+        self.send_command("END")
         return
 
 # -----------------------------------------------------------------------------------------------------------
 
     def send_to_print(self, message='', end='\n') -> None:
-        self.conn.send(f"PRINT#{message}{end}")
+        if not self.stop_event.is_set():
+            self.conn.send(f"PRINT#{message}{end}")
         return
 
 # -----------------------------------------------------------------------------------------------------------    
@@ -77,6 +77,19 @@ class Process():
         self.conn.send(command)
         return
     
+# -----------------------------------------------------------------------------------------------------------
+
+    def thread_cleanup(self) -> None:
+        # stop all threads
+        self.stop_event.set()
+
+        # join all threads
+        for thr in self.threads:
+            if thr.is_alive():
+                thr.join()
+
+        return
+
 # -----------------------------------------------------------------------------------------------------------
 
     def open_config(self):
@@ -90,6 +103,7 @@ class Process():
         except FileNotFoundError:
             self.send_to_print()
             self.send_to_print("ERROR while reading src\\config.json file. Check for file existance.")
+            self.send_command("FINISH")
             sys.exit(1)
 
         self.send_to_print("done!")
@@ -114,6 +128,7 @@ class Process():
         except OSError:
             self.send_to_print()
             self.send_to_print("ERROR while loading DBC files. Check for file existance.")
+            self.send_command("FINISH")
             sys.exit(1)
 
         return db_list
@@ -132,19 +147,44 @@ class Process():
         fs = self.setup_fs()
         proc = procData.ProcessData(fs, self.dbc_list)
 
+        # thread end check
+        if self.stop_event.is_set():
+            print("Conversion aborted.")
+            return None
+
         # get raw dataframe from mf4 file
         df_raw, device_id = proc.get_raw_data(mf4_file)
+
+        # thread end check
+        if self.stop_event.is_set():
+            print("Conversion aborted.")
+            return None
 
         # replace transport protocol with single frames
         tp = mfd.MultiFrameDecoder("j1939")
         df_raw = tp.combine_tp_frames(df_raw)
 
+        # thread end check
+        if self.stop_event.is_set():
+            print("Conversion aborted.")
+            return None
+
         # extract can messages
         df_phys = proc.extract_phys(df_raw)
+
+        # thread end check
+        if self.stop_event.is_set():
+            print("Conversion aborted.")
+            return None
 
         # set correct index values
         df_phys.index = pd.to_datetime(df_phys.index)
         df_phys.index = df_phys.index.round('1us')
+
+        # thread end check
+        if self.stop_event.is_set():
+            print("Conversion aborted.")
+            return None
 
         # write time info if required
         if self.config["settings"]["write_time_info"]:
@@ -160,6 +200,13 @@ class Process():
 
     def aggregate(self, df, lock: threading.Lock, dfs: list) -> None:
         """Aggregates input signal dataframe by removing redundant values"""
+
+        # thread end check
+        if self.stop_event.is_set():
+            with lock:
+                print("Aggregation thread stopped.")
+            return
+
         num_rows = df.shape[0]
 
         if num_rows > 0:
@@ -174,6 +221,12 @@ class Process():
             # iterate through indexes and store them only if the value changes,
             # or if the time gap exceeds given seconds
             for idx in range(num_rows):
+                # thread end check
+                if self.stop_event.is_set():
+                    with lock:
+                        print("Aggregation thread stopped.")
+                    return
+
                 time_diff = df.index[idx] - df.index[previous]
                 if (df.iat[previous, 0] != df.iat[idx, 0]):
                     idx_array.append(idx-1)
@@ -187,11 +240,19 @@ class Process():
             idx_array.append(num_rows - 1)
             # create a new dataframe and remove duplicates
             result_df = df.iloc[list(dict.fromkeys(idx_array))]
+
+            # thread end check
+            if self.stop_event.is_set():
+                with lock:
+                    print("Aggregation thread stopped.")
+                return
             
             # safely store the aggregated signal
             with lock:
                 dfs.append(result_df)
                 self.send_to_print(f"     = finished agg. signal: {sig_name}")
+
+            return
 
 # -----------------------------------------------------------------------------------------------------------                
 
@@ -204,6 +265,11 @@ class Process():
             return column_df
 
         for signal_name in df['Signal'].unique():
+            # thread end check
+            if self.stop_event.is_set():
+                print("Conversion aborted.")
+                return None
+
             signal_df = df[df['Signal'] == signal_name][['Physical Value']].copy()
             signal_df.rename(columns={'Physical Value': signal_name}, inplace=True)
             column_df.append(signal_df)
@@ -225,7 +291,7 @@ class Process():
         
         else:
             # run the process
-            self.process_handle()
+            self.send_command("ACK")
 
         return
 
@@ -234,10 +300,17 @@ class Process():
     def process_handle(self) -> None:
         """Function that handles MF4 files process from conversion to upload"""
 
+        self.send_command("START")
+
         # prepare the database
-        db = myDB.DatabaseHandle(self.config, self.conn)
+        db = myDB.DatabaseHandle(self.config, self.conn, self.stop_event)
         db.connect()
-        db.create_schema()        
+        db.create_schema()
+
+        # thread end check
+        if self.stop_event.is_set():
+            print("Process thread stopped.")
+            return
 
         # load MF4 files
         mf4_file_list, num_of_mf4_files = self.utils.get_MF4_files("SourceMF4")
@@ -245,33 +318,59 @@ class Process():
 
         try: 
             for file in mf4_file_list:
+                # thread end check
+                if self.stop_event.is_set():
+                    print("Process thread stopped.")
+                    return
+
                 # CONVERT FILE into Signal files
                 self.send_to_print(f" - Converting: {file}")
             
                 dfs_to_upload = []
                 converted_files = self.convert_mf4(file)
 
+                # thread end check
+                if self.stop_event.is_set():
+                    print("Process thread stopped.")
+                    return
+
                 # AGGREGATE if requested
                 if self.config["settings"]["aggregate"]:
-                    threads = []
+                    agg_threads = []
                     self.send_to_print("   - aggregating...")
                     # run each signal in a different thread
                     lock = Lock()
                     for signal_df in converted_files:
+                        # thread end check
+                        if self.stop_event.is_set():
+                            print("Process thread stopped.")
+                            return None
+
                         thread = threading.Thread(target=self.aggregate, args=(signal_df, lock, dfs_to_upload))
-                        threads.append(thread)
                         thread.start()
+                        agg_threads.append(thread)
+                        self.threads.append(thread)
                     
-                    # wait for threads to finish
-                    for thr in threads:
+                    # wait for aggregation threads to finish
+                    for thr in agg_threads:
                         thr.join()
                 
                 else:
                     dfs_to_upload = converted_files
 
+                # thread end check
+                if self.stop_event.is_set():
+                    print("Process thread stopped.")
+                    return
+
                 # UPLOAD TO DB
                 self.send_to_print("   - uploading...")
                 db.upload_data(dfs_to_upload)
+
+                # thread end check
+                if self.stop_event.is_set():
+                    print("Process thread stopped.")
+                    return
     
                 # MOVE DONE FILES if requested
                 if self.config["settings"]["move_done_files"]:
@@ -286,12 +385,14 @@ class Process():
         except Exception as e:
             self.send_to_print()
             self.send_to_print(f"Process ERROR:  {e}")
-            sys.exit(1)()
+            self.send_command("FINISH")
+            return
 
         self.send_to_print()
         self.send_to_print("                                      ~ ")           
         self.send_to_print("Everything completed successfully!  c[_]")
         self.send_to_print()
+        self.send_command("FINISH")
         return
 
 # ==========================================================================================================================
@@ -301,6 +402,15 @@ def warning_handler(message, category, filename, lineo, file=None, line=None) ->
     return
 
 # ==========================================================================================================================
+
+def process_handle(connection) -> None:
+    app_utilities = utils.Utils(connection)
+
+    app = Process(app_utilities, connection)
+    app.await_orders()
+
+    return
+    
 
 def main():
     warnings.showwarning = warning_handler
@@ -313,14 +423,13 @@ def main():
     app_gui = gui.App()
     app_interface = gui.AppInterface(app_gui, conn1)
 
-    app_utilities = utils.Utils(conn2)
-
-    app = Process(app_utilities, conn2)
-
-    proc = multiprocessing.Process(target=app.await_orders)
+    proc = multiprocessing.Process(target=process_handle, args=(conn2, ))
     proc.start()
 
+    # blocking function
     app_interface.run()
+
+    return
 
 # ==========================================================================================================================
 

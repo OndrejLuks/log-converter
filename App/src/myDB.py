@@ -7,7 +7,7 @@ import sys
 # ===========================================================================================================
 
 class DatabaseHandle:
-    def __init__(self, config, conn):
+    def __init__(self, config, conn, event):
         self.schema_name = config["database"]["schema_name"]
         self.host = config["database"]["host"]
         self.port = config["database"]["port"]
@@ -20,6 +20,7 @@ class DatabaseHandle:
         self.conn_string = "postgresql://" + self.user + ":" + self.password + "@" + self.host + "/" + self.database
 
         self.conn = conn
+        self.stop_event = event
 
 # -----------------------------------------------------------------------------------------------------------
 
@@ -29,7 +30,8 @@ class DatabaseHandle:
 # -----------------------------------------------------------------------------------------------------------
     
     def send_to_print(self, message='', end='\n') -> None:
-        self.conn.send(f"PRINT#{message}{end}")
+        if not self.stop_event.is_set():
+            self.conn.send(f"PRINT#{message}{end}")
         return
 
 # -----------------------------------------------------------------------------------------------------------
@@ -89,6 +91,11 @@ class DatabaseHandle:
     def upload_data(self, data: list) -> None:
         """Uploads given list of dataframes to the database"""
         for df in data:
+             # thread end check
+            if self.stop_event.is_set():
+                print("Database upload aborted.")
+                return
+
             try:
                 table_name = f"{df.columns.values[0]}"
                 self.send_to_print(f"     > uploading signal: {table_name}")

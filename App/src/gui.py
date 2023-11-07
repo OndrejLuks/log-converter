@@ -65,7 +65,10 @@ class AppInterface():
         # update GUI
         self.app.mainloop()
 
-        # WHAT HAPPENS TO THE THREAD IF THE WINDOW IS KILLED? 
+        # join the read_thr in a new dialogue
+        #exit_dialogue = ExitDialogue(read_thr)
+        #exit_dialogue.mainloop()
+
         read_thr.join()
 
         return
@@ -106,6 +109,9 @@ class AppInterface():
                         else:
                             self.print_to_box("Warning: requested popup with wrong number of parameters!\n")
 
+                case "ACK":
+                    self.send_ack()
+
                 case "END":
                     break
 
@@ -113,7 +119,8 @@ class AppInterface():
                     self.print_to_box(f"Can't recognize received item: {messages}\n")
 
         return
-    
+
+
 # -----------------------------------------------------------------------------------------------------------
 
     def send_ack(self) -> None:
@@ -1052,7 +1059,37 @@ class App(customtkinter.CTk):
         self.open_toplevel_ok(type, message, callback)
         return
 
+# ================================================================================================================================
+
+class ExitDialogue(customtkinter.CTk):
+    def __init__(self, thread):
+        super().__init__()
+        self.thr = thread
+
+        try:
+            # set colors
+            customtkinter.set_appearance_mode("system")
+            self.col_frame_title_bg = "#5e5e5e"
+            self.col_frame_title_tx = "white"
+            self.col_lab = "white"
+            self.col_tx = "black"
+
+            self.minsize(300, 100)
+            self.resizable(False, False)
+            self.title("Information")
+            self.grid_columnconfigure(0, weight=1)
+
+            msg = "Application is closing ..."
+
+            # Message
+            self.msg = customtkinter.CTkLabel(self, text=msg, fg_color=self.col_lab, text_color=self.col_tx, corner_radius=6)
+            self.msg.grid(row=0, column=0, padx=10, pady=(20, 0), sticky="nswe")
+
+        except Exception as e:
+            print()
+            print(f"ERROR while trying to initialize GUI window: {e}")
 
 
-
-        
+    def close(self) -> None:
+        self.thr.join()
+        self.destroy()
