@@ -10,7 +10,6 @@ import customtkinter
 import threading
 import json
 import time
-import sys
 import os
 
 

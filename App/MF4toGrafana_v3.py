@@ -13,7 +13,7 @@
 
 from datetime import timedelta
 from threading import Lock
-from src import procData, mfd, myDB, gui, utils
+from src import procData, mfd, myDB, gui, utils, communication
 from pathlib import Path
 import pandas as pd
 import os
@@ -28,42 +28,8 @@ import multiprocessing
 # ==========================================================================================================================
 # ==========================================================================================================================
 
-
-class PipeCommunication():
-    def __init__(self, conn, event):
-        self.pipe = conn
-        self.stop_event = event
-
-# -----------------------------------------------------------------------------------------------------------
-
-    def send_to_print(self, message='', end='\n') -> None:
-        if not self.stop_event.is_set():
-            self.pipe.send(f"PRINT#{message}{end}")
-        return
-
-# -----------------------------------------------------------------------------------------------------------    
-
-    def send_command(self, command) -> None:
-        self.pipe.send(command)
-        return
-    
-# -----------------------------------------------------------------------------------------------------------    
-
-    def send_error(self, type: str, message: str, terminate: str) -> None:
-        self.pipe.send(f"POP-ERR#{type}#{message}#{terminate}")
-        return
-    
-# ----------------------------------------------------------------------------------------------------------- 
-
-    def receive(self) -> str:
-        return self.pipe.recv()
-
-
-# ==========================================================================================================================
-# ==========================================================================================================================
-
 class Process():
-    def __init__(self, utilities: utils.Utils, communication: PipeCommunication, stop_ev):
+    def __init__(self, utilities: utils.Utils, communication: communication.PipeCommunication, stop_ev):
         self.utils = utilities
         self.comm = communication
         self.stop_event = stop_ev
@@ -420,7 +386,7 @@ def warning_handler(message, category, filename, lineo, file=None, line=None) ->
 
 def process_handle(connection) -> None:
     stop_event = threading.Event()
-    pipe_communication = PipeCommunication(connection, stop_event)
+    pipe_communication = communication.PipeCommunication(connection, stop_event)
 
     app_utilities = utils.Utils(pipe_communication)
     app = Process(app_utilities, pipe_communication, stop_event)
