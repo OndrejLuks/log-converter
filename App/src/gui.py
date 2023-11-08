@@ -9,6 +9,7 @@
 import customtkinter
 import threading
 import json
+import time
 import sys
 import os
 
@@ -62,12 +63,8 @@ class AppInterface():
         read_thr = threading.Thread(target=self.read_pipe)
         read_thr.start()
 
-        # update GUI
+        # update GUI - blocking function
         self.app.mainloop()
-
-        # join the read_thr in a new dialogue
-        #exit_dialogue = ExitDialogue(read_thr)
-        #exit_dialogue.mainloop()
 
         read_thr.join()
 
@@ -118,6 +115,7 @@ class AppInterface():
                 case _:
                     self.print_to_box(f"Can't recognize received item: {messages}\n")
 
+        self.app.kill_main_window()
         return
 
 
@@ -422,6 +420,32 @@ class TopWindowOk(customtkinter.CTkToplevel):
         return
         
 # ================================================================================================================================         
+
+class TopWindowExit(customtkinter.CTkToplevel):
+    def __init__(self, master):
+        super().__init__(master)
+
+        try:
+            self.minsize(300, 100)
+            self.resizable(False, False)
+            self.title("Information")
+            self.grid_columnconfigure(0, weight=1)
+        
+            # bring the window into the foregroud
+            self.after(100, self.lift)
+
+            msg = "Application is closing..."
+
+            # Message
+            self.msg = customtkinter.CTkLabel(self, text=msg, fg_color=self.master.col_popup_ok_lab, text_color=self.master.col_popup_ok_tx, corner_radius=6)
+            self.msg.grid(row=0, column=0, padx=10, pady=(20, 0), sticky="nswe")
+        
+        except Exception as e:
+            self.master.text_box.write(f"ERROR While opening toplevel pop-up: {e}")
+
+
+# ================================================================================================================================   
+
 
 class DatabaseFrame(customtkinter.CTkFrame):
     """Class representing the frame for database settings.
@@ -943,9 +967,18 @@ class App(customtkinter.CTk):
 
 
     def exit_program(self) -> None:
-        self.conn.send("END")
         self.kill_toplevel()
-        self.destroy()
+        self.open_toplevel_exit()
+        self.conn.send("END")
+        return
+
+
+    def kill_main_window(self) -> None:
+        # delay so that popup can load properly
+        time.sleep(1)
+        self.kill_toplevel()
+        self.quit()
+        return
 
     
     def open_config(self):
@@ -1016,6 +1049,17 @@ class App(customtkinter.CTk):
         return
     
 
+    def open_toplevel_exit(self) -> None:
+        # check for window existance
+        if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
+            # create toplevel window
+            self.toplevel_window = TopWindowExit(self)
+            # position the toplevel window relatively to the main window
+            self.toplevel_window.geometry("+%d+%d" %(self.winfo_x()+200, self.winfo_y()+200))
+
+        return
+    
+
     def save(self) -> None:
         """Saves all possible changes into the config.json file."""
         if self.database_frame.save_to_json() and self.process_frame.save_to_json():
@@ -1058,38 +1102,3 @@ class App(customtkinter.CTk):
         
         self.open_toplevel_ok(type, message, callback)
         return
-
-# ================================================================================================================================
-
-class ExitDialogue(customtkinter.CTk):
-    def __init__(self, thread):
-        super().__init__()
-        self.thr = thread
-
-        try:
-            # set colors
-            customtkinter.set_appearance_mode("system")
-            self.col_frame_title_bg = "#5e5e5e"
-            self.col_frame_title_tx = "white"
-            self.col_lab = "white"
-            self.col_tx = "black"
-
-            self.minsize(300, 100)
-            self.resizable(False, False)
-            self.title("Information")
-            self.grid_columnconfigure(0, weight=1)
-
-            msg = "Application is closing ..."
-
-            # Message
-            self.msg = customtkinter.CTkLabel(self, text=msg, fg_color=self.col_lab, text_color=self.col_tx, corner_radius=6)
-            self.msg.grid(row=0, column=0, padx=10, pady=(20, 0), sticky="nswe")
-
-        except Exception as e:
-            print()
-            print(f"ERROR while trying to initialize GUI window: {e}")
-
-
-    def close(self) -> None:
-        self.thr.join()
-        self.destroy()
