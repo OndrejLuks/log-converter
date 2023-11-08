@@ -59,14 +59,18 @@ class AppInterface():
         None
         """
 
-        # create a new thread with function that will read from PIPE
-        read_thr = threading.Thread(target=self.read_pipe)
-        read_thr.start()
+        try:
+            # create a new thread with function that will read from PIPE
+            read_thr = threading.Thread(target=self.read_pipe)
+            read_thr.start()
 
-        # update GUI - blocking function
-        self.app.mainloop()
+            # update GUI - blocking function
+            self.app.mainloop()
 
-        read_thr.join()
+            read_thr.join()
+
+        except Exception as e:
+            print(f"Error occured in the main run() method:\n{e}")
 
         return
 
@@ -92,19 +96,25 @@ class AppInterface():
                     if len(messages) == 2:
                         self.print_to_box(messages[1])
                     else:
-                        self.print_to_box("Warning: blank message print requested!\n")
+                        self.generate_pop_up_error("WARNING", "Blank message print requested!", False)
 
                 case "PROG":
                     if len(messages) == 2:
                         self.update_progress_bar(float(messages[1]))
                     else:
-                        self.print_to_box("Warning: blank progress update requested!\n")
+                        self.generate_pop_up_error("WARNING", "Blank progress update requested!", False)
 
-                case "POPYN":
+                case "POP-ACK":
                         if len(messages) == 4:
                             self.generate_pop_up_yn(messages[1], messages[2], messages[3], self.send_ack, self.kill_pop_up)
                         else:
-                            self.print_to_box("Warning: requested popup with wrong number of parameters!\n")
+                            self.generate_pop_up_error("WARNING", "Requested ack popup with wrong number of parameters!", False)
+
+                case "POP-ERR":
+                    if len(messages) == 4:
+                        self.generate_pop_up_error(messages[1], messages[2], messages[3] == "T")
+                    else:
+                        self.generate_pop_up_error("WARNING", "Requested error popup with wrong number of parameters!", False)
 
                 case "ACK":
                     self.send_ack()
@@ -113,7 +123,7 @@ class AppInterface():
                     break
 
                 case _:
-                    self.print_to_box(f"Can't recognize received item: {messages}\n")
+                    self.generate_pop_up_error("WARNING", f"Can't recognize received item: {messages}", False)
 
         self.app.kill_main_window()
         return
@@ -123,26 +133,6 @@ class AppInterface():
 
     def send_ack(self) -> None:
         self.pipe.send("RUN-ACK")
-        self.kill_pop_up()
-        return
-
-# -----------------------------------------------------------------------------------------------------------
-
-    def callback_w_toplevel_kill(self, callback_fn: callable) -> None:
-        """Runs the given callback function and kills toplevel window.
-        
-        Parameters
-        ----------
-        - callback_fn
-            - function to call
-            
-        Returns
-        -------
-        None
-        """
-        if callback_fn is not None:
-            callback_fn()
-
         self.kill_pop_up()
         return
 
@@ -190,6 +180,12 @@ class AppInterface():
         self.app.open_toplevel_ok(type, message)
         return
     
+# -----------------------------------------------------------------------------------------------------------    
+
+    def generate_pop_up_error(self, type: str, message: str, terminate: bool) -> None:
+        self.app.error_handle(type, message, terminate)
+        return
+    
 # -----------------------------------------------------------------------------------------------------------
 
     def kill_pop_up(self) -> None:
@@ -212,38 +208,6 @@ class AppInterface():
         None"""
         
         self.app.text_box.write(message)
-        return
-
-# -----------------------------------------------------------------------------------------------------------
-
-    def set_start_function(self, function) -> None:
-        """Sets desired callback start function to the Start and SaveStart button.
-        
-        Parametres
-        ----------
-        - function
-            - This function will be assigned as a callback to the buttons
-            
-        Returns
-        -------
-        None"""
-
-        if not callable(function):
-            raise ValueError("The provided parameter is not a function!")
-
-        self.app.button_frame.start_function = function
-        return
-
-# -----------------------------------------------------------------------------------------------------------
-
-    def save_changes(self) -> None:
-        """Saves changes made in the GUI to src\\config.json file.
-        
-        Returns
-        -------
-        None"""
-
-        self.app.save()
         return
 
 # -----------------------------------------------------------------------------------------------------------
@@ -378,7 +342,7 @@ class TopWindowOk(customtkinter.CTkToplevel):
     - close()
     """
 
-    def __init__(self, master, type: str, msg: str, function: callable = None):
+    def __init__(self, master, type: str, msg: str, callback: callable = None):
         super().__init__(master)
 
         try:
@@ -391,29 +355,14 @@ class TopWindowOk(customtkinter.CTkToplevel):
             # bring the window into the foregroud
             self.after(100, self.lift)
 
-            if function is not None:
-                self.callback = function
-            else:
-                self.callback = self.close
-
             # Message
             self.msg = customtkinter.CTkLabel(self, text=msg, fg_color=self.master.col_popup_ok_lab, text_color=self.master.col_popup_ok_tx, corner_radius=6)
             self.msg.grid(row=0, column=0, padx=10, pady=(20, 0), sticky="nswe")
 
             # OK button
-            self.btn_ok = customtkinter.CTkButton(self, text="Okay", text_color=self.master.col_btn_tx, command=self.callback)
+            self.btn_ok = customtkinter.CTkButton(self, text="Okay", text_color=self.master.col_btn_tx, command=callback)
             self.btn_ok.grid(row=1, column=0, padx=10, pady=10, sticky="swe")
         
-        except Exception as e:
-            self.master.text_box.write(f"ERROR While opening toplevel pop-up: {e}")
-
-
-    def close(self) -> None:
-        """Destroys the toplevel window"""
-        try:
-            self.destroy()
-            self.update()
-
         except Exception as e:
             self.master.text_box.write(f"ERROR While opening toplevel pop-up: {e}")
 
@@ -496,8 +445,7 @@ class DatabaseFrame(customtkinter.CTkFrame):
                 self.labels.append(label)
                 self.entries.append((entry, name[1]))
 
-        except Exception as e:
-            self.master.text_box.write(f"ERROR: {e}")
+        except Exception:
             self.master.error_handle("ERROR", "Unable to create GUI - database", terminate=True)
 
 
@@ -523,8 +471,7 @@ class DatabaseFrame(customtkinter.CTkFrame):
             with open(os.path.join("src", "config.json"), "w") as file:
                 json.dump(self.master.my_config, file, indent=4)
 
-        except Exception as e:
-            self.master.text_box.write(f"WARNING: {e}")
+        except Exception:
             self.master.error_handle("WARNING", "Unable to save the settings", terminate=False)
             return False
 
@@ -593,8 +540,7 @@ class ProcessFrame(customtkinter.CTkFrame):
                 self.labels.append(label)
                 self.entries.append((entry, name[1]))
         
-        except Exception as e:
-            self.master.text_box.write(f"ERROR: {e}")
+        except Exception:
             self.master.error_handle("ERROR", "Unable to create GUI - process", terminate=True)
 
     
@@ -635,8 +581,7 @@ class ProcessFrame(customtkinter.CTkFrame):
             with open(os.path.join("src", "config.json"), "w") as file:
                 json.dump(self.master.my_config, file, indent=4)
         
-        except Exception as e:
-            self.master.text_box.write(f"WARNING: {e}")
+        except Exception:
             self.master.error_handle("WARNING", "Unable to save the settings", terminate=False)
             return False
         
@@ -675,8 +620,7 @@ class TextboxFrame(customtkinter.CTkFrame):
             self.textbox.grid(row=1, column=0, sticky="nsew")
             self.textbox.configure(state="disabled", font=("Courier New", 12))
 
-        except Exception as e:
-            self.master.text_box.write(f"ERROR: {e}")
+        except Exception:
             self.master.error_handle("ERROR", "Unable to create GUI - textbox", terminate=True)
 
 
@@ -733,8 +677,7 @@ class ProgressFrame(customtkinter.CTkFrame):
             self.progress.set(0)
             self.progress.grid_forget()
 
-        except Exception as e:
-            self.master.text_box.write(f"ERROR: {e}")
+        except Exception:
             self.master.error_handle("ERROR", "Unable to create GUI - progress", terminate=True)
 
 
@@ -744,8 +687,7 @@ class ProgressFrame(customtkinter.CTkFrame):
             self.title.grid(row=0, column=0, padx=10, pady=0, sticky="w")
             self.progress.grid(row=0, column=1, padx=10, pady=0, sticky="nsew")
 
-        except Exception as e:
-            self.master.text_box.write(f"WARNING: {e}")
+        except Exception:
             self.master.error_handle("WARNING", "Unable to show the progress frame", terminate=False)
 
         return
@@ -757,8 +699,7 @@ class ProgressFrame(customtkinter.CTkFrame):
             self.title.grid_forget()
             self.progress.grid_forget()
 
-        except Exception as e:
-            self.master.text_box.write(f"WARNING: {e}")
+        except Exception:
             self.master.error_handle("WARNING", "Unable to hide the progress frame", terminate=False)
 
         return
@@ -775,8 +716,7 @@ class ProgressFrame(customtkinter.CTkFrame):
         try:
             self.progress.set(val)
 
-        except Exception as e:
-            self.master.text_box.write(f"WARNING: {e}")
+        except Exception:
             self.master.error_handle("WARNING", "Unable set a new value of the progress frame", terminate=False)
 
         return
@@ -831,8 +771,7 @@ class ButtonsFrame(customtkinter.CTkFrame):
             self.btn_save_start = customtkinter.CTkButton(self, text="Save and Start", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self.btn_callback_save_start)
             self.btn_save_start.grid(row=0, column=3, padx=5, pady=5, sticky="nswe")
 
-        except Exception as e:
-            self.master.text_box.write(f"ERROR: {e}")
+        except Exception:
             self.master.error_handle("ERROR", "Unable to create GUI - buttons", terminate=True)
 
 
@@ -866,8 +805,7 @@ class ButtonsFrame(customtkinter.CTkFrame):
             self.btn_start.configure(state="disabled")
             self.btn_save_start.configure(state="disabled")
 
-        except Exception as e:
-            self.master.text_box.write(f"WARNING: {e}")
+        except Exception:
             self.master.error_handle("WARNING", "Unable to disable buttos", terminate=False)
 
         return
@@ -880,8 +818,7 @@ class ButtonsFrame(customtkinter.CTkFrame):
             self.btn_start.configure(state="normal")
             self.btn_save_start.configure(state="normal")
 
-        except Exception as e:
-            self.master.text_box.write(f"WARNING: {e}")
+        except Exception:
             self.master.error_handle("WARNING", "Unable to enable buttos", terminate=False)
 
         return
@@ -990,7 +927,7 @@ class App(customtkinter.CTk):
         except FileNotFoundError:
             print()
             print("ERROR while reading src\\config.json file. Check for file existance.")
-            sys.exit(1)
+            self.exit_program()
     
         return data
     
@@ -1098,7 +1035,7 @@ class App(customtkinter.CTk):
         if terminate:
             callback = self.exit_program
         else:
-            callback = None
+            callback = self.kill_toplevel
         
         self.open_toplevel_ok(type, message, callback)
         return

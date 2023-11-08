@@ -1,13 +1,12 @@
 from sqlalchemy.exc import IntegrityError, ProgrammingError
 from sqlalchemy import create_engine, schema
 from sqlalchemy.sql import text
-import sys
 
 # ===========================================================================================================
 # ===========================================================================================================
 
 class DatabaseHandle:
-    def __init__(self, config, conn, event):
+    def __init__(self, config, communication, event):
         self.schema_name = config["database"]["schema_name"]
         self.host = config["database"]["host"]
         self.port = config["database"]["port"]
@@ -19,20 +18,13 @@ class DatabaseHandle:
 
         self.conn_string = "postgresql://" + self.user + ":" + self.password + "@" + self.host + "/" + self.database
 
-        self.conn = conn
+        self.comm = communication
         self.stop_event = event
 
 # -----------------------------------------------------------------------------------------------------------
 
     def __del__(self):
         self.finish()
-
-# -----------------------------------------------------------------------------------------------------------
-    
-    def send_to_print(self, message='', end='\n') -> None:
-        if not self.stop_event.is_set():
-            self.conn.send(f"PRINT#{message}{end}")
-        return
 
 # -----------------------------------------------------------------------------------------------------------
     
@@ -48,8 +40,7 @@ class DatabaseHandle:
             pass
 
         except Exception as e:
-            self.send_to_print()
-            self.send_to_print(f"WARNING - querry:  {e}")
+            self.comm.send_error("WARNING", f"Problem with query:\n{e}", "F")
 
 # -----------------------------------------------------------------------------------------------------------
 
@@ -60,9 +51,7 @@ class DatabaseHandle:
             self.connection = self.engine.connect()
 
         except Exception as e:
-            self.send_to_print()
-            self.send_to_print(f"DB CONNECTION ERROR:  {e}")
-            sys.exit(1)
+            self.comm.send_error("ERROR", f"DB CONNECTION ERROR:\n{e}", "T")
 
 # -----------------------------------------------------------------------------------------------------------    
 
@@ -72,19 +61,16 @@ class DatabaseHandle:
             if self.clean:
                 # clean upload is selected
                 if self.connection.dialect.has_schema(self.connection, self.schema_name):
-                    self.send_to_print(f" - Dropping schema {self.schema_name}")
+                    self.comm.send_to_print(f" - Dropping schema {self.schema_name}")
                     self._querry(f"DROP SCHEMA {self.schema_name} CASCADE")
 
             if not self.connection.dialect.has_schema(self.connection, self.schema_name):
-                self.send_to_print(f" - Creating schema {self.schema_name}")
+                self.comm.send_to_print(f" - Creating schema {self.schema_name}")
                 self.connection.execute(schema.CreateSchema(self.schema_name))
                 self.connection.commit()
 
-                
         except Exception as e:
-            self.send_to_print()
-            self.send_to_print(f"ERROR - schema:  {e}")
-            sys.exit(1)
+            self.comm.send_error("ERROR", f"Error with DB schema:\n{e}", "T")
     
 # -----------------------------------------------------------------------------------------------------------
 
@@ -98,7 +84,7 @@ class DatabaseHandle:
 
             try:
                 table_name = f"{df.columns.values[0]}"
-                self.send_to_print(f"     > uploading signal: {table_name}")
+                self.comm.send_to_print(f"     > uploading signal: {table_name}")
                 df.to_sql(name=table_name,
                             con=self.engine,
                             schema=self.schema_name,
@@ -110,22 +96,19 @@ class DatabaseHandle:
                 self._querry(f'ALTER TABLE {self.schema_name}."{table_name}" ADD PRIMARY KEY (time_stamp)')
 
             except IntegrityError:
-                self.send_to_print("       - WARNING: Skipping signal upload due to unique violation. This record already exists in the DB.")
+                self.comm.send_to_print("       - WARNING: Skipping signal upload due to unique violation. This record already exists in the DB.")
             
             except Exception as e:
-                self.send_to_print()
-                self.send_to_print(f"DB UPLOAD WARNING:  {e}")
+                self.comm.send_error("WARNING", f"Problem with DB upload:\n{e}", "F")
     
 # -----------------------------------------------------------------------------------------------------------
 
     def finish(self) -> None:
         """Function to handle database connection closing"""
         try:
-            self.send_to_print("Closing database connection ...  ", end='')
+            self.comm.send_to_print("Closing database connection ...  ", end='')
             self.connection.close()
-            self.send_to_print("done!")
+            self.comm.send_to_print("done!")
             
         except Exception as e:
-            self.send_to_print()
-            self.send_to_print(f"DB CLOSING ERROR:  {e}")
-
+            self.comm.send_error("WARNING", f"Problem with closing DB:\n{e}", "F")

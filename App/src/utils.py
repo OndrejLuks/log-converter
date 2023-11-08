@@ -7,7 +7,6 @@
 
 
 import os
-import sys
 import pytz
 import shutil
 
@@ -36,14 +35,8 @@ class Utils():
 
 # -----------------------------------------------------------------------------------------------------------
 
-    def __init__(self, conn) -> None:
-        self.conn = conn
-
-# -----------------------------------------------------------------------------------------------------------
-
-    def send_to_print(self, message='', end='\n') -> None:
-        self.conn.send(f"PRINT#{message}{end}")
-        return
+    def __init__(self, communication) -> None:
+        self.comm = communication
 
 # -----------------------------------------------------------------------------------------------------------
     
@@ -66,8 +59,9 @@ class Utils():
                 f.write(file_name + "," + str(start_time) + "," + str(end_time) + "\n")
 
         except Exception as e:
-            self.send_to_print()
-            self.send_to_print(f"INFO RECORDING WARNING:  {e}\n") 
+            self.comm.send_error("WARNING", f"Failed to write MF4 info:\n{e}", "F")
+
+        return
 
 # -----------------------------------------------------------------------------------------------------------
 
@@ -85,14 +79,12 @@ class Utils():
                         out.append(mf4_file)
 
         except Exception as e:
-            self.send_to_print()
-            self.send_to_print(f"MF4 READING WARNING:  {e}\n") 
-            sys.exit(1)
+            self.comm.send_error("ERROR", f"Error while reading MF4 files:\n{e}", "T")
 
         if len(out) == 0:
-            self.send_to_print()
-            self.send_to_print("WARNING: No MF4 files found!\n")
-            self.send_to_print()
+            self.comm.send_to_print()
+            self.comm.send_to_print("WARNING: No MF4 files found!\n")
+            self.comm.send_to_print()
 
         return out, len(out)
 
@@ -106,10 +98,11 @@ class Utils():
                     dir_path = os.path.join(root, dir_name)
                     if not os.listdir(dir_path):
                         os.rmdir(dir_path)
+
         except OSError:
-            self.send_to_print()
-            self.send_to_print(f"ERROR: Failed to remove empty subdirs of root {top_level}\n")
-            sys.exit(1)
+            self.comm.send_error("WARNING", f"Failed to remove empty subdirs of root {top_level}", "F")
+
+        return
 
 # -----------------------------------------------------------------------------------------------------------
 
@@ -126,11 +119,11 @@ class Utils():
             shutil.move(file, target_file)
 
         except Exception as e:
-            self.send_to_print()
-            self.send_to_print(f"FILE MOVING WARNING:  {e}\n")
+            self.comm.send_error("WARNING", f"Problem with file movement:\n{e}", "F")
 
         # remove empty source folders
         self.rm_empty_subdirs("SourceMF4")
+        return
 
 # -----------------------------------------------------------------------------------------------------------
 
@@ -141,5 +134,6 @@ class Utils():
                 os.makedirs(target_dir)
 
         except Exception as e:
-            self.send_to_print()
-            self.send_to_print(f"DIR CREATION WARNING:  {e}\n")
+            self.comm.send_error("WARNING", f"Problem with dir creation:\n{e}", "F")
+        
+        return

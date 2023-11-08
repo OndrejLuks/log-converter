@@ -17,7 +17,6 @@ from src import procData, mfd, myDB, gui, utils
 from pathlib import Path
 import pandas as pd
 import os
-import sys
 import json
 import warnings
 import threading
@@ -30,20 +29,53 @@ import multiprocessing
 # ==========================================================================================================================
 
 
+class PipeCommunication():
+    def __init__(self, conn, event):
+        self.pipe = conn
+        self.stop_event = event
+
+# -----------------------------------------------------------------------------------------------------------
+
+    def send_to_print(self, message='', end='\n') -> None:
+        if not self.stop_event.is_set():
+            self.pipe.send(f"PRINT#{message}{end}")
+        return
+
+# -----------------------------------------------------------------------------------------------------------    
+
+    def send_command(self, command) -> None:
+        self.pipe.send(command)
+        return
+    
+# -----------------------------------------------------------------------------------------------------------    
+
+    def send_error(self, type: str, message: str, terminate: str) -> None:
+        self.pipe.send(f"POP-ERR#{type}#{message}#{terminate}")
+        return
+    
+# ----------------------------------------------------------------------------------------------------------- 
+
+    def receive(self) -> str:
+        return self.pipe.recv()
+
+
+# ==========================================================================================================================
+# ==========================================================================================================================
+
 class Process():
-    def __init__(self, utilities: utils.Utils, conn):
+    def __init__(self, utilities: utils.Utils, communication: PipeCommunication, stop_ev):
         self.utils = utilities
+        self.comm = communication
+        self.stop_event = stop_ev
         self.config = None
         self.dbc_list = self.create_dbc_list()
-        self.conn = conn
         self.threads = []
-        self.stop_event = threading.Event()
 
 # -----------------------------------------------------------------------------------------------------------
 
     def await_orders(self) -> None:
         while True:
-            event = self.conn.recv()
+            event = self.comm.receive()
 
             match event:
                 case "RUN-PROP":
@@ -59,22 +91,9 @@ class Process():
                     break
 
                 case _:
-                    self.send_to_print("Unknown command to the process")
+                    self.comm.send_to_print("Unknown command to the process")
         
-        self.send_command("END")
-        return
-
-# -----------------------------------------------------------------------------------------------------------
-
-    def send_to_print(self, message='', end='\n') -> None:
-        if not self.stop_event.is_set():
-            self.conn.send(f"PRINT#{message}{end}")
-        return
-
-# -----------------------------------------------------------------------------------------------------------    
-
-    def send_command(self, command) -> None:
-        self.conn.send(command)
+        self.comm.send_command("END")
         return
     
 # -----------------------------------------------------------------------------------------------------------
@@ -94,19 +113,16 @@ class Process():
 
     def open_config(self):
         """Loads configure json file (config.json) from root directory. Returns json object."""
-        self.send_to_print("Reading config file ... ", end='')
+        self.comm.send_to_print("Reading config file ... ", end='')
 
         try:
             with open(os.path.join("src", "config.json"), "r") as file:
                 data = json.load(file)
 
         except FileNotFoundError:
-            self.send_to_print()
-            self.send_to_print("ERROR while reading src\\config.json file. Check for file existance.")
-            self.send_command("FINISH")
-            sys.exit(1)
+            self.comm.send_error("ERROR", "Can't read src\\config.json file. Check for file existance.", "T")
 
-        self.send_to_print("done!")
+        self.comm.send_to_print("done!")
         return data
     
 # -----------------------------------------------------------------------------------------------------------
@@ -126,10 +142,7 @@ class Process():
                     db_list.append(db)
 
         except OSError:
-            self.send_to_print()
-            self.send_to_print("ERROR while loading DBC files. Check for file existance.")
-            self.send_command("FINISH")
-            sys.exit(1)
+            self.comm.send_error("ERROR", "Can't load DBC files. Check for file existance.", "T")
 
         return db_list
 
@@ -188,12 +201,12 @@ class Process():
 
         # write time info if required
         if self.config["settings"]["write_time_info"]:
-            self.send_to_print("   - writing time information into MF4-info.csv...")
+            self.comm.send_to_print("   - writing time information into MF4-info.csv...")
             # check if df is not empty
             if df_phys.shape[0] > 0:
                 self.utils.write_time_info(mf4_file, df_phys.index[0], df_phys.index[-1])
 
-        self.send_to_print("   - extracting individual signals...")
+        self.comm.send_to_print("   - extracting individual signals...")
         return self.split_df_by_cols(df_phys)
 
 # -----------------------------------------------------------------------------------------------------------
@@ -212,7 +225,7 @@ class Process():
         if num_rows > 0:
             sig_name = df.columns.values[0]
             with lock:
-                self.send_to_print(f"     > started aggregating signal: {sig_name}")
+                self.comm.send_to_print(f"     > started aggregating signal: {sig_name}")
             # create an array of indexes to use as a mask for the dataframe
             idx_array = []
             # insert first index into the array
@@ -250,7 +263,7 @@ class Process():
             # safely store the aggregated signal
             with lock:
                 dfs.append(result_df)
-                self.send_to_print(f"     = finished agg. signal: {sig_name}")
+                self.comm.send_to_print(f"     = finished agg. signal: {sig_name}")
 
             return
 
@@ -263,16 +276,20 @@ class Process():
         if not 'Signal' in df.columns:
             # No signals were converted
             return column_df
+        
+        try:
+            for signal_name in df['Signal'].unique():
+                # thread end check
+                if self.stop_event.is_set():
+                    print("Conversion aborted.")
+                    return None
 
-        for signal_name in df['Signal'].unique():
-            # thread end check
-            if self.stop_event.is_set():
-                print("Conversion aborted.")
-                return None
+                signal_df = df[df['Signal'] == signal_name][['Physical Value']].copy()
+                signal_df.rename(columns={'Physical Value': signal_name}, inplace=True)
+                column_df.append(signal_df)
 
-            signal_df = df[df['Signal'] == signal_name][['Physical Value']].copy()
-            signal_df.rename(columns={'Physical Value': signal_name}, inplace=True)
-            column_df.append(signal_df)
+        except Exception as e:
+            self.comm.send_error("ERROR", f"Can't split df:\n{e}", "T")
 
         return column_df
 
@@ -287,11 +304,11 @@ class Process():
             type = "WARNING!"
             msg = 'With "Clean upload" enabled, the whole current database will be erased!'
             ques = "Do you really want to proceed?"
-            self.send_command(f"POPYN#{type}#{msg}#{ques}")
+            self.comm.send_command(f"POP-ACK#{type}#{msg}#{ques}")
         
         else:
             # run the process
-            self.send_command("ACK")
+            self.comm.send_command("ACK")
 
         return
 
@@ -300,10 +317,10 @@ class Process():
     def process_handle(self) -> None:
         """Function that handles MF4 files process from conversion to upload"""
 
-        self.send_command("START")
+        self.comm.send_command("START")
 
         # prepare the database
-        db = myDB.DatabaseHandle(self.config, self.conn, self.stop_event)
+        db = myDB.DatabaseHandle(self.config, self.comm, self.stop_event)
         db.connect()
         db.create_schema()
 
@@ -324,7 +341,7 @@ class Process():
                     return
 
                 # CONVERT FILE into Signal files
-                self.send_to_print(f" - Converting: {file}")
+                self.comm.send_to_print(f" - Converting: {file}")
             
                 dfs_to_upload = []
                 converted_files = self.convert_mf4(file)
@@ -337,7 +354,7 @@ class Process():
                 # AGGREGATE if requested
                 if self.config["settings"]["aggregate"]:
                     agg_threads = []
-                    self.send_to_print("   - aggregating...")
+                    self.comm.send_to_print("   - aggregating...")
                     # run each signal in a different thread
                     lock = Lock()
                     for signal_df in converted_files:
@@ -364,7 +381,7 @@ class Process():
                     return
 
                 # UPLOAD TO DB
-                self.send_to_print("   - uploading...")
+                self.comm.send_to_print("   - uploading...")
                 db.upload_data(dfs_to_upload)
 
                 # thread end check
@@ -374,25 +391,23 @@ class Process():
     
                 # MOVE DONE FILES if requested
                 if self.config["settings"]["move_done_files"]:
-                    self.send_to_print("   - moving the file...")
+                    self.comm.send_to_print("   - moving the file...")
                     self.utils.move_done_file(file, "SourceMF4")
 
                 num_of_done_mf4_files += 1
-                self.send_command(f"PROG#{round((num_of_done_mf4_files / num_of_mf4_files), 2)}")
-                self.send_to_print(f"   - DONE!     Overall progress:  {round((num_of_done_mf4_files / num_of_mf4_files)*100, 2)} %")
-                self.send_to_print()
+                self.comm.send_command(f"PROG#{round((num_of_done_mf4_files / num_of_mf4_files), 2)}")
+                self.comm.send_to_print(f"   - DONE!     Overall progress:  {round((num_of_done_mf4_files / num_of_mf4_files)*100, 2)} %")
+                self.comm.send_to_print()
 
         except Exception as e:
-            self.send_to_print()
-            self.send_to_print(f"Process ERROR:  {e}")
-            self.send_command("FINISH")
+            self.comm.send_error("ERROR", f"Process error:\n{e}", "T")
             return
 
-        self.send_to_print()
-        self.send_to_print("                                      ~ ")           
-        self.send_to_print("Everything completed successfully!  c[_]")
-        self.send_to_print()
-        self.send_command("FINISH")
+        self.comm.send_to_print()
+        self.comm.send_to_print("                                      ~ ")           
+        self.comm.send_to_print("Everything completed successfully!  c[_]")
+        self.comm.send_to_print()
+        self.comm.send_command("FINISH")
         return
 
 # ==========================================================================================================================
@@ -404,22 +419,22 @@ def warning_handler(message, category, filename, lineo, file=None, line=None) ->
 # ==========================================================================================================================
 
 def process_handle(connection) -> None:
-    app_utilities = utils.Utils(connection)
+    stop_event = threading.Event()
+    pipe_communication = PipeCommunication(connection, stop_event)
 
-    app = Process(app_utilities, connection)
+    app_utilities = utils.Utils(pipe_communication)
+    app = Process(app_utilities, pipe_communication, stop_event)
+
     app.await_orders()
-
-    return
     
+    return
 
+    
 def main():
     warnings.showwarning = warning_handler
 
     conn1, conn2 = multiprocessing.Pipe()
 
-
-    # handle all connection stuff inside AppInterface, pass conn1 to AppInterface, not App
-    # create a function that will set the conn1 into App 
     app_gui = gui.App()
     app_interface = gui.AppInterface(app_gui, conn1)
 
