@@ -6,8 +6,10 @@
 # ==========================================================================================================================
 
 
+from . import communication
 import os
 import pytz
+import json
 import shutil
 
 
@@ -35,7 +37,7 @@ class Utils():
 
 # -----------------------------------------------------------------------------------------------------------
 
-    def __init__(self, communication) -> None:
+    def __init__(self, communication: communication.PipeCommunication) -> None:
         self.comm = communication
 
 # -----------------------------------------------------------------------------------------------------------
@@ -137,3 +139,20 @@ class Utils():
             self.comm.send_error("WARNING", f"Problem with dir creation:\n{e}", "F")
         
         return
+    
+# -----------------------------------------------------------------------------------------------------------
+
+    def open_config(self, path: str):
+        """Loads configure json file (config.json) from root directory. Returns json object."""
+        self.comm.send_to_print("Reading config file ... ", end='')
+
+        try:
+            with open(path, "r") as file:
+                data = json.load(file)
+
+        except FileNotFoundError:
+            self.comm.send_error("ERROR", f"Can't read {path} file. Check for file existance.", "T")
+            return None
+
+        self.comm.send_to_print("done!")
+        return data

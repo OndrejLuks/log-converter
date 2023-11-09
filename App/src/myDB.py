@@ -7,6 +7,8 @@ from sqlalchemy.sql import text
 
 class DatabaseHandle:
     def __init__(self, config, communication, event):
+        # ADD TRY - EXCEPT CLAUSE
+        self.comm = communication
         self.schema_name = config["database"]["schema_name"]
         self.host = config["database"]["host"]
         self.port = config["database"]["port"]
@@ -18,7 +20,6 @@ class DatabaseHandle:
 
         self.conn_string = "postgresql://" + self.user + ":" + self.password + "@" + self.host + "/" + self.database
 
-        self.comm = communication
         self.stop_event = event
 
 # -----------------------------------------------------------------------------------------------------------
