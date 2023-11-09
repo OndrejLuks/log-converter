@@ -9,15 +9,13 @@
 
 from datetime import timedelta
 from threading import Lock
-from src import procData, mfd, myDB, gui, utils, communication
+from src import procData, mfd, myDB, utils, communication
 from pathlib import Path
 import pandas as pd
 import os
-import warnings
 import threading
 import can_decoder
 import canedge_browser
-import multiprocessing
 
 
 # ==========================================================================================================================
@@ -243,7 +241,7 @@ class Conversion():
             return
 
         # load MF4 files
-        mf4_file_list, num_of_mf4_files = self.utils.get_MF4_files(os.path.join("..", "SourceMF4"))
+        mf4_file_list, num_of_mf4_files = self.utils.get_MF4_files(os.path.join("SourceMF4"))
         num_of_done_mf4_files = 0
 
         try: 

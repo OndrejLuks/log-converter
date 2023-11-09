@@ -77,7 +77,9 @@ class Utils():
                 for file in files:
                     if file.endswith(".MF4"):
                         # found MF4 file
-                        mf4_file = os.path.join(root, file)
+                        mf4_file = os.path.join("..", root, file)
+                        print(root)
+                        print(file)
                         out.append(mf4_file)
 
         except Exception as e:

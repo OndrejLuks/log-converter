@@ -11,16 +11,8 @@
 # ==========================================================================================================================
 
 
-from datetime import timedelta
-from threading import Lock
-from src import procData, mfd, myDB, gui, utils, communication, BackendHandle
-from pathlib import Path
-import pandas as pd
-import os
+from src import gui, BackendHandle
 import warnings
-import threading
-import can_decoder
-import canedge_browser
 import multiprocessing
 
 
