@@ -11,7 +11,7 @@
 # ==========================================================================================================================
 
 
-from src import gui, BackendHandle
+from src import gui, backend_handle
 import warnings
 import multiprocessing
 
@@ -27,8 +27,8 @@ def warning_handler(message, category, filename, lineo, file=None, line=None) ->
 # ==========================================================================================================================
 
 def run_backend(connection) -> None:
-    backend_handle = BackendHandle.BackendHandle(connection)
-    backend_handle.run()
+    backend = backend_handle.BackendHandle(connection)
+    backend.run()
     
     return
 

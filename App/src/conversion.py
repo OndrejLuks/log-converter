@@ -8,9 +8,9 @@
 from datetime import timedelta
 from threading import Lock
 
-from .procData import ProcessData
+from .proc_data import ProcessData
 from .mfd import MultiFrameDecoder
-from .myDB import DatabaseHandle
+from .db_handle import DatabaseHandle
 from .utils import Utils
 from .communication import PipeCommunication
 

@@ -7,8 +7,8 @@
 
 from .communication import PipeCommunication
 from .utils import Utils
-from .Conversion import Conversion
-from .myDB import DatabaseHandle
+from .conversion import Conversion
+from .db_handle import DatabaseHandle
 import threading
 
 # ================================================================================================================================
