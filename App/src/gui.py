@@ -1000,6 +1000,8 @@ class App(customtkinter.CTk):
         """Saves all possible changes into the config.json file."""
         if self.database_frame.save_to_json() and self.process_frame.save_to_json():
             self.text_box.write(f"Successfully saved!\n")
+            # update backend configuration
+            self.conn.send("U-CONF")
         else:
             self.text_box.write(f"Failed to save.\n")
 

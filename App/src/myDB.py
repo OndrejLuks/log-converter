@@ -1,3 +1,10 @@
+# Made by Ondrej Luks, 2023
+# ondrej.luks@doosan.com
+
+
+# ================================================================================================================================
+# ================================================================================================================================
+
 from sqlalchemy.exc import IntegrityError, ProgrammingError
 from sqlalchemy import create_engine, schema
 from sqlalchemy.sql import text
@@ -7,7 +14,7 @@ from sqlalchemy.sql import text
 
 class DatabaseHandle:
     def __init__(self, config, communication, event):
-        # ADD TRY - EXCEPT CLAUSE
+        # TODO ADD TRY - EXCEPT CLAUSE
         self.comm = communication
         self.schema_name = config["database"]["schema_name"]
         self.host = config["database"]["host"]
@@ -113,3 +120,18 @@ class DatabaseHandle:
             
         except Exception as e:
             self.comm.send_error("WARNING", f"Problem with closing DB:\n{e}", "F")
+
+# -----------------------------------------------------------------------------------------------------------
+
+    def update_config(self, config) -> None:
+        self.schema_name = config["database"]["schema_name"]
+        self.host = config["database"]["host"]
+        self.port = config["database"]["port"]
+        self.database = config["database"]["database"]
+        self.user = config["database"]["user"]
+        self.password = config["database"]["password"]
+        self.clean = config["settings"]["clean_upload"]
+
+        self.conn_string = "postgresql://" + self.user + ":" + self.password + "@" + self.host + "/" + self.database
+
+        return

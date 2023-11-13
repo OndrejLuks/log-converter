@@ -5,9 +5,11 @@
 # ================================================================================================================================
 # ================================================================================================================================
 
-from . import communication, Conversion, utils, myDB
+from .communication import PipeCommunication
+from .utils import Utils
+from .Conversion import Conversion
+from .myDB import DatabaseHandle
 import threading
-
 
 # ================================================================================================================================
 # ================================================================================================================================
@@ -17,16 +19,16 @@ class BackendHandle():
     def __init__(self, connection):
         self.stop_event = threading.Event()
 
-        self.comm = communication.PipeCommunication(connection, self.stop_event)
-        self.utils = utils.Utils(self.comm)
+        self.comm = PipeCommunication(connection, self.stop_event)
+        self.utils = Utils(self.comm)
         
 
         self.config = self.utils.open_config("src/config.json")
-        self.db = myDB.DatabaseHandle(self.config, self.comm, self.stop_event)
+        self.db = DatabaseHandle(self.config, self.comm, self.stop_event)
 
         self.threads = []
 
-        self.conv = Conversion.Conversion(self.utils, self.comm, self.db, self.stop_event, self.threads, self.config)
+        self.conv = Conversion(self.utils, self.comm, self.db, self.stop_event, self.threads, self.config)
 
 
     def run(self):
@@ -42,6 +44,9 @@ class BackendHandle():
                     thr_proc.start()
                     self.threads.append(thr_proc)
 
+                case "U-CONF":
+                    self.update_configs()
+                
                 case "END":
                     self.thread_cleanup()
                     break
@@ -61,5 +66,14 @@ class BackendHandle():
         for thr in self.threads:
             if thr.is_alive():
                 thr.join()
+
+        return
+    
+
+    def update_configs(self) -> None:
+        self.config = self.utils.open_config("src/config.json")
+        self.db.update_config(self.config)
+        self.conv.update_config(self.config)
+        self.comm.send_to_print("Settings updated.")
 
         return

@@ -5,11 +5,15 @@
 # ================================================================================================================================
 # ================================================================================================================================
 
-
-
 from datetime import timedelta
 from threading import Lock
-from src import procData, mfd, myDB, utils, communication
+
+from .procData import ProcessData
+from .mfd import MultiFrameDecoder
+from .myDB import DatabaseHandle
+from .utils import Utils
+from .communication import PipeCommunication
+
 from pathlib import Path
 import pandas as pd
 import os
@@ -17,14 +21,13 @@ import threading
 import can_decoder
 import canedge_browser
 
-
 # ==========================================================================================================================
 # ==========================================================================================================================
 
 class Conversion():
-    def __init__(self, utilities: utils.Utils,
-                 communication: communication.PipeCommunication,
-                 database: myDB.DatabaseHandle,
+    def __init__(self, utilities: Utils,
+                 communication: PipeCommunication,
+                 database: DatabaseHandle,
                  stop_ev: threading.Event, 
                  thrs: list,
                  config):
@@ -60,6 +63,12 @@ class Conversion():
 
 # -----------------------------------------------------------------------------------------------------------
 
+    def update_config(self, config) -> None:
+        self.config = config
+        return
+
+# -----------------------------------------------------------------------------------------------------------
+
     def setup_fs(self) -> canedge_browser.LocalFileSystem:
         """Sets up a filesystem required for signal extraxtion from raw MF4"""
         base_path = Path(__file__).parent
@@ -70,7 +79,7 @@ class Conversion():
     def convert_mf4(self, mf4_file: os.path) -> list:
         """Converts and decodes MF4 files to a dataframe using DBC files."""
         fs = self.setup_fs()
-        proc = procData.ProcessData(fs, self.dbc_list)
+        proc = ProcessData(fs, self.dbc_list)
 
         # thread end check
         if self.stop_event.is_set():
@@ -86,7 +95,7 @@ class Conversion():
             return None
 
         # replace transport protocol with single frames
-        tp = mfd.MultiFrameDecoder("j1939")
+        tp = MultiFrameDecoder("j1939")
         df_raw = tp.combine_tp_frames(df_raw)
 
         # thread end check
@@ -208,9 +217,6 @@ class Conversion():
 # -----------------------------------------------------------------------------------------------------------
     
     def check_db_override(self) -> None:
-        # load config
-        self.config = self.utils.open_config("src/config.json")
-        
         # check DB override
         if self.config["settings"]["clean_upload"]:
             type = "WARNING!"
