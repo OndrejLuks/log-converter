@@ -32,7 +32,6 @@ class AppInterface():
     - generate_pop_up_ok (type, message)
     - kill_pop_up ()
     - print_to_box (message)
-    - set_start_function (function)
     - save_changes ()
     - disable_buttons ()
     - enable_buttons ()
@@ -158,25 +157,6 @@ class AppInterface():
         None
         """
         self.app.open_toplevel_yn(type, message, question, callback_yes, callback_no)
-        return
-
-# -----------------------------------------------------------------------------------------------------------
-
-    def generate_pop_up_ok(self, type: str, message: str) -> None:
-        """Generates a message popup window with OK button.
-        
-        Parametres
-        ----------
-        - type : str
-            - Name of the window
-        - message : str
-            - Displayed message in the white box
-            
-        Returns
-        -------
-        None"""
-
-        self.app.open_toplevel_ok(type, message)
         return
     
 # -----------------------------------------------------------------------------------------------------------    
@@ -305,23 +285,23 @@ class TopWindowYesNo(customtkinter.CTkToplevel):
             self.after(100, self.lift)
 
             # Message
-            self.msg = customtkinter.CTkLabel(self, text=msg, fg_color=self.master.col_popup_yn_lab, text_color=self.master.col_popup_yn_tx, corner_radius=6)
-            self.msg.grid(row=0, column=0, columnspan=2, padx=10, pady=(20, 0), sticky="nswe")
+            self._msg = customtkinter.CTkLabel(self, text=msg, fg_color=self.master.col_popup_yn_lab, text_color=self.master.col_popup_yn_tx, corner_radius=6)
+            self._msg.grid(row=0, column=0, columnspan=2, padx=10, pady=(20, 0), sticky="nswe")
 
             # Question
-            self.question = customtkinter.CTkLabel(self, text=question, text_color=self.master.col_popup_yn_tx)
-            self.question.grid(row=1, column=0, columnspan=2, padx=10, pady=20, sticky="nswe")
+            self._question = customtkinter.CTkLabel(self, text=question, text_color=self.master.col_popup_yn_tx)
+            self._question.grid(row=1, column=0, columnspan=2, padx=10, pady=20, sticky="nswe")
 
             # YES button
-            self.btn_yes = customtkinter.CTkButton(self, text="Yes", text_color=self.master.col_btn_tx, command=btn_callback_yes)
-            self.btn_yes.grid(row=2, column=0, padx=10, pady=10, sticky="nswe")
+            self._btn_yes = customtkinter.CTkButton(self, text="Yes", text_color=self.master.col_btn_tx, command=btn_callback_yes)
+            self._btn_yes.grid(row=2, column=0, padx=10, pady=10, sticky="nswe")
 
             # NO button
-            self.btn_no = customtkinter.CTkButton(self, text="No", text_color=self.master.col_btn_tx, command=btn_callback_no)
-            self.btn_no.grid(row=2, column=1, padx=10, pady=10, sticky="nswe")
+            self._btn_no = customtkinter.CTkButton(self, text="No", text_color=self.master.col_btn_tx, command=btn_callback_no)
+            self._btn_no.grid(row=2, column=1, padx=10, pady=10, sticky="nswe")
         
         except Exception as e:
-            self.master.text_box.write(f"ERROR While opening toplevel pop-up: {e}")
+            self.master.text_box.write(f"ERROR While opening toplevel pop-up:\n{e}")
         
 # ================================================================================================================================
 
@@ -355,15 +335,15 @@ class TopWindowOk(customtkinter.CTkToplevel):
             self.after(100, self.lift)
 
             # Message
-            self.msg = customtkinter.CTkLabel(self, text=msg, fg_color=self.master.col_popup_ok_lab, text_color=self.master.col_popup_ok_tx, corner_radius=6)
-            self.msg.grid(row=0, column=0, padx=10, pady=(20, 0), sticky="nswe")
+            self._msg = customtkinter.CTkLabel(self, text=msg, fg_color=self.master.col_popup_ok_lab, text_color=self.master.col_popup_ok_tx, corner_radius=6)
+            self._msg.grid(row=0, column=0, padx=10, pady=(20, 0), sticky="nswe")
 
             # OK button
-            self.btn_ok = customtkinter.CTkButton(self, text="Okay", text_color=self.master.col_btn_tx, command=callback)
-            self.btn_ok.grid(row=1, column=0, padx=10, pady=10, sticky="swe")
+            self._btn_ok = customtkinter.CTkButton(self, text="Okay", text_color=self.master.col_btn_tx, command=callback)
+            self._btn_ok.grid(row=1, column=0, padx=10, pady=10, sticky="swe")
         
         except Exception as e:
-            self.master.text_box.write(f"ERROR While opening toplevel pop-up: {e}")
+            self.master.text_box.write(f"ERROR While opening toplevel pop-up:\n{e}")
 
         return
         
@@ -385,11 +365,11 @@ class TopWindowExit(customtkinter.CTkToplevel):
             msg = "Application is closing..."
 
             # Message
-            self.msg = customtkinter.CTkLabel(self, text=msg, fg_color=self.master.col_popup_ok_lab, text_color=self.master.col_popup_ok_tx, corner_radius=6)
-            self.msg.grid(row=0, column=0, padx=10, pady=(20, 0), sticky="nswe")
+            self._msg = customtkinter.CTkLabel(self, text=msg, fg_color=self.master.col_popup_ok_lab, text_color=self.master.col_popup_ok_tx, corner_radius=6)
+            self._msg.grid(row=0, column=0, padx=10, pady=(20, 0), sticky="nswe")
         
         except Exception as e:
-            self.master.text_box.write(f"ERROR While opening toplevel pop-up: {e}")
+            self.master.text_box.write(f"ERROR While opening toplevel pop-up:\n{e}")
 
 
 # ================================================================================================================================   
@@ -431,8 +411,8 @@ class DatabaseFrame(customtkinter.CTkFrame):
                         ("User", "user"),
                         ("Password", "password"),
                         ("Schema", "schema_name")]
-            self.entries = []
-            self.labels = []
+            self._entries = []
+            self._labels = []
 
             # create entries
             for i, name in enumerate(self.entry_names):
@@ -441,8 +421,8 @@ class DatabaseFrame(customtkinter.CTkFrame):
                 entry = customtkinter.CTkEntry(self, placeholder_text=self.master.my_config["database"][name[1]])
                 entry.grid(row=i+1, column=1, padx=10, pady=10, sticky="we")
 
-                self.labels.append(label)
-                self.entries.append((entry, name[1]))
+                self._labels.append(label)
+                self._entries.append((entry, name[1]))
 
         except Exception:
             self.master.error_handle("ERROR", "Unable to create GUI - database", terminate=True)
@@ -451,7 +431,7 @@ class DatabaseFrame(customtkinter.CTkFrame):
 
     def refresh(self) -> None:
         """Updates dynamic elements of the GUI based on config.json content."""
-        for entry in self.entries:
+        for entry in self._entries:
             entry[0].configure(placeholder_text=self.master.my_config["database"][entry[1]])
 
         return
@@ -461,7 +441,7 @@ class DatabaseFrame(customtkinter.CTkFrame):
         """Saves database settings changes into the config.json file"""
         try:
             # update config
-            for entry in self.entries:
+            for entry in self._entries:
                 val = str(entry[0].get())
                 if not len(val) == 0:
                     self.master.my_config["database"][entry[1]] = val
@@ -504,15 +484,15 @@ class ProcessFrame(customtkinter.CTkFrame):
             self.grid_columnconfigure(1, weight=2)
 
             # Frame title
-            self.title = customtkinter.CTkLabel(self, text="Process configuration", fg_color=self.master.col_frame_title_bg, text_color=self.master.col_frame_title_tx, corner_radius=6)
-            self.title.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="we")
+            self._title = customtkinter.CTkLabel(self, text="Process configuration", fg_color=self.master.col_frame_title_bg, text_color=self.master.col_frame_title_tx, corner_radius=6)
+            self._title.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="we")
 
             # define switch names
             switch_names = [("Aggregate", "aggregate"),
                             ("Move done files", "move_done_files"),
                             ("Write time info", "write_time_info"),
                             ("Clean upload", "clean_upload")]
-            self.switches = []
+            self._switches = []
 
             # create switches
             for i, name in enumerate(switch_names):
@@ -523,29 +503,29 @@ class ProcessFrame(customtkinter.CTkFrame):
                 if self.master.my_config["settings"][name[1]]:
                     switch.select()
 
-                self.switches.append((switch, name[1]))
+                self._switches.append((switch, name[1]))
 
             # define entry names
             entry_names = [("Agg. max skip seconds", "agg_max_skip_seconds")]
-            self.entries = []
-            self.labels = []
+            self._entries = []
+            self._labels = []
             # create entries
             for i, name in enumerate(entry_names):
                 label = customtkinter.CTkLabel(self, text=name[0], fg_color="transparent")
-                label.grid(row=i+1+len(self.switches), column=0, padx=10, pady=10, sticky="w")
+                label.grid(row=i+1+len(self._switches), column=0, padx=10, pady=10, sticky="w")
                 entry = customtkinter.CTkEntry(self, placeholder_text=self.master.my_config["settings"][name[1]])
-                entry.grid(row=i+1+len(self.switches), column=1, padx=10, pady=10, sticky="we")
+                entry.grid(row=i+1+len(self._switches), column=1, padx=10, pady=10, sticky="we")
 
-                self.labels.append(label)
-                self.entries.append((entry, name[1]))
+                self._labels.append(label)
+                self._entries.append((entry, name[1]))
         
-        except Exception:
-            self.master.error_handle("ERROR", "Unable to create GUI - process", terminate=True)
+        except Exception as e:
+            self.master.error_handle("ERROR", f"Unable to create GUI - process\n{e}", terminate=True)
 
     
     def refresh(self) -> None:
         """Updates dynamic elements of the GUI based on config.json content."""
-        for entry in self.entries:
+        for entry in self._entries:
             entry[0].configure(placeholder_text=self.master.my_config["settings"][entry[1]])
 
         return
@@ -554,14 +534,14 @@ class ProcessFrame(customtkinter.CTkFrame):
     def save_to_json(self) -> bool:
         """Saves process settings changes into the config.json file"""
         # update config
-        for switch in self.switches:
+        for switch in self._switches:
             val = int(switch[0].get())
             if val == 1:
                 self.master.my_config["settings"][switch[1]] = True
             if val == 0:
                 self.master.my_config["settings"][switch[1]] = False
 
-        for entry in self.entries:
+        for entry in self._entries:
             val = str(entry[0].get())
             if not len(val) == 0:
                 # try to convert numbers from entries into string
@@ -611,13 +591,13 @@ class TextboxFrame(customtkinter.CTkFrame):
             self.grid_rowconfigure(1, weight=1)
 
             # frame title
-            self.title = customtkinter.CTkLabel(self, text="Feedback prompt", fg_color="transparent")
-            self.title.grid(row=0, column=0, columnspan=2, padx=10, pady=5, sticky="we")
+            self._title = customtkinter.CTkLabel(self, text="Feedback prompt", fg_color="transparent")
+            self._title.grid(row=0, column=0, columnspan=2, padx=10, pady=5, sticky="we")
             
             # define textbox
-            self.textbox = customtkinter.CTkTextbox(master=self, corner_radius=0, activate_scrollbars=True, wrap="word")
-            self.textbox.grid(row=1, column=0, sticky="nsew")
-            self.textbox.configure(state="disabled", font=("Courier New", 12))
+            self._textbox = customtkinter.CTkTextbox(master=self, corner_radius=0, activate_scrollbars=True, wrap="word")
+            self._textbox.grid(row=1, column=0, sticky="nsew")
+            self._textbox.configure(state="disabled", font=("Courier New", 12))
 
         except Exception:
             self.master.error_handle("ERROR", "Unable to create GUI - textbox", terminate=True)
@@ -632,13 +612,13 @@ class TextboxFrame(customtkinter.CTkFrame):
             - message to be printed
         """
         # make the textbox writeable
-        self.textbox.configure(state="normal")
+        self._textbox.configure(state="normal")
         # insert message at the end
-        self.textbox.insert("end", msg)
+        self._textbox.insert("end", msg)
         # scroll to the end
-        self.textbox.see("end")
+        self._textbox.see("end")
         # make the textbox non-writeable
-        self.textbox.configure(state="disabled")
+        self._textbox.configure(state="disabled")
         return
 
 # ================================================================================================================================
@@ -668,13 +648,13 @@ class ProgressFrame(customtkinter.CTkFrame):
             self.grid_columnconfigure(1, weight=1)
 
             # frame title
-            self.title = customtkinter.CTkLabel(self, text="Progress", fg_color="transparent", height=1)
-            self.title.grid_forget()
+            self._title = customtkinter.CTkLabel(self, text="Progress", fg_color="transparent", height=1)
+            self._title.grid_forget()
             
             # define progress bar
-            self.progress = customtkinter.CTkProgressBar(master=self, mode="determinate", corner_radius=0, fg_color=self.master.col_progress_bg, progress_color=self.master.col_progress_bar, height=1)
-            self.progress.set(0)
-            self.progress.grid_forget()
+            self._progress = customtkinter.CTkProgressBar(master=self, mode="determinate", corner_radius=0, fg_color=self.master.col_progress_bg, progress_color=self.master.col_progress_bar, height=1)
+            self._progress.set(0)
+            self._progress.grid_forget()
 
         except Exception:
             self.master.error_handle("ERROR", "Unable to create GUI - progress", terminate=True)
@@ -683,8 +663,8 @@ class ProgressFrame(customtkinter.CTkFrame):
     def show(self) -> None:
         """Shows this object inside the master window."""
         try:
-            self.title.grid(row=0, column=0, padx=10, pady=0, sticky="w")
-            self.progress.grid(row=0, column=1, padx=10, pady=0, sticky="nsew")
+            self._title.grid(row=0, column=0, padx=10, pady=0, sticky="w")
+            self._progress.grid(row=0, column=1, padx=10, pady=0, sticky="nsew")
 
         except Exception:
             self.master.error_handle("WARNING", "Unable to show the progress frame", terminate=False)
@@ -695,8 +675,8 @@ class ProgressFrame(customtkinter.CTkFrame):
     def hide(self) -> None:
         """Hides this object within the master window."""
         try:
-            self.title.grid_forget()
-            self.progress.grid_forget()
+            self._title.grid_forget()
+            self._progress.grid_forget()
 
         except Exception:
             self.master.error_handle("WARNING", "Unable to hide the progress frame", terminate=False)
@@ -713,7 +693,7 @@ class ProgressFrame(customtkinter.CTkFrame):
             - only numbers from closed interval <0 to 1>
         """
         try:
-            self.progress.set(val)
+            self._progress.set(val)
 
         except Exception:
             self.master.error_handle("WARNING", "Unable set a new value of the progress frame", terminate=False)
@@ -729,7 +709,6 @@ class ButtonsFrame(customtkinter.CTkFrame):
     
     Attributes
     ----------
-    - start_function : callable
     - btn_discard : customtkinter.CTkButton
     - btn_start : customtkinter.CTkButton
     - btn_save : customtkinter.CTkButton
@@ -749,32 +728,30 @@ class ButtonsFrame(customtkinter.CTkFrame):
         super().__init__(master)
         
         try:
-            self.start_function = None
-
             self.grid_columnconfigure((0, 1, 2, 3), weight=1)
             self.configure(fg_color="transparent")
             
             # define Discard changes button
-            self.btn_discard = customtkinter.CTkButton(self, text="Discard changes", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self.btn_callback_discard)
-            self.btn_discard.grid(row=0, column=0, padx=5, pady=5, sticky="nswe")
+            self._btn_discard = customtkinter.CTkButton(self, text="Discard changes", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self._btn_callback_discard)
+            self._btn_discard.grid(row=0, column=0, padx=5, pady=5, sticky="nswe")
 
             # define Start button
-            self.btn_start = customtkinter.CTkButton(self, text="Start", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self.btn_callback_start)
-            self.btn_start.grid(row=0, column=1, padx=5, pady=5, sticky="nswe")
+            self._btn_start = customtkinter.CTkButton(self, text="Start", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self._btn_callback_start)
+            self._btn_start.grid(row=0, column=1, padx=5, pady=5, sticky="nswe")
 
             # define Save button
-            self.btn_save = customtkinter.CTkButton(self, text="Save", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self.master.save)
-            self.btn_save.grid(row=0, column=2, padx=5, pady=5, sticky="nswe")
+            self._btn_save = customtkinter.CTkButton(self, text="Save", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self._btn_callback_save)
+            self._btn_save.grid(row=0, column=2, padx=5, pady=5, sticky="nswe")
 
             # define Save and Start button
-            self.btn_save_start = customtkinter.CTkButton(self, text="Save and Start", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self.btn_callback_save_start)
-            self.btn_save_start.grid(row=0, column=3, padx=5, pady=5, sticky="nswe")
+            self._btn_save_start = customtkinter.CTkButton(self, text="Save and Start", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self._btn_callback_save_start)
+            self._btn_save_start.grid(row=0, column=3, padx=5, pady=5, sticky="nswe")
 
         except Exception:
             self.master.error_handle("ERROR", "Unable to create GUI - buttons", terminate=True)
 
 
-    def btn_callback_discard(self) -> None:
+    def _btn_callback_discard(self) -> None:
         """Callback function for the discard button. Opens a new toplevel window."""
         tpe = "WARNING!"
         msge = "All changes you made will not be saved."
@@ -783,14 +760,18 @@ class ButtonsFrame(customtkinter.CTkFrame):
         return
     
 
-    def btn_callback_start(self) -> None:
+    def _btn_callback_start(self) -> None:
         """Callback function for the start button."""
         self.master.conn.send("RUN-PROP")
-
         return
     
 
-    def btn_callback_save_start(self) -> None:
+    def _btn_callback_save(self) -> None:
+        self.master.save()
+        return
+    
+
+    def _btn_callback_save_start(self) -> None:
         """Callback function for the Save and Start button. Defined via AppInterface."""
         self.master.save()
         self.master.conn.send("RUN-PROP")
@@ -800,9 +781,9 @@ class ButtonsFrame(customtkinter.CTkFrame):
     def disable_buttons(self) -> None:
         """Makes several buttons unclickable"""
         try:
-            self.btn_discard.configure(state="disabled")
-            self.btn_start.configure(state="disabled")
-            self.btn_save_start.configure(state="disabled")
+            self._btn_discard.configure(state="disabled")
+            self._btn_start.configure(state="disabled")
+            self._btn_save_start.configure(state="disabled")
 
         except Exception:
             self.master.error_handle("WARNING", "Unable to disable buttos", terminate=False)
@@ -813,9 +794,9 @@ class ButtonsFrame(customtkinter.CTkFrame):
     def enable_buttons(self) -> None:
         """Restores buttons to be clickable again"""
         try:
-            self.btn_discard.configure(state="normal")
-            self.btn_start.configure(state="normal")
-            self.btn_save_start.configure(state="normal")
+            self._btn_discard.configure(state="normal")
+            self._btn_start.configure(state="normal")
+            self._btn_save_start.configure(state="normal")
 
         except Exception:
             self.master.error_handle("WARNING", "Unable to enable buttos", terminate=False)
@@ -875,7 +856,7 @@ class App(customtkinter.CTk):
 
             self.title("MF4 Signal converter")
             self.minsize(650, 700)
-            self.protocol("WM_DELETE_WINDOW", self.closing_handle)
+            self.protocol("WM_DELETE_WINDOW", self._closing_handle)
 
             self.grid_columnconfigure(1, weight=1)
             self.grid_columnconfigure(0, weight=1)
@@ -1026,7 +1007,7 @@ class App(customtkinter.CTk):
         return
     
 
-    def closing_handle(self) -> None:
+    def _closing_handle(self) -> None:
         self.open_toplevel_yn("WARNING", "Do you really want to exit?", "", self.exit_program, self.kill_toplevel)
         return
     

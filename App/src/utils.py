@@ -38,7 +38,7 @@ class Utils():
 # -----------------------------------------------------------------------------------------------------------
 
     def __init__(self, communication: PipeCommunication) -> None:
-        self.comm = communication
+        self._comm = communication
 
 # -----------------------------------------------------------------------------------------------------------
     
@@ -61,7 +61,7 @@ class Utils():
                 f.write(file_name + "," + str(start_time) + "," + str(end_time) + "\n")
 
         except Exception as e:
-            self.comm.send_error("WARNING", f"Failed to write MF4 info:\n{e}", "F")
+            self._comm.send_error("WARNING", f"Failed to write MF4 info:\n{e}", "F")
 
         return
 
@@ -81,12 +81,12 @@ class Utils():
                         out.append(mf4_file)
 
         except Exception as e:
-            self.comm.send_error("ERROR", f"Error while reading MF4 files:\n{e}", "T")
+            self._comm.send_error("ERROR", f"Error while reading MF4 files:\n{e}", "T")
 
         if len(out) == 0:
-            self.comm.send_to_print()
-            self.comm.send_to_print("WARNING: No MF4 files found!\n")
-            self.comm.send_to_print()
+            self._comm.send_to_print()
+            self._comm.send_to_print("WARNING: No MF4 files found!\n")
+            self._comm.send_to_print()
 
         return out, len(out)
 
@@ -102,7 +102,7 @@ class Utils():
                         os.rmdir(dir_path)
 
         except OSError:
-            self.comm.send_error("WARNING", f"Failed to remove empty subdirs of root {top_level}", "F")
+            self._comm.send_error("WARNING", f"Failed to remove empty subdirs of root {top_level}", "F")
 
         return
 
@@ -121,7 +121,7 @@ class Utils():
             shutil.move(file, target_file)
 
         except Exception as e:
-            self.comm.send_error("WARNING", f"Problem with file movement:\n{e}", "F")
+            self._comm.send_error("WARNING", f"Problem with file movement:\n{e}", "F")
 
         # remove empty source folders
         self.rm_empty_subdirs("SourceMF4")
@@ -136,7 +136,7 @@ class Utils():
                 os.makedirs(target_dir)
 
         except Exception as e:
-            self.comm.send_error("WARNING", f"Problem with dir creation:\n{e}", "F")
+            self._comm.send_error("WARNING", f"Problem with dir creation:\n{e}", "F")
         
         return
     
@@ -144,15 +144,15 @@ class Utils():
 
     def open_config(self, path: str):
         """Loads configure json file (config.json) from root directory. Returns json object."""
-        self.comm.send_to_print("Reading config file ... ", end='')
+        self._comm.send_to_print("Reading config file ... ", end='')
 
         try:
             with open(path, "r") as file:
                 data = json.load(file)
 
         except FileNotFoundError:
-            self.comm.send_error("ERROR", f"Can't read {path} file. Check for file existance.", "T")
+            self._comm.send_error("ERROR", f"Can't read {path} file. Check for file existance.", "T")
             return None
 
-        self.comm.send_to_print("done!")
+        self._comm.send_to_print("done!")
         return data

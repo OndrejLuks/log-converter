@@ -20,7 +20,7 @@ import multiprocessing
 # ==========================================================================================================================
 
 
-def warning_handler(message, category, filename, lineo, file=None, line=None) -> None:
+def _warning_handler(message, category, filename, lineo, file=None, line=None) -> None:
     """Handles warnings for more compact vizualization. Mostly only because of blank signal convertion."""
     return
 
@@ -34,7 +34,7 @@ def run_backend(connection) -> None:
 
     
 def main():
-    warnings.showwarning = warning_handler
+    warnings.showwarning = _warning_handler
 
     conn1, conn2 = multiprocessing.Pipe()
 

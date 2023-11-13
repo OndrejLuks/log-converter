@@ -31,14 +31,14 @@ class Conversion():
                  stop_ev: threading.Event, 
                  thrs: list,
                  config):
-        self.utils = utilities
-        self.comm = communication
-        self.stop_event = stop_ev
-        self.db = database
-        self.threads = thrs
+        self._utils = utilities
+        self._comm = communication
+        self._stop_event = stop_ev
+        self._db = database
+        self._threads = thrs
 
-        self.config = config
-        self.dbc_list = self.create_dbc_list()
+        self._config = config
+        self._dbc_list = self.create_dbc_list()
         
 # -----------------------------------------------------------------------------------------------------------
 
@@ -57,32 +57,32 @@ class Conversion():
                     db_list.append(db)
 
         except OSError:
-            self.comm.send_error("ERROR", "Can't load DBC files. Check for file existance.", "T")
+            self._comm.send_error("ERROR", "Can't load DBC files. Check for file existance.", "T")
 
         return db_list
 
 # -----------------------------------------------------------------------------------------------------------
 
     def update_config(self, config) -> None:
-        self.config = config
+        self._config = config
         return
 
 # -----------------------------------------------------------------------------------------------------------
 
-    def setup_fs(self) -> canedge_browser.LocalFileSystem:
+    def _setup_fs(self) -> canedge_browser.LocalFileSystem:
         """Sets up a filesystem required for signal extraxtion from raw MF4"""
         base_path = Path(__file__).parent
         return canedge_browser.LocalFileSystem(base_path=base_path)
 
 # -----------------------------------------------------------------------------------------------------------
 
-    def convert_mf4(self, mf4_file: os.path) -> list:
+    def _convert_mf4(self, mf4_file: os.path) -> list:
         """Converts and decodes MF4 files to a dataframe using DBC files."""
-        fs = self.setup_fs()
-        proc = ProcessData(fs, self.dbc_list)
+        fs = self._setup_fs()
+        proc = ProcessData(fs, self._dbc_list)
 
         # thread end check
-        if self.stop_event.is_set():
+        if self._stop_event.is_set():
             print("Conversion aborted.")
             return None
 
@@ -90,7 +90,7 @@ class Conversion():
         df_raw, device_id = proc.get_raw_data(mf4_file)
 
         # thread end check
-        if self.stop_event.is_set():
+        if self._stop_event.is_set():
             print("Conversion aborted.")
             return None
 
@@ -99,7 +99,7 @@ class Conversion():
         df_raw = tp.combine_tp_frames(df_raw)
 
         # thread end check
-        if self.stop_event.is_set():
+        if self._stop_event.is_set():
             print("Conversion aborted.")
             return None
 
@@ -107,7 +107,7 @@ class Conversion():
         df_phys = proc.extract_phys(df_raw)
 
         # thread end check
-        if self.stop_event.is_set():
+        if self._stop_event.is_set():
             print("Conversion aborted.")
             return None
 
@@ -116,27 +116,27 @@ class Conversion():
         df_phys.index = df_phys.index.round('1us')
 
         # thread end check
-        if self.stop_event.is_set():
+        if self._stop_event.is_set():
             print("Conversion aborted.")
             return None
 
         # write time info if required
-        if self.config["settings"]["write_time_info"]:
-            self.comm.send_to_print("   - writing time information into MF4-info.csv...")
+        if self._config["settings"]["write_time_info"]:
+            self._comm.send_to_print("   - writing time information into MF4-info.csv...")
             # check if df is not empty
             if df_phys.shape[0] > 0:
-                self.utils.write_time_info(mf4_file, df_phys.index[0], df_phys.index[-1])
+                self._utils.write_time_info(mf4_file, df_phys.index[0], df_phys.index[-1])
 
-        self.comm.send_to_print("   - extracting individual signals...")
-        return self.split_df_by_cols(df_phys)
+        self._comm.send_to_print("   - extracting individual signals...")
+        return self._split_df_by_cols(df_phys)
 
 # -----------------------------------------------------------------------------------------------------------
 
-    def aggregate(self, df, lock: threading.Lock, dfs: list) -> None:
+    def _aggregate(self, df, lock: threading.Lock, dfs: list) -> None:
         """Aggregates input signal dataframe by removing redundant values"""
 
         # thread end check
-        if self.stop_event.is_set():
+        if self._stop_event.is_set():
             with lock:
                 print("Aggregation thread stopped.")
             return
@@ -146,7 +146,7 @@ class Conversion():
         if num_rows > 0:
             sig_name = df.columns.values[0]
             with lock:
-                self.comm.send_to_print(f"     > started aggregating signal: {sig_name}")
+                self._comm.send_to_print(f"     > started aggregating signal: {sig_name}")
             # create an array of indexes to use as a mask for the dataframe
             idx_array = []
             # insert first index into the array
@@ -156,7 +156,7 @@ class Conversion():
             # or if the time gap exceeds given seconds
             for idx in range(num_rows):
                 # thread end check
-                if self.stop_event.is_set():
+                if self._stop_event.is_set():
                     with lock:
                         print("Aggregation thread stopped.")
                     return
@@ -166,7 +166,7 @@ class Conversion():
                     idx_array.append(idx-1)
                     idx_array.append(idx)
                     previous = idx
-                elif (time_diff > timedelta(seconds=self.config["settings"]["agg_max_skip_seconds"])):
+                elif (time_diff > timedelta(seconds=self._config["settings"]["agg_max_skip_seconds"])):
                     idx_array.append(idx)
                     previous = idx
 
@@ -176,7 +176,7 @@ class Conversion():
             result_df = df.iloc[list(dict.fromkeys(idx_array))]
 
             # thread end check
-            if self.stop_event.is_set():
+            if self._stop_event.is_set():
                 with lock:
                     print("Aggregation thread stopped.")
                 return
@@ -184,13 +184,13 @@ class Conversion():
             # safely store the aggregated signal
             with lock:
                 dfs.append(result_df)
-                self.comm.send_to_print(f"     = finished agg. signal: {sig_name}")
+                self._comm.send_to_print(f"     = finished agg. signal: {sig_name}")
 
             return
 
 # -----------------------------------------------------------------------------------------------------------                
 
-    def split_df_by_cols(self, df) -> list:
+    def _split_df_by_cols(self, df) -> list:
         """Extracts and returns individual signals from given converted physica-value-dataframe"""
         column_df = []
 
@@ -201,7 +201,7 @@ class Conversion():
         try:
             for signal_name in df['Signal'].unique():
                 # thread end check
-                if self.stop_event.is_set():
+                if self._stop_event.is_set():
                     print("Conversion aborted.")
                     return None
 
@@ -210,7 +210,7 @@ class Conversion():
                 column_df.append(signal_df)
 
         except Exception as e:
-            self.comm.send_error("ERROR", f"Can't split df:\n{e}", "T")
+            self._comm.send_error("ERROR", f"Can't split df:\n{e}", "T")
 
         return column_df
 
@@ -218,15 +218,15 @@ class Conversion():
     
     def check_db_override(self) -> None:
         # check DB override
-        if self.config["settings"]["clean_upload"]:
+        if self._config["settings"]["clean_upload"]:
             type = "WARNING!"
             msg = 'With "Clean upload" enabled, the whole current database will be erased!'
             ques = "Do you really want to proceed?"
-            self.comm.send_command(f"POP-ACK#{type}#{msg}#{ques}")
+            self._comm.send_command(f"POP-ACK#{type}#{msg}#{ques}")
         
         else:
             # run the process
-            self.comm.send_command("ACK")
+            self._comm.send_command("ACK")
 
         return
 
@@ -235,55 +235,55 @@ class Conversion():
     def process_handle(self) -> None:
         """Function that handles MF4 files process from conversion to upload"""
 
-        self.comm.send_command("START")
+        self._comm.send_command("START")
 
         # prepare the database
-        self.db.connect()
-        self.db.create_schema()
+        self._db.connect()
+        self._db.create_schema()
 
         # thread end check
-        if self.stop_event.is_set():
+        if self._stop_event.is_set():
             print("Process thread stopped.")
             return
 
         # load MF4 files
-        mf4_file_list, num_of_mf4_files = self.utils.get_MF4_files(os.path.join("SourceMF4"))
+        mf4_file_list, num_of_mf4_files = self._utils.get_MF4_files(os.path.join("SourceMF4"))
         num_of_done_mf4_files = 0
 
         try: 
             for file in mf4_file_list:
                 # thread end check
-                if self.stop_event.is_set():
+                if self._stop_event.is_set():
                     print("Process thread stopped.")
                     return
 
                 # CONVERT FILE into Signal files
-                self.comm.send_to_print(f" - Converting: {file}")
+                self._comm.send_to_print(f" - Converting: {file}")
             
                 dfs_to_upload = []
-                converted_files = self.convert_mf4(file)
+                converted_files = self._convert_mf4(file)
 
                 # thread end check
-                if self.stop_event.is_set():
+                if self._stop_event.is_set():
                     print("Process thread stopped.")
                     return
 
                 # AGGREGATE if requested
-                if self.config["settings"]["aggregate"]:
+                if self._config["settings"]["aggregate"]:
                     agg_threads = []
-                    self.comm.send_to_print("   - aggregating...")
+                    self._comm.send_to_print("   - aggregating...")
                     # run each signal in a different thread
                     lock = Lock()
                     for signal_df in converted_files:
                         # thread end check
-                        if self.stop_event.is_set():
+                        if self._stop_event.is_set():
                             print("Process thread stopped.")
                             return None
 
-                        thread = threading.Thread(target=self.aggregate, args=(signal_df, lock, dfs_to_upload))
+                        thread = threading.Thread(target=self._aggregate, args=(signal_df, lock, dfs_to_upload))
                         thread.start()
                         agg_threads.append(thread)
-                        self.threads.append(thread)
+                        self._threads.append(thread)
                     
                     # wait for aggregation threads to finish
                     for thr in agg_threads:
@@ -293,38 +293,38 @@ class Conversion():
                     dfs_to_upload = converted_files
 
                 # thread end check
-                if self.stop_event.is_set():
+                if self._stop_event.is_set():
                     print("Process thread stopped.")
                     return
 
                 # UPLOAD TO DB
-                self.comm.send_to_print("   - uploading...")
-                self.db.upload_data(dfs_to_upload)
+                self._comm.send_to_print("   - uploading...")
+                self._db.upload_data(dfs_to_upload)
 
                 # thread end check
-                if self.stop_event.is_set():
+                if self._stop_event.is_set():
                     print("Process thread stopped.")
                     return
     
                 # MOVE DONE FILES if requested
-                if self.config["settings"]["move_done_files"]:
-                    self.comm.send_to_print("   - moving the file...")
-                    self.utils.move_done_file(file, "SourceMF4")
+                if self._config["settings"]["move_done_files"]:
+                    self._comm.send_to_print("   - moving the file...")
+                    self._utils.move_done_file(file, "SourceMF4")
 
                 num_of_done_mf4_files += 1
-                self.comm.send_command(f"PROG#{round((num_of_done_mf4_files / num_of_mf4_files), 2)}")
-                self.comm.send_to_print(f"   - DONE!     Overall progress:  {round((num_of_done_mf4_files / num_of_mf4_files)*100, 2)} %")
-                self.comm.send_to_print()
+                self._comm.send_command(f"PROG#{round((num_of_done_mf4_files / num_of_mf4_files), 2)}")
+                self._comm.send_to_print(f"   - DONE!     Overall progress:  {round((num_of_done_mf4_files / num_of_mf4_files)*100, 2)} %")
+                self._comm.send_to_print()
 
         except Exception as e:
-            self.comm.send_error("ERROR", f"Process error:\n{e}", "T")
+            self._comm.send_error("ERROR", f"Process error:\n{e}", "T")
             return
 
-        self.comm.send_to_print()
-        self.comm.send_to_print("                                      ~ ")           
-        self.comm.send_to_print("Everything completed successfully!  c[_]")
-        self.comm.send_to_print()
-        self.comm.send_command("FINISH")
+        self._comm.send_to_print()
+        self._comm.send_to_print("                                      ~ ")           
+        self._comm.send_to_print("Everything completed successfully!  c[_]")
+        self._comm.send_to_print()
+        self._comm.send_command("FINISH")
         return
 
 # ==========================================================================================================================

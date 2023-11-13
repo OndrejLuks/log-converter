@@ -17,63 +17,63 @@ import threading
 
 class BackendHandle():
     def __init__(self, connection):
-        self.stop_event = threading.Event()
+        self._stop_event = threading.Event()
 
-        self.comm = PipeCommunication(connection, self.stop_event)
-        self.utils = Utils(self.comm)
+        self._comm = PipeCommunication(connection, self._stop_event)
+        self._utils = Utils(self._comm)
         
 
-        self.config = self.utils.open_config("src/config.json")
-        self.db = DatabaseHandle(self.config, self.comm, self.stop_event)
+        self._config = self._utils.open_config("src/config.json")
+        self._db = DatabaseHandle(self._config, self._comm, self._stop_event)
 
-        self.threads = []
+        self._threads = []
 
-        self.conv = Conversion(self.utils, self.comm, self.db, self.stop_event, self.threads, self.config)
+        self._conv = Conversion(self._utils, self._comm, self._db, self._stop_event, self._threads, self._config)
 
 
     def run(self):
         while True:
-            event = self.comm.receive()
+            event = self._comm.receive()
 
             match event:
                 case "RUN-PROP":
-                    self.conv.check_db_override()
+                    self._conv.check_db_override()
 
                 case "RUN-ACK":
-                    thr_proc = threading.Thread(target=self.conv.process_handle)
+                    thr_proc = threading.Thread(target=self._conv.process_handle)
                     thr_proc.start()
-                    self.threads.append(thr_proc)
+                    self._threads.append(thr_proc)
 
                 case "U-CONF":
-                    self.update_configs()
+                    self._update_configs()
                 
                 case "END":
-                    self.thread_cleanup()
+                    self._thread_cleanup()
                     break
 
                 case _:
-                    self.comm.send_to_print("Unknown command to the process")
+                    self._comm.send_to_print("Unknown command to the process")
         
-        self.comm.send_command("END")
+        self._comm.send_command("END")
         return
     
 
-    def thread_cleanup(self) -> None:
+    def _thread_cleanup(self) -> None:
         # stop all threads
-        self.stop_event.set()
+        self._stop_event.set()
 
         # join all threads
-        for thr in self.threads:
+        for thr in self._threads:
             if thr.is_alive():
                 thr.join()
 
         return
     
 
-    def update_configs(self) -> None:
-        self.config = self.utils.open_config("src/config.json")
-        self.db.update_config(self.config)
-        self.conv.update_config(self.config)
-        self.comm.send_to_print("Settings updated.")
+    def _update_configs(self) -> None:
+        self._config = self._utils.open_config("src/config.json")
+        self._db.update_config(self.config)
+        self._conv.update_config(self.config)
+        self._comm.send_to_print("Settings updated.")
 
         return
