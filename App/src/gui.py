@@ -5,7 +5,8 @@
 # ================================================================================================================================
 # ================================================================================================================================
 
-
+import tkinter
+from tkcalendar import Calendar
 import customtkinter
 import threading
 import json
@@ -372,7 +373,138 @@ class TopWindowExit(customtkinter.CTkToplevel):
             self.master.text_box.write(f"ERROR While opening toplevel pop-up:\n{e}")
 
 
-# ================================================================================================================================   
+# ================================================================================================================================
+
+
+class TimeSelectorFrame(customtkinter.CTkFrame):
+    def __init__(self, master):
+        super().__init__(master)
+
+        self.configure(fg_color="transparent")
+
+        self.grid_columnconfigure((0, 2, 4), weight=10)
+        self.grid_columnconfigure((1, 3), weight=1)
+
+        self._entry_width = 30
+        self._entries = []
+
+        # hh
+        hh = customtkinter.CTkEntry(self, placeholder_text="hh", width=self._entry_width)
+        hh.grid(row=0, column=0, padx=0, pady=0, sticky="nswe")
+        self._entries.append((hh, "hours"))
+        # :
+        self._col1 = customtkinter.CTkLabel(self, text=":", fg_color="transparent")
+        self._col1.grid(row=0, column=1, padx=5, pady=0, sticky="nswe")
+        # mm
+        mm = customtkinter.CTkEntry(self, placeholder_text="mm", width=self._entry_width)
+        mm.grid(row=0, column=2, padx=0, pady=0, sticky="nswe")
+        self._entries.append((mm, "minutes"))
+        # :
+        self._col2 = customtkinter.CTkLabel(self, text=":", fg_color="transparent")
+        self._col2.grid(row=0, column=3, padx=5, pady=0, sticky="nswe")
+        # ss
+        ss = customtkinter.CTkEntry(self, placeholder_text="ss", width=self._entry_width)
+        ss.grid(row=0, column=4, padx=0, pady=0, sticky="nswe")
+        self._entries.append((ss, "seconds"))
+
+    
+    def get_values(self) -> list:
+        output = []
+
+        for entry in self._entries:
+            val = str(entry[0].get())
+            if not len(val) == 0:
+                output.append(val)
+            else:
+                self.master.master.text_box.write(f"WARNING: Time {entry[1]} missing, 00 set as default!\n")
+                output.append("00")
+
+        return output
+    
+
+
+class DateTimePickerFrame(customtkinter.CTkFrame):
+    def __init__(self, master, title: str):
+        super().__init__(master)
+
+        self.grid_columnconfigure(0, weight=1)
+
+        # title
+        self._time_select_label = customtkinter.CTkLabel(self, text=title, fg_color="transparent")
+        self._time_select_label.grid(row=0, column=0, padx=10, pady=(5, 0), sticky="w")
+
+        # callendar
+        self._calendar = Calendar(self, selectmode="day", showweeknumbers=False, cursor="hand2", date_pattern="y-mm-dd", borderwidth=0, bordercolor="white")
+        self._calendar.grid(row=2, column=0, padx=10, pady=5, sticky="we")
+
+        # time
+        self._time_entry = TimeSelectorFrame(self)
+        self._time_entry.grid(row=3, column=0, padx=10, pady=5, sticky="we")
+
+
+
+class DownloadFrame(customtkinter.CTkFrame):
+    def __init__(self, master):
+        super().__init__(master)
+
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=2)
+
+        self.grid_rowconfigure(7, weight=1)
+
+        self._signal = ""
+
+        # frame title
+        self._title = customtkinter.CTkLabel(self, text="Data download", fg_color=self.master.col_frame_title_bg, text_color=self.master.col_frame_title_tx, corner_radius=6)
+        self._title.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="we")
+
+        # load signals
+        self._sig_load_label = customtkinter.CTkLabel(self, text="Load signals:", fg_color="transparent")
+        self._sig_load_label.grid(row=1, column=0, padx=10, pady=5, sticky="w")
+
+        self._btn_load = customtkinter.CTkButton(self, text="Load from DB", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self._btn_callback_load)
+        self._btn_load.grid(row=1, column=1, padx=10, pady=5, sticky="nswe")
+
+        # signal selection
+        self._sig_select_label = customtkinter.CTkLabel(self, text="Select signal:", fg_color="transparent")
+        self._sig_select_label.grid(row=2, column=0, padx=10, pady=5, sticky="w")
+        
+        self._combobox = customtkinter.CTkOptionMenu(self, values=["option 1", "option 2", "option 3"], command=self._combo_callback)
+        self._combobox.grid(row=2, column=1, padx=10, pady=5, sticky="nswe")
+
+        # from date-time
+        self._date_time_from = DateTimePickerFrame(self, "Select FROM time stamp:")
+        self._date_time_from.grid(row=5, column=0, columnspan=2, padx=0, pady=(10, 0), sticky="nswe")
+
+        # to date-time
+        self._date_time_to = DateTimePickerFrame(self, "Select TO time time stamp:")
+        self._date_time_to.grid(row=6, column=0, columnspan=2, padx=0, pady=10, sticky="nswe")
+
+        # download button
+        self._btn_download = customtkinter.CTkButton(self, text="Download as csv", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self._btn_callback_download)
+        self._btn_download.grid(row=7, column=0, columnspan=2, padx=10, pady=10, sticky="swe")
+
+
+    def _combo_callback(self, choice) -> None:
+        self._signal = str(choice)
+        return
+
+
+    def _btn_callback_load(self) -> None:
+        # TODO Load signals from DB
+        return
+    
+
+    def _btn_callback_download(self) -> None:
+        # TODO
+        from_time = ["01", "02", "03"]
+        to_time = ["01", "02", "03"]
+        print(f"Signal {self._signal} >  from  {from_time[0]}:{from_time[1]}:{from_time[2]}  to  {to_time[0]}:{to_time[1]}:{to_time[2]}")
+
+        return
+
+        
+# ================================================================================================================================
 
 
 class DatabaseFrame(customtkinter.CTkFrame):
@@ -401,8 +533,8 @@ class DatabaseFrame(customtkinter.CTkFrame):
             self.grid_columnconfigure(1, weight=2)
             
             # Frame title
-            self.title = customtkinter.CTkLabel(self, text="Database configuration", fg_color=self.master.col_frame_title_bg, text_color=self.master.col_frame_title_tx, corner_radius=6)
-            self.title.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="we")
+            self._title = customtkinter.CTkLabel(self, text="Database configuration", fg_color=self.master.col_frame_title_bg, text_color=self.master.col_frame_title_tx, corner_radius=6)
+            self._title.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="we")
             
             # define entry names
             self.entry_names = [("Host", "host"),
@@ -855,11 +987,12 @@ class App(customtkinter.CTk):
             self.toplevel_window = None
 
             self.title("MF4 Signal converter")
-            self.minsize(650, 700)
+            self.minsize(900, 770)
             self.protocol("WM_DELETE_WINDOW", self._closing_handle)
 
-            self.grid_columnconfigure(1, weight=1)
             self.grid_columnconfigure(0, weight=1)
+            self.grid_columnconfigure(1, weight=1)
+            self.grid_columnconfigure(2, weight=1)
             self.grid_rowconfigure(1, weight=1)
 
             self.database_frame = DatabaseFrame(self)
@@ -875,7 +1008,10 @@ class App(customtkinter.CTk):
             self.progress_bar.grid(row=2, column=0, columnspan=2, padx=0, pady=0, sticky="nswe")
 
             self.button_frame = ButtonsFrame(self)
-            self.button_frame.grid(row=3, column=0, padx=5, pady=10, columnspan=2, sticky="nswe")
+            self.button_frame.grid(row=3, column=0, columnspan=2, padx=5, pady=(10, 15), sticky="nswe")
+
+            self.download_frame = DownloadFrame(self)
+            self.download_frame.grid(row=0, column=2, rowspan=4, padx=10, pady=(10, 10), sticky="nswe")
 
 
         except Exception as e:
