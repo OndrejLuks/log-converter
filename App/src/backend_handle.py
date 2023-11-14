@@ -35,7 +35,10 @@ class BackendHandle():
         while True:
             event = self._comm.receive()
 
-            match event:
+            # tolekize the message by '#'
+            messages = event.split("#")
+
+            match messages[0]:
                 case "RUN-PROP":
                     self._conv.check_db_override()
 
@@ -46,7 +49,16 @@ class BackendHandle():
 
                 case "U-CONF":
                     self._update_configs()
-                
+
+                case "FETCH-SIG":
+                    self._fetch_signals()
+
+                case "DOWNL":
+                    if len(messages) == 5:
+                        self._download_signal(sig=messages[1], from_str=messages[2], to_str=messages[3], file_name=messages[4])
+                    else:
+                        self._comm.send_error("WARNING", "Blank download requested!", False)
+
                 case "END":
                     self._thread_cleanup()
                     break
@@ -72,8 +84,47 @@ class BackendHandle():
 
     def _update_configs(self) -> None:
         self._config = self._utils.open_config("src/config.json")
-        self._db.update_config(self.config)
-        self._conv.update_config(self.config)
+        self._db.update_config(self._config)
+        self._conv.update_config(self._config)
         self._comm.send_to_print("Settings updated.")
 
         return
+    
+
+    def _fetch_signals(self) -> None:
+        self._db.connect()
+        tbl_names = self._db.get_table_names()
+        self._db.finish()
+
+        if len(tbl_names) == 0:
+            self._comm.send_error("WARNING", "No signals found!", "F")
+            return
+        
+        self._comm.send_command("U-SIG")
+        
+        for tbl in tbl_names:
+            self._comm.send_command(tbl)
+
+        self._comm.send_command("U-SIG-END")
+        
+        return
+    
+
+    def _download_signal(self, sig: str, from_str: str, to_str: str, file_name: str) -> None:
+
+        if not (self._utils.time_valid(from_str) and self._utils.time_valid(to_str)):
+            self._comm.send_error("WARNING", "Entered time values are not real.", "F")
+            return
+        
+        if not self._utils.time_date_follow_check(from_str, to_str):
+            self._comm.send_error("WARNING", "FROM time is set after TO time.", "F")
+            return
+
+        self._db.connect()
+        self._db.save_data(sig, from_str, to_str, file_name)
+        self._db.finish()
+        
+        return
+    
+
+

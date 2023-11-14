@@ -5,7 +5,7 @@
 # ================================================================================================================================
 # ================================================================================================================================
 
-import tkinter
+from tkinter import filedialog
 from tkcalendar import Calendar
 import customtkinter
 import threading
@@ -115,6 +115,9 @@ class AppInterface():
                     else:
                         self.generate_pop_up_error("WARNING", "Requested error popup with wrong number of parameters!", False)
 
+                case "U-SIG":
+                    self.update_signals()
+
                 case "ACK":
                     self.send_ack()
 
@@ -127,6 +130,25 @@ class AppInterface():
         self.app.kill_main_window()
         return
 
+
+# -----------------------------------------------------------------------------------------------------------
+
+    def update_signals(self) -> None:
+        new_signals = []
+        
+        while(True):
+            sig = self.pipe.recv()
+
+            if sig == "U-SIG-END":
+                break
+
+            new_signals.append(sig)
+
+        # sort alphabetically
+        new_signals.sort()
+        # update signals in gui
+        self.app.download_frame.update_signals(new_signals)
+        return
 
 # -----------------------------------------------------------------------------------------------------------
 
@@ -416,7 +438,7 @@ class TimeSelectorFrame(customtkinter.CTkFrame):
             if not len(val) == 0:
                 output.append(val)
             else:
-                self.master.master.text_box.write(f"WARNING: Time {entry[1]} missing, 00 set as default!\n")
+                self.master.master.master.text_box.write(f"WARNING: Time {entry[1]} missing, 00 set as default!\n")
                 output.append("00")
 
         return output
@@ -442,6 +464,13 @@ class DateTimePickerFrame(customtkinter.CTkFrame):
         self._time_entry.grid(row=3, column=0, padx=10, pady=5, sticky="we")
 
 
+    def get_values(self) -> dict:
+        time_val = self._time_entry.get_values()
+        date_val = self._calendar.get_date().split("-")
+        return {"date" : {"y" : date_val[0], "m" : date_val[1], "d" : date_val[2]},
+                "time" : {"h" : time_val[0], "m" : time_val[1], "s" : time_val[2]}}
+
+
 
 class DownloadFrame(customtkinter.CTkFrame):
     def __init__(self, master):
@@ -453,6 +482,7 @@ class DownloadFrame(customtkinter.CTkFrame):
         self.grid_rowconfigure(7, weight=1)
 
         self._signal = ""
+        self._signals = ["none"]
 
         # frame title
         self._title = customtkinter.CTkLabel(self, text="Data download", fg_color=self.master.col_frame_title_bg, text_color=self.master.col_frame_title_tx, corner_radius=6)
@@ -469,15 +499,15 @@ class DownloadFrame(customtkinter.CTkFrame):
         self._sig_select_label = customtkinter.CTkLabel(self, text="Select signal:", fg_color="transparent")
         self._sig_select_label.grid(row=2, column=0, padx=10, pady=5, sticky="w")
         
-        self._combobox = customtkinter.CTkOptionMenu(self, values=["option 1", "option 2", "option 3"], command=self._combo_callback)
-        self._combobox.grid(row=2, column=1, padx=10, pady=5, sticky="nswe")
+        self._option_menu = customtkinter.CTkOptionMenu(self, values=self._signals, command=self._combo_callback)
+        self._option_menu.grid(row=2, column=1, padx=10, pady=5, sticky="nswe")
 
         # from date-time
         self._date_time_from = DateTimePickerFrame(self, "Select FROM time stamp:")
         self._date_time_from.grid(row=5, column=0, columnspan=2, padx=0, pady=(10, 0), sticky="nswe")
 
         # to date-time
-        self._date_time_to = DateTimePickerFrame(self, "Select TO time time stamp:")
+        self._date_time_to = DateTimePickerFrame(self, "Select TO time stamp:")
         self._date_time_to.grid(row=6, column=0, columnspan=2, padx=0, pady=10, sticky="nswe")
 
         # download button
@@ -491,17 +521,39 @@ class DownloadFrame(customtkinter.CTkFrame):
 
 
     def _btn_callback_load(self) -> None:
-        # TODO Load signals from DB
+        self._signals.clear()
+        # fetch signals from the database
+        self.master.conn.send("FETCH-SIG")
         return
     
 
     def _btn_callback_download(self) -> None:
-        # TODO
-        from_time = ["01", "02", "03"]
-        to_time = ["01", "02", "03"]
-        print(f"Signal {self._signal} >  from  {from_time[0]}:{from_time[1]}:{from_time[2]}  to  {to_time[0]}:{to_time[1]}:{to_time[2]}")
+        if self._signal == "":
+            self.master.error_handle("WARNING", "Signal not selected!", False)
+            return
+
+        file_path = filedialog.asksaveasfile(defaultextension=".csv", filetypes=[("CSV files", "*.csv")])
+
+        if file_path:
+            from_t = self._date_time_from.get_values()
+            to_t = self._date_time_to.get_values()
+
+            from_str = f"{from_t['date']['y']}-{from_t['date']['m']}-{from_t['date']['d']} {from_t['time']['h']}:{from_t['time']['m']}:{from_t['time']['s']}"
+            to_str = f"{to_t['date']['y']}-{to_t['date']['m']}-{to_t['date']['d']} {to_t['time']['h']}:{to_t['time']['m']}:{to_t['time']['s']}"
+
+            self.master.conn.send(f"DOWNL#{self._signal}#{from_str}#{to_str}#{file_path.name}")
 
         return
+    
+
+    def update_signals(self, signals: list) -> None:
+        self._signals = signals
+        # update option menu
+        self._option_menu.destroy()
+        self._option_menu = customtkinter.CTkOptionMenu(self, values=self._signals, command=self._combo_callback)
+        self._option_menu.grid(row=2, column=1, padx=10, pady=5, sticky="nswe")
+        return
+
 
         
 # ================================================================================================================================
