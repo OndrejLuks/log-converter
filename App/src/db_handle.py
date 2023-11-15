@@ -37,7 +37,7 @@ class DatabaseHandle:
 
 # -----------------------------------------------------------------------------------------------------------
     
-    def querry(self, message: str) -> list:
+    def querry(self, message: str, fetch_results: bool) -> list:
         """Sends and executes a querry specified in the message to the database."""
               
         try:
@@ -53,8 +53,16 @@ class DatabaseHandle:
             self._comm.send_error("WARNING", f"Problem with query:\n{e}", "F")
             return None
         
-        data = result.fetchall()
-        return data
+        if fetch_results:
+            try:
+                data = result.fetchall()
+                return data
+            
+            except Exception as e:
+                self._comm.send_error("WARNING", f"Problem with query results:\n{e}", "F")
+                return []
+
+        return []
 
 # -----------------------------------------------------------------------------------------------------------
 
@@ -78,7 +86,7 @@ class DatabaseHandle:
                 # clean upload is selected
                 if self._connection.dialect.has_schema(self._connection, self._schema_name):
                     self._comm.send_to_print(f" - Dropping schema {self._schema_name}")
-                    self.querry(f"DROP SCHEMA {self._schema_name} CASCADE")
+                    self.querry(f"DROP SCHEMA {self._schema_name} CASCADE", False)
 
             if not self._connection.dialect.has_schema(self._connection, self._schema_name):
                 self._comm.send_to_print(f" - Creating schema {self._schema_name}")
@@ -109,7 +117,7 @@ class DatabaseHandle:
                             if_exists="append")
                 self._connection.commit()
                 # set primary key
-                self.querry(f'ALTER TABLE {self._schema_name}."{table_name}" ADD PRIMARY KEY (time_stamp)')
+                self.querry(f'ALTER TABLE {self._schema_name}."{table_name}" ADD PRIMARY KEY (time_stamp)', False)
 
             except IntegrityError:
                 self._comm.send_to_print("       - WARNING: Skipping signal upload due to unique violation. This record already exists in the DB.")
@@ -163,7 +171,7 @@ class DatabaseHandle:
         try:
             qry = f"SELECT * FROM {self._schema_name}.\"{table}\" WHERE time_stamp >= '{from_time}' AND time_stamp <= '{to_time}'"
   
-            result = self.querry(qry)
+            result = self.querry(qry, True)
             data_frame = pd.DataFrame(result)
             data_frame.to_csv(file_path, index=False)
 
