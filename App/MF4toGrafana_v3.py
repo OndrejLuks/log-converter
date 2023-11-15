@@ -11,7 +11,7 @@
 # ==========================================================================================================================
 
 
-from src import gui, backend_handle
+from src import gui, gui_interface, backend_handle
 import warnings
 import multiprocessing
 
@@ -39,7 +39,7 @@ def main():
     conn1, conn2 = multiprocessing.Pipe()
 
     app_gui = gui.App()
-    app_interface = gui.AppInterface(app_gui, conn1)
+    app_interface = gui_interface.AppInterface(app_gui, conn1)
 
     proc = multiprocessing.Process(target=run_backend, args=(conn2, ))
     proc.start()

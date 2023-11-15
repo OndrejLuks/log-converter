@@ -11,8 +11,8 @@ from sqlalchemy.sql import text
 from .communication import PipeCommunication
 import pandas as pd
 
-# ===========================================================================================================
-# ===========================================================================================================
+# ================================================================================================================================
+# ================================================================================================================================
 
 class DatabaseHandle:
     def __init__(self, config, communication: PipeCommunication, event):
@@ -34,12 +34,12 @@ class DatabaseHandle:
 
         self._conn_string = "postgresql://" + self._user + ":" + self._password + "@" + self._host + "/" + self._database
         
-# -----------------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def __del__(self):
         self.finish()
 
-# -----------------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------------------------
     
     def querry(self, message: str, fetch_results: bool) -> list:
         """Sends and executes a querry specified in the message to the database."""
@@ -68,7 +68,7 @@ class DatabaseHandle:
 
         return []
 
-# -----------------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def connect(self) -> None:
         """Function to handle database connection procedure"""
@@ -81,7 +81,7 @@ class DatabaseHandle:
         except Exception as e:
             self._comm.send_error("ERROR", f"DB CONNECTION ERROR:\n{e}", "T")
 
-# -----------------------------------------------------------------------------------------------------------    
+# --------------------------------------------------------------------------------------------------------------------------------   
 
     def create_schema(self) -> None:
         """Creates schena if not exists"""
@@ -100,7 +100,7 @@ class DatabaseHandle:
         except Exception as e:
             self._comm.send_error("ERROR", f"Error with DB schema:\n{e}", "T")
     
-# -----------------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def upload_data(self, data: list) -> None:
         """Uploads given list of dataframes to the database"""
@@ -129,7 +129,7 @@ class DatabaseHandle:
             except Exception as e:
                 self._comm.send_error("WARNING", f"Problem with DB upload:\n{e}", "F")
     
-# -----------------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def finish(self) -> None:
         """Function to handle database connection closing"""
@@ -141,7 +141,7 @@ class DatabaseHandle:
         except Exception as e:
             self._comm.send_error("WARNING", f"Problem with closing DB:\n{e}", "F")
 
-# -----------------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def update_config(self, config) -> None:
         try:
@@ -160,7 +160,7 @@ class DatabaseHandle:
 
         return
 
-# -----------------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def get_table_names(self) -> list:
         try:
@@ -173,17 +173,19 @@ class DatabaseHandle:
 
         return tbl_names
     
-# -----------------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def save_data(self, table: str, from_time: str, to_time: str, file_path: str) -> None:
-        try:
+        self._comm.send_to_print("Downloading data ...")
+
+        try:          
             qry = f"SELECT * FROM {self._schema_name}.\"{table}\" WHERE time_stamp >= '{from_time}' AND time_stamp <= '{to_time}'"
   
             result = self.querry(qry, True)
             data_frame = pd.DataFrame(result)
             data_frame.to_csv(file_path, index=False)
 
-            self._comm.send_to_print(f"SUCCESS: Data downloaded to {file_path}")
+            self._comm.send_to_print(f"SUCCESS: Selected data saved to {file_path}")
 
         except Exception as e:
             self._comm.send_error("WARNING", f"Problem with data download:\n{e}", "F")

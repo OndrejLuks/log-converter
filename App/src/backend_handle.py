@@ -28,6 +28,7 @@ class BackendHandle():
         self._db = DatabaseHandle(self._config, self._comm, self._stop_event)
         self._conv = Conversion(self._utils, self._comm, self._db, self._stop_event, self._threads, self._config)
 
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def run(self):
         try:
@@ -71,7 +72,8 @@ class BackendHandle():
         
         self._comm.send_command("END")
         return
-    
+
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def _thread_cleanup(self) -> None:
         # stop all threads
@@ -83,7 +85,8 @@ class BackendHandle():
                 thr.join()
 
         return
-    
+
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def _update_configs(self) -> None:
         self._config = self._utils.open_config("src/config.json")
@@ -92,7 +95,8 @@ class BackendHandle():
         self._comm.send_to_print("Settings updated.")
 
         return
-    
+
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def _fetch_signals(self) -> None:
         self._db.connect()
@@ -111,7 +115,8 @@ class BackendHandle():
         self._comm.send_command("U-SIG-END")
         
         return
-    
+
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def _download_signal(self, sig: str, from_str: str, to_str: str, file_name: str) -> None:
 

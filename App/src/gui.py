@@ -5,279 +5,16 @@
 # ================================================================================================================================
 # ================================================================================================================================
 
-from tkinter import filedialog
 from tkcalendar import Calendar
+from tkinter import filedialog
 import customtkinter
-import threading
 import json
 import time
 import os
 
-
-# ==========================================================================================================================
-# ==========================================================================================================================
-
-
-class AppInterface():
-    """Interface for the App class.
-    
-    Attributes
-    ----------
-    - app
-        - reference to an instance of the App class
-        - required upon construction
-        
-    Methods
-    -------
-    - generate_pop_up_yn (type, message, question, callback_yes, callback_no)
-    - generate_pop_up_ok (type, message)
-    - kill_pop_up ()
-    - print_to_box (message)
-    - save_changes ()
-    - disable_buttons ()
-    - enable_buttons ()
-    - show_progress_bar ()
-    - hide_progress_bar ()
-    - update_progress_bar ()
-    """
-
-    def __init__(self, app, pipe):
-        """Constructior of AppInterface"""
-        self.app = app
-        self.pipe = pipe
-
-        self.app.set_connection(pipe)
-
-# -----------------------------------------------------------------------------------------------------------
-    
-    def run(self) -> None:
-        """Runs and shows the GUI application
-        
-        Returns
-        -------
-        None
-        """
-
-        try:
-            # create a new thread with function that will read from PIPE
-            read_thr = threading.Thread(target=self.read_pipe)
-            read_thr.start()
-
-            # update GUI - blocking function
-            self.app.mainloop()
-
-            read_thr.join()
-
-        except Exception as e:
-            print(f"Error occured in the main GUI run() method:\n{e}")
-
-        return
-
-# -----------------------------------------------------------------------------------------------------------
-
-    def read_pipe(self) -> None:
-        while True:
-            event = self.pipe.recv()
-
-            # tolekize the message by '#'
-            messages = event.split("#")
-
-            match messages[0]:
-                case "FINISH":
-                    self.enable_buttons()
-                    self.hide_progress_bar()
-                
-                case "START":
-                    self.disable_buttons()
-                    self.show_progress_bar()
-                    
-                case "PRINT":
-                    if len(messages) == 2:
-                        self.print_to_box(messages[1])
-                    else:
-                        self.generate_pop_up_error("WARNING", "Blank message print requested!", False)
-
-                case "PROG":
-                    if len(messages) == 2:
-                        self.update_progress_bar(float(messages[1]))
-                    else:
-                        self.generate_pop_up_error("WARNING", "Blank progress update requested!", False)
-
-                case "POP-ACK":
-                        if len(messages) == 4:
-                            self.generate_pop_up_yn(messages[1], messages[2], messages[3], self.send_ack, self.kill_pop_up)
-                        else:
-                            self.generate_pop_up_error("WARNING", "Requested ack popup with wrong number of parameters!", False)
-
-                case "POP-ERR":
-                    if len(messages) == 4:
-                        self.generate_pop_up_error(messages[1], messages[2], messages[3] == "T")
-                    else:
-                        self.generate_pop_up_error("WARNING", "Requested error popup with wrong number of parameters!", False)
-
-                case "U-SIG":
-                    self.update_signals()
-
-                case "ACK":
-                    self.send_ack()
-
-                case "END":
-                    break
-
-                case _:
-                    self.generate_pop_up_error("WARNING", f"Can't recognize received item: {messages}", False)
-
-        self.app.kill_main_window()
-        return
-
-# -----------------------------------------------------------------------------------------------------------
-
-    def update_signals(self) -> None:
-        new_signals = []
-        
-        while(True):
-            sig = self.pipe.recv()
-
-            if sig == "U-SIG-END":
-                break
-
-            new_signals.append(sig)
-
-        # sort alphabetically
-        new_signals.sort()
-        # update signals in gui
-        self.app.download_frame.update_signals(new_signals)
-        return
-
-# -----------------------------------------------------------------------------------------------------------
-
-    def send_ack(self) -> None:
-        self.pipe.send("RUN-ACK")
-        self.kill_pop_up()
-        return
-
-# -----------------------------------------------------------------------------------------------------------
-    
-    def generate_pop_up_yn(self, type: str, message: str, question: str, callback_yes: callable, callback_no: callable) -> None:
-        """Generates a desired popup window with YES and NO buttons.
-        
-        Parametres
-        ----------
-        - type : str
-            - Name of the window
-        - message : str
-            - Displayed message in the white box
-        - question : str
-            - Displayed question under the message
-        - callback_yes
-            - Function assigned to the YES button
-        - callback_no
-            - Function assigned to the NO button
-            
-        Returns
-        -------
-        None
-        """
-        self.app.open_toplevel_yn(type, message, question, callback_yes, callback_no)
-        return
-    
-# -----------------------------------------------------------------------------------------------------------    
-
-    def generate_pop_up_error(self, type: str, message: str, terminate: bool) -> None:
-        self.app.error_handle(type, message, terminate)
-        return
-    
-# -----------------------------------------------------------------------------------------------------------
-
-    def kill_pop_up(self) -> None:
-        """Closes the currently open toplevel pop-up"""
-        self.app.kill_toplevel()
-        return
-
-# -----------------------------------------------------------------------------------------------------------
-
-    def print_to_box(self, message: str = '\n') -> None:
-        """Prints the given message into the GUI textbox.
-        
-        Parametres
-        ----------
-        - message : str
-            - Message to be printed
-        
-        Returns
-        -------
-        None"""
-        
-        self.app.text_box.write(message)
-        return
-
-# -----------------------------------------------------------------------------------------------------------
-
-    def disable_buttons(self) -> None:
-        """Disables following buttons: btn_save_start, btn_discard, btn_start.
-        
-        Returns
-        -------
-        None"""
-
-        self.app.button_frame.disable_buttons()
-        return
-
-# -----------------------------------------------------------------------------------------------------------
-
-    def enable_buttons(self) -> None:
-        """Enables following buttons: btn_save_start, btn_discard, btn_start.
-        
-        Returns
-        -------
-        None"""
-
-        self.app.button_frame.enable_buttons()
-        return
-
-# -----------------------------------------------------------------------------------------------------------
-    
-    def show_progress_bar(self) -> None:
-        """Shows the progress bar under the textbox.
-        
-        Returns
-        -------
-        None"""
-
-        self.app.progress_bar.show()
-        return
-
-# -----------------------------------------------------------------------------------------------------------
-
-    def hide_progress_bar(self) -> None:
-        """Hides the progress bar under the textbox.
-        
-        Returns
-        -------
-        None"""  
-
-        self.app.progress_bar.hide()
-        return
-
-# -----------------------------------------------------------------------------------------------------------
-
-    def update_progress_bar(self, value: float) -> None:
-        """Updates the progress bar to the given value.
-        
-        Parametres
-        ----------
-        - value
-            - float value of progress, between 0 and 1
-            
-        Returns
-        -------
-        None"""
-
-        self.app.progress_bar.set_value(value)
-        return
-    
-        
 # ================================================================================================================================
+# ================================================================================================================================
+
 
 class TopWindowYesNo(customtkinter.CTkToplevel):
     """Class representing a yes/no pop-up window.
@@ -324,8 +61,10 @@ class TopWindowYesNo(customtkinter.CTkToplevel):
         
         except Exception as e:
             self.master.text_box.write(f"ERROR While opening toplevel pop-up:\n{e}")
-        
+
+
 # ================================================================================================================================
+
 
 class TopWindowOk(customtkinter.CTkToplevel):
     """Class representing a warning pop-up window.
@@ -368,8 +107,10 @@ class TopWindowOk(customtkinter.CTkToplevel):
             self.master.text_box.write(f"ERROR While opening toplevel pop-up:\n{e}")
 
         return
-        
+
+
 # ================================================================================================================================         
+
 
 class TopWindowExit(customtkinter.CTkToplevel):
     def __init__(self, master):
@@ -432,6 +173,7 @@ class TimeSelectorFrame(customtkinter.CTkFrame):
         except Exception as e:
             self.master.master.master.error_handle("ERROR", f"Unable to create GUI - time entry:\n{e}", terminate=True)
 
+# --------------------------------------------------------------------------------------------------------------------------------
     
     def get_values(self) -> list:
         output = []
@@ -445,7 +187,9 @@ class TimeSelectorFrame(customtkinter.CTkFrame):
                 output.append("00")
 
         return output
-    
+
+
+# ================================================================================================================================
 
 
 class DateTimePickerFrame(customtkinter.CTkFrame):
@@ -470,6 +214,7 @@ class DateTimePickerFrame(customtkinter.CTkFrame):
         except Exception as e:
             self.master.master.error_handle("ERROR", f"Unable to create GUI - date entry:\n{e}", terminate=True)
 
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def get_values(self) -> dict:
         time_val = self._time_entry.get_values()
@@ -477,6 +222,8 @@ class DateTimePickerFrame(customtkinter.CTkFrame):
         return {"date" : {"y" : date_val[0], "m" : date_val[1], "d" : date_val[2]},
                 "time" : {"h" : time_val[0], "m" : time_val[1], "s" : time_val[2]}}
 
+
+# ================================================================================================================================
 
 
 class DownloadFrame(customtkinter.CTkFrame):
@@ -525,18 +272,21 @@ class DownloadFrame(customtkinter.CTkFrame):
         except Exception as e:
             self.master.error_handle("ERROR", f"Unable to create GUI - download:\n{e}", terminate=True)
 
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def _combo_callback(self, choice) -> None:
         self._signal = str(choice)
         return
 
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def _btn_callback_load(self) -> None:
         self._signals.clear()
         # fetch signals from the database
-        self.master.conn.send("FETCH-SIG")
+        self.master.comm.send_command("FETCH-SIG")
         return
-    
+
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def _btn_callback_download(self) -> None:
         if self._signal == "":
@@ -554,13 +304,14 @@ class DownloadFrame(customtkinter.CTkFrame):
                 from_str = f"{from_t['date']['y']}-{from_t['date']['m']}-{from_t['date']['d']} {from_t['time']['h']}:{from_t['time']['m']}:{from_t['time']['s']}"
                 to_str = f"{to_t['date']['y']}-{to_t['date']['m']}-{to_t['date']['d']} {to_t['time']['h']}:{to_t['time']['m']}:{to_t['time']['s']}"
 
-                self.master.conn.send(f"DOWNL#{self._signal}#{from_str}#{to_str}#{file_path.name}")
+                self.master.comm.send_command(f"DOWNL#{self._signal}#{from_str}#{to_str}#{file_path.name}")
 
         except Exception as e:
             self.master.error_handle("ERROR", f"Unable to download data:\n{e}", terminate=True)
 
         return
-    
+
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def update_signals(self, signals: list) -> None:
         self._signals = signals
@@ -576,7 +327,6 @@ class DownloadFrame(customtkinter.CTkFrame):
         return
 
 
-        
 # ================================================================================================================================
 
 
@@ -632,7 +382,7 @@ class DatabaseFrame(customtkinter.CTkFrame):
         except Exception as e:
             self.master.error_handle("ERROR", f"Unable to create GUI - database:\n{e}", terminate=True)
 
-
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def refresh(self) -> None:
         """Updates dynamic elements of the GUI based on config.json content."""
@@ -641,6 +391,7 @@ class DatabaseFrame(customtkinter.CTkFrame):
 
         return
 
+# --------------------------------------------------------------------------------------------------------------------------------
     
     def save_to_json(self) -> bool:
         """Saves database settings changes into the config.json file"""
@@ -661,7 +412,9 @@ class DatabaseFrame(customtkinter.CTkFrame):
 
         return True        
 
+
 # ================================================================================================================================   
+
 
 class ProcessFrame(customtkinter.CTkFrame):
     """Class representing the frame for process settings.
@@ -727,7 +480,8 @@ class ProcessFrame(customtkinter.CTkFrame):
         except Exception as e:
             self.master.error_handle("ERROR", f"Unable to create GUI - process\n{e}", terminate=True)
 
-    
+# --------------------------------------------------------------------------------------------------------------------------------
+
     def refresh(self) -> None:
         """Updates dynamic elements of the GUI based on config.json content."""
         for entry in self._entries:
@@ -735,6 +489,7 @@ class ProcessFrame(customtkinter.CTkFrame):
 
         return
 
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def save_to_json(self) -> bool:
         """Saves process settings changes into the config.json file"""
@@ -771,7 +526,9 @@ class ProcessFrame(customtkinter.CTkFrame):
         
         return True
 
+
 # ================================================================================================================================
+
 
 class TextboxFrame(customtkinter.CTkFrame):
     """Class representing the frame for textbox.
@@ -807,6 +564,7 @@ class TextboxFrame(customtkinter.CTkFrame):
         except Exception as e:
             self.master.error_handle("ERROR", f"Unable to create GUI - textbox:\n{e}", terminate=True)
 
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def write(self, msg: str = "\n") -> None:
         """Prints the given message to the GUI's textbox.
@@ -826,7 +584,9 @@ class TextboxFrame(customtkinter.CTkFrame):
         self._textbox.configure(state="disabled")
         return
 
+
 # ================================================================================================================================
+
 
 class ProgressFrame(customtkinter.CTkFrame):
     """Class representing the frame for progress bar.
@@ -864,6 +624,7 @@ class ProgressFrame(customtkinter.CTkFrame):
         except Exception as e:
             self.master.error_handle("ERROR", f"Unable to create GUI - progress:\n{e}", terminate=True)
 
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def show(self) -> None:
         """Shows this object inside the master window."""
@@ -876,6 +637,7 @@ class ProgressFrame(customtkinter.CTkFrame):
 
         return
 
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def hide(self) -> None:
         """Hides this object within the master window."""
@@ -888,6 +650,7 @@ class ProgressFrame(customtkinter.CTkFrame):
 
         return
 
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def set_value(self, val: float) -> None:
         """Sets given value to the progress bar.
@@ -905,7 +668,9 @@ class ProgressFrame(customtkinter.CTkFrame):
 
         return
 
+
 # ================================================================================================================================
+
 
 class ButtonsFrame(customtkinter.CTkFrame):
     """Class representing the frame for buttons.
@@ -955,6 +720,7 @@ class ButtonsFrame(customtkinter.CTkFrame):
         except Exception as e:
             self.master.error_handle("ERROR", f"Unable to create GUI - buttons:\n{e}", terminate=True)
 
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def _btn_callback_discard(self) -> None:
         """Callback function for the discard button. Opens a new toplevel window."""
@@ -963,25 +729,29 @@ class ButtonsFrame(customtkinter.CTkFrame):
         ques = "Do you really want to proceed?"
         self.master.open_toplevel_yn(tpe, msge, ques, self.master.exit_program, self.master.kill_toplevel)
         return
-    
+
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def _btn_callback_start(self) -> None:
         """Callback function for the start button."""
-        self.master.conn.send("RUN-PROP")
+        self.master.comm.send_command("RUN-PROP")
         return
-    
+
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def _btn_callback_save(self) -> None:
         self.master.save()
         return
-    
+
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def _btn_callback_save_start(self) -> None:
         """Callback function for the Save and Start button. Defined via AppInterface."""
         self.master.save()
-        self.master.conn.send("RUN-PROP")
+        self.master.comm.send_command("RUN-PROP")
         return
 
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def disable_buttons(self) -> None:
         """Makes several buttons unclickable"""
@@ -994,7 +764,8 @@ class ButtonsFrame(customtkinter.CTkFrame):
             self.master.error_handle("WARNING", "Unable to disable buttos", terminate=False)
 
         return
-    
+
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def enable_buttons(self) -> None:
         """Restores buttons to be clickable again"""
@@ -1010,6 +781,7 @@ class ButtonsFrame(customtkinter.CTkFrame):
 
 
 # ================================================================================================================================
+
 
 class App(customtkinter.CTk):
     """Main GUI window class. Container for all of the frames.
@@ -1038,7 +810,7 @@ class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
 
-        self.conn = None
+        self.comm = None
 
         try:
             # set colors
@@ -1091,13 +863,15 @@ class App(customtkinter.CTk):
             print()
             print(f"ERROR while trying to initialize GUI window:\n{e}")
 
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def exit_program(self) -> None:
         self.kill_toplevel()
         self.open_toplevel_exit()
-        self.conn.send("END")
+        self.comm.send_command("END")
         return
 
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def kill_main_window(self) -> None:
         # delay so that popup can load properly
@@ -1106,7 +880,8 @@ class App(customtkinter.CTk):
         self.quit()
         return
 
-    
+# --------------------------------------------------------------------------------------------------------------------------------
+
     def open_config(self):
         """Loads configure json file (config.json) from root directory. Returns json object."""
         try:
@@ -1119,8 +894,9 @@ class App(customtkinter.CTk):
             self.exit_program()
     
         return data
-    
-    
+
+# --------------------------------------------------------------------------------------------------------------------------------
+
     def open_toplevel_yn(self, type: str, message: str, question: str, callback_yes, callback_no) -> None:
         """Opens a toplevel window over the main window with given parameters and YES/NO buttons.
         
@@ -1149,7 +925,8 @@ class App(customtkinter.CTk):
             self.toplevel_window.geometry("+%d+%d" %(self.winfo_x()+200, self.winfo_y()+200))
 
         return
-    
+
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def open_toplevel_ok(self, type: str, message: str, callback: callable = None) -> None:
         """Opens a toplevel window over the main window with given message and OK button.
@@ -1173,7 +950,8 @@ class App(customtkinter.CTk):
             self.toplevel_window.geometry("+%d+%d" %(self.winfo_x()+200, self.winfo_y()+200))
 
         return
-    
+
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def open_toplevel_exit(self) -> None:
         # check for window existance
@@ -1184,14 +962,15 @@ class App(customtkinter.CTk):
             self.toplevel_window.geometry("+%d+%d" %(self.winfo_x()+200, self.winfo_y()+200))
 
         return
-    
+
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def save(self) -> None:
         """Saves all possible changes into the config.json file."""
         if self.database_frame.save_to_json() and self.process_frame.save_to_json():
             self.text_box.write(f"Successfully saved!\n")
             # update backend configuration
-            self.conn.send("U-CONF")
+            self.comm.send_command("U-CONF")
         else:
             self.text_box.write(f"Failed to save.\n")
 
@@ -1200,13 +979,15 @@ class App(customtkinter.CTk):
         self.process_frame.refresh()
 
         return
-    
 
-    def set_connection(self, connection) -> None:
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def set_communication(self, communication) -> None:
         """Sets the connection stream"""
-        self.conn = connection
+        self.comm = communication
         return
-    
+
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def kill_toplevel(self) -> None:
         """Destroys the toplevel window"""
@@ -1214,12 +995,14 @@ class App(customtkinter.CTk):
             self.toplevel_window.destroy()
             self.toplevel_window.update()
         return
-    
+
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def _closing_handle(self) -> None:
         self.open_toplevel_yn("WARNING", "Do you really want to exit?", "", self.exit_program, self.kill_toplevel)
         return
-    
+
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def error_handle(self, type: str, message: str, terminate: bool) -> None:
         """Creates an error popup on demand with the possibility of program termination"""
