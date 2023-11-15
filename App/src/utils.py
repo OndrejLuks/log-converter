@@ -84,6 +84,7 @@ class Utils():
 
         except Exception as e:
             self._comm.send_error("ERROR", f"Error while reading MF4 files:\n{e}", "T")
+            out.clear()
 
         if len(out) == 0:
             self._comm.send_to_print()
@@ -163,23 +164,28 @@ class Utils():
 
     def time_valid(self, date_time: str) -> bool:
         # date_time comes in format: "yyy-mm-dd hh:mm:ss"
-        time_list = date_time.split(" ")[1].split(":")
-        
         try:
-            hh = int(time_list[0])
-            mm = int(time_list[1])
-            ss = int(time_list[2])
+            time_list = date_time.split(" ")[1].split(":")
+            
+            try:
+                hh = int(time_list[0])
+                mm = int(time_list[1])
+                ss = int(time_list[2])
 
-        except ValueError:
-            return False
-        
-        if hh < 0 or hh > 23:
-            return False
-        
-        if mm < 0 or mm > 59:
-            return False
-        
-        if ss < 0 or ss > 59:
+            except ValueError:
+                return False
+            
+            if hh < 0 or hh > 23:
+                return False
+            
+            if mm < 0 or mm > 59:
+                return False
+            
+            if ss < 0 or ss > 59:
+                return False
+            
+        except Exception as e:
+            self._comm.send_error("WARNING", f"Problem with time validation:\n{e}", "F")
             return False
         
         return True
@@ -187,10 +193,15 @@ class Utils():
 # -----------------------------------------------------------------------------------------------------------
 
     def time_date_follow_check(self, sooner: str, later: str) -> bool:
-        from_dt = datetime.strptime(sooner, "%Y-%m-%d %H:%M:%S")
-        to_dt = datetime.strptime(later, "%Y-%m-%d %H:%M:%S")
+        try:
+            from_dt = datetime.strptime(sooner, "%Y-%m-%d %H:%M:%S")
+            to_dt = datetime.strptime(later, "%Y-%m-%d %H:%M:%S")
 
-        if from_dt > to_dt:
+            if from_dt > to_dt:
+                return False
+            
+        except Exception as e:
+            self._comm.send_error("WARNING", f"Problem with time date validation:\n{e}", "F")
             return False
-        
+            
         return True

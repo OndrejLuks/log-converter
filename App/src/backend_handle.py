@@ -17,54 +17,57 @@ import threading
 
 class BackendHandle():
     def __init__(self, connection):
+        self._threads = []
         self._stop_event = threading.Event()
 
         self._comm = PipeCommunication(connection, self._stop_event)
         self._utils = Utils(self._comm)
         
-
         self._config = self._utils.open_config("src/config.json")
+
         self._db = DatabaseHandle(self._config, self._comm, self._stop_event)
-
-        self._threads = []
-
         self._conv = Conversion(self._utils, self._comm, self._db, self._stop_event, self._threads, self._config)
 
 
     def run(self):
-        while True:
-            event = self._comm.receive()
+        try:
+            while True:
+                event = self._comm.receive()
 
-            # tolekize the message by '#'
-            messages = event.split("#")
+                # tokenize the message by '#'
+                messages = event.split("#")
 
-            match messages[0]:
-                case "RUN-PROP":
-                    self._conv.check_db_override()
+                match messages[0]:
+                    case "RUN-PROP":
+                        self._conv.check_db_override()
 
-                case "RUN-ACK":
-                    thr_proc = threading.Thread(target=self._conv.process_handle)
-                    thr_proc.start()
-                    self._threads.append(thr_proc)
+                    case "RUN-ACK":
+                        thr_proc = threading.Thread(target=self._conv.process_handle)
+                        thr_proc.start()
+                        self._threads.append(thr_proc)
 
-                case "U-CONF":
-                    self._update_configs()
+                    case "U-CONF":
+                        self._update_configs()
 
-                case "FETCH-SIG":
-                    self._fetch_signals()
+                    case "FETCH-SIG":
+                        self._fetch_signals()
 
-                case "DOWNL":
-                    if len(messages) == 5:
-                        self._download_signal(sig=messages[1], from_str=messages[2], to_str=messages[3], file_name=messages[4])
-                    else:
-                        self._comm.send_error("WARNING", "Blank download requested!", False)
+                    case "DOWNL":
+                        if len(messages) == 5:
+                            self._download_signal(sig=messages[1], from_str=messages[2], to_str=messages[3], file_name=messages[4])
+                        else:
+                            self._comm.send_error("WARNING", "Blank download requested!", False)
 
-                case "END":
-                    self._thread_cleanup()
-                    break
+                    case "END":
+                        self._thread_cleanup()
+                        break
 
-                case _:
-                    self._comm.send_to_print("Unknown command to the process")
+                    case _:
+                        self._comm.send_to_print("Unknown command to the process")
+
+        except Exception as e:
+            self._comm.send_error("ERROR", f"Problem in main backend loop:\n{e}", "F")
+            self._thread_cleanup()
         
         self._comm.send_command("END")
         return
@@ -125,6 +128,3 @@ class BackendHandle():
         self._db.finish()
         
         return
-    
-
-

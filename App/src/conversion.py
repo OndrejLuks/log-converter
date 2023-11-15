@@ -8,10 +8,10 @@
 from datetime import timedelta
 from threading import Lock
 
-from .proc_data import ProcessData
 from .mfd import MultiFrameDecoder
-from .db_handle import DatabaseHandle
 from .utils import Utils
+from .proc_data import ProcessData
+from .db_handle import DatabaseHandle
 from .communication import PipeCommunication
 
 from pathlib import Path
@@ -78,54 +78,59 @@ class Conversion():
 
     def _convert_mf4(self, mf4_file: os.path) -> list:
         """Converts and decodes MF4 files to a dataframe using DBC files."""
-        fs = self._setup_fs()
-        proc = ProcessData(fs, self._dbc_list)
+        try:
+            fs = self._setup_fs()
+            proc = ProcessData(fs, self._dbc_list)
 
-        # thread end check
-        if self._stop_event.is_set():
-            print("Conversion aborted.")
-            return None
+            # thread end check
+            if self._stop_event.is_set():
+                print("Conversion aborted.")
+                return None
 
-        # get raw dataframe from mf4 file
-        df_raw, device_id = proc.get_raw_data(mf4_file)
+            # get raw dataframe from mf4 file
+            df_raw, device_id = proc.get_raw_data(mf4_file)
 
-        # thread end check
-        if self._stop_event.is_set():
-            print("Conversion aborted.")
-            return None
+            # thread end check
+            if self._stop_event.is_set():
+                print("Conversion aborted.")
+                return None
 
-        # replace transport protocol with single frames
-        tp = MultiFrameDecoder("j1939")
-        df_raw = tp.combine_tp_frames(df_raw)
+            # replace transport protocol with single frames
+            tp = MultiFrameDecoder("j1939")
+            df_raw = tp.combine_tp_frames(df_raw)
 
-        # thread end check
-        if self._stop_event.is_set():
-            print("Conversion aborted.")
-            return None
+            # thread end check
+            if self._stop_event.is_set():
+                print("Conversion aborted.")
+                return None
 
-        # extract can messages
-        df_phys = proc.extract_phys(df_raw)
+            # extract can messages
+            df_phys = proc.extract_phys(df_raw)
 
-        # thread end check
-        if self._stop_event.is_set():
-            print("Conversion aborted.")
-            return None
+            # thread end check
+            if self._stop_event.is_set():
+                print("Conversion aborted.")
+                return None
 
-        # set correct index values
-        df_phys.index = pd.to_datetime(df_phys.index)
-        df_phys.index = df_phys.index.round('1us')
+            # set correct index values
+            df_phys.index = pd.to_datetime(df_phys.index)
+            df_phys.index = df_phys.index.round('1us')
 
-        # thread end check
-        if self._stop_event.is_set():
-            print("Conversion aborted.")
-            return None
+            # thread end check
+            if self._stop_event.is_set():
+                print("Conversion aborted.")
+                return None
 
-        # write time info if required
-        if self._config["settings"]["write_time_info"]:
-            self._comm.send_to_print("   - writing time information into MF4-info.csv...")
-            # check if df is not empty
-            if df_phys.shape[0] > 0:
-                self._utils.write_time_info(mf4_file, df_phys.index[0], df_phys.index[-1])
+            # write time info if required
+            if self._config["settings"]["write_time_info"]:
+                self._comm.send_to_print("   - writing time information into MF4-info.csv...")
+                # check if df is not empty
+                if df_phys.shape[0] > 0:
+                    self._utils.write_time_info(mf4_file, df_phys.index[0], df_phys.index[-1])
+        
+        except Exception as e:
+            self._comm.send_error("ERROR", f"Problem in MF4 conversion:\n{e}", "T")
+            return []
 
         self._comm.send_to_print("   - extracting individual signals...")
         return self._split_df_by_cols(df_phys)
@@ -211,6 +216,7 @@ class Conversion():
 
         except Exception as e:
             self._comm.send_error("ERROR", f"Can't split df:\n{e}", "T")
+            return []
 
         return column_df
 

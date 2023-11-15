@@ -69,7 +69,7 @@ class AppInterface():
             read_thr.join()
 
         except Exception as e:
-            print(f"Error occured in the main run() method:\n{e}")
+            print(f"Error occured in the main GUI run() method:\n{e}")
 
         return
 
@@ -129,7 +129,6 @@ class AppInterface():
 
         self.app.kill_main_window()
         return
-
 
 # -----------------------------------------------------------------------------------------------------------
 
@@ -402,32 +401,36 @@ class TimeSelectorFrame(customtkinter.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
 
-        self.configure(fg_color="transparent")
+        try:
+            self.configure(fg_color="transparent")
 
-        self.grid_columnconfigure((0, 2, 4), weight=10)
-        self.grid_columnconfigure((1, 3), weight=1)
+            self.grid_columnconfigure((0, 2, 4), weight=10)
+            self.grid_columnconfigure((1, 3), weight=1)
 
-        self._entry_width = 30
-        self._entries = []
+            self._entry_width = 30
+            self._entries = []
 
-        # hh
-        hh = customtkinter.CTkEntry(self, placeholder_text="hh", width=self._entry_width)
-        hh.grid(row=0, column=0, padx=0, pady=0, sticky="nswe")
-        self._entries.append((hh, "hours"))
-        # :
-        self._col1 = customtkinter.CTkLabel(self, text=":", fg_color="transparent")
-        self._col1.grid(row=0, column=1, padx=5, pady=0, sticky="nswe")
-        # mm
-        mm = customtkinter.CTkEntry(self, placeholder_text="mm", width=self._entry_width)
-        mm.grid(row=0, column=2, padx=0, pady=0, sticky="nswe")
-        self._entries.append((mm, "minutes"))
-        # :
-        self._col2 = customtkinter.CTkLabel(self, text=":", fg_color="transparent")
-        self._col2.grid(row=0, column=3, padx=5, pady=0, sticky="nswe")
-        # ss
-        ss = customtkinter.CTkEntry(self, placeholder_text="ss", width=self._entry_width)
-        ss.grid(row=0, column=4, padx=0, pady=0, sticky="nswe")
-        self._entries.append((ss, "seconds"))
+            # hh
+            hh = customtkinter.CTkEntry(self, placeholder_text="hh", width=self._entry_width)
+            hh.grid(row=0, column=0, padx=0, pady=0, sticky="nswe")
+            self._entries.append((hh, "hours"))
+            # :
+            self._col1 = customtkinter.CTkLabel(self, text=":", fg_color="transparent")
+            self._col1.grid(row=0, column=1, padx=5, pady=0, sticky="nswe")
+            # mm
+            mm = customtkinter.CTkEntry(self, placeholder_text="mm", width=self._entry_width)
+            mm.grid(row=0, column=2, padx=0, pady=0, sticky="nswe")
+            self._entries.append((mm, "minutes"))
+            # :
+            self._col2 = customtkinter.CTkLabel(self, text=":", fg_color="transparent")
+            self._col2.grid(row=0, column=3, padx=5, pady=0, sticky="nswe")
+            # ss
+            ss = customtkinter.CTkEntry(self, placeholder_text="ss", width=self._entry_width)
+            ss.grid(row=0, column=4, padx=0, pady=0, sticky="nswe")
+            self._entries.append((ss, "seconds"))
+
+        except Exception as e:
+            self.master.master.master.error_handle("ERROR", f"Unable to create GUI - time entry:\n{e}", terminate=True)
 
     
     def get_values(self) -> list:
@@ -449,19 +452,23 @@ class DateTimePickerFrame(customtkinter.CTkFrame):
     def __init__(self, master, title: str):
         super().__init__(master)
 
-        self.grid_columnconfigure(0, weight=1)
+        try:
+            self.grid_columnconfigure(0, weight=1)
 
-        # title
-        self._time_select_label = customtkinter.CTkLabel(self, text=title, fg_color="transparent")
-        self._time_select_label.grid(row=0, column=0, padx=10, pady=(5, 0), sticky="w")
+            # title
+            self._time_select_label = customtkinter.CTkLabel(self, text=title, fg_color="transparent")
+            self._time_select_label.grid(row=0, column=0, padx=10, pady=(5, 0), sticky="w")
 
-        # callendar
-        self._calendar = Calendar(self, selectmode="day", showweeknumbers=False, cursor="hand2", date_pattern="y-mm-dd", borderwidth=0, bordercolor="white")
-        self._calendar.grid(row=2, column=0, padx=10, pady=5, sticky="we")
+            # callendar
+            self._calendar = Calendar(self, selectmode="day", showweeknumbers=False, cursor="hand2", date_pattern="y-mm-dd", borderwidth=0, bordercolor="white")
+            self._calendar.grid(row=2, column=0, padx=10, pady=5, sticky="we")
 
-        # time
-        self._time_entry = TimeSelectorFrame(self)
-        self._time_entry.grid(row=3, column=0, padx=10, pady=5, sticky="we")
+            # time
+            self._time_entry = TimeSelectorFrame(self)
+            self._time_entry.grid(row=3, column=0, padx=10, pady=5, sticky="we")
+        
+        except Exception as e:
+            self.master.master.error_handle("ERROR", f"Unable to create GUI - date entry:\n{e}", terminate=True)
 
 
     def get_values(self) -> dict:
@@ -476,43 +483,47 @@ class DownloadFrame(customtkinter.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
 
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_columnconfigure(1, weight=2)
+        try:
+            self.grid_columnconfigure(0, weight=1)
+            self.grid_columnconfigure(1, weight=2)
 
-        self.grid_rowconfigure(7, weight=1)
+            self.grid_rowconfigure(7, weight=1)
 
-        self._signal = ""
-        self._signals = ["none"]
+            self._signal = ""
+            self._signals = ["none"]
 
-        # frame title
-        self._title = customtkinter.CTkLabel(self, text="Data download", fg_color=self.master.col_frame_title_bg, text_color=self.master.col_frame_title_tx, corner_radius=6)
-        self._title.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="we")
+            # frame title
+            self._title = customtkinter.CTkLabel(self, text="Data download", fg_color=self.master.col_frame_title_bg, text_color=self.master.col_frame_title_tx, corner_radius=6)
+            self._title.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="we")
 
-        # load signals
-        self._sig_load_label = customtkinter.CTkLabel(self, text="Load signals:", fg_color="transparent")
-        self._sig_load_label.grid(row=1, column=0, padx=10, pady=5, sticky="w")
+            # load signals
+            self._sig_load_label = customtkinter.CTkLabel(self, text="Load signals:", fg_color="transparent")
+            self._sig_load_label.grid(row=1, column=0, padx=10, pady=5, sticky="w")
 
-        self._btn_load = customtkinter.CTkButton(self, text="Load from DB", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self._btn_callback_load)
-        self._btn_load.grid(row=1, column=1, padx=10, pady=5, sticky="nswe")
+            self._btn_load = customtkinter.CTkButton(self, text="Load from DB", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self._btn_callback_load)
+            self._btn_load.grid(row=1, column=1, padx=10, pady=5, sticky="nswe")
 
-        # signal selection
-        self._sig_select_label = customtkinter.CTkLabel(self, text="Select signal:", fg_color="transparent")
-        self._sig_select_label.grid(row=2, column=0, padx=10, pady=5, sticky="w")
-        
-        self._option_menu = customtkinter.CTkOptionMenu(self, values=self._signals, command=self._combo_callback)
-        self._option_menu.grid(row=2, column=1, padx=10, pady=5, sticky="nswe")
+            # signal selection
+            self._sig_select_label = customtkinter.CTkLabel(self, text="Select signal:", fg_color="transparent")
+            self._sig_select_label.grid(row=2, column=0, padx=10, pady=5, sticky="w")
+            
+            self._option_menu = customtkinter.CTkOptionMenu(self, values=self._signals, command=self._combo_callback)
+            self._option_menu.grid(row=2, column=1, padx=10, pady=5, sticky="nswe")
 
-        # from date-time
-        self._date_time_from = DateTimePickerFrame(self, "Select FROM time stamp:")
-        self._date_time_from.grid(row=5, column=0, columnspan=2, padx=0, pady=(10, 0), sticky="nswe")
+            # from date-time
+            self._date_time_from = DateTimePickerFrame(self, "Select FROM time stamp:")
+            self._date_time_from.grid(row=5, column=0, columnspan=2, padx=0, pady=(10, 0), sticky="nswe")
 
-        # to date-time
-        self._date_time_to = DateTimePickerFrame(self, "Select TO time stamp:")
-        self._date_time_to.grid(row=6, column=0, columnspan=2, padx=0, pady=10, sticky="nswe")
+            # to date-time
+            self._date_time_to = DateTimePickerFrame(self, "Select TO time stamp:")
+            self._date_time_to.grid(row=6, column=0, columnspan=2, padx=0, pady=10, sticky="nswe")
 
-        # download button
-        self._btn_download = customtkinter.CTkButton(self, text="Download as csv", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self._btn_callback_download)
-        self._btn_download.grid(row=7, column=0, columnspan=2, padx=10, pady=10, sticky="swe")
+            # download button
+            self._btn_download = customtkinter.CTkButton(self, text="Download as csv", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self._btn_callback_download)
+            self._btn_download.grid(row=7, column=0, columnspan=2, padx=10, pady=10, sticky="swe")
+
+        except Exception as e:
+            self.master.error_handle("ERROR", f"Unable to create GUI - download:\n{e}", terminate=True)
 
 
     def _combo_callback(self, choice) -> None:
@@ -532,26 +543,36 @@ class DownloadFrame(customtkinter.CTkFrame):
             self.master.error_handle("WARNING", "Signal not selected!", False)
             return
 
-        file_path = filedialog.asksaveasfile(defaultextension=".csv", filetypes=[("CSV files", "*.csv")])
+        try:
+            file_path = filedialog.asksaveasfile(defaultextension=".csv", filetypes=[("CSV files", "*.csv")])
 
-        if file_path:
-            from_t = self._date_time_from.get_values()
-            to_t = self._date_time_to.get_values()
+            if file_path:
+                from_t = self._date_time_from.get_values()
+                to_t = self._date_time_to.get_values()
 
-            from_str = f"{from_t['date']['y']}-{from_t['date']['m']}-{from_t['date']['d']} {from_t['time']['h']}:{from_t['time']['m']}:{from_t['time']['s']}"
-            to_str = f"{to_t['date']['y']}-{to_t['date']['m']}-{to_t['date']['d']} {to_t['time']['h']}:{to_t['time']['m']}:{to_t['time']['s']}"
+                # format "yyyy-mm-dd hh-ss-mm"
+                from_str = f"{from_t['date']['y']}-{from_t['date']['m']}-{from_t['date']['d']} {from_t['time']['h']}:{from_t['time']['m']}:{from_t['time']['s']}"
+                to_str = f"{to_t['date']['y']}-{to_t['date']['m']}-{to_t['date']['d']} {to_t['time']['h']}:{to_t['time']['m']}:{to_t['time']['s']}"
 
-            self.master.conn.send(f"DOWNL#{self._signal}#{from_str}#{to_str}#{file_path.name}")
+                self.master.conn.send(f"DOWNL#{self._signal}#{from_str}#{to_str}#{file_path.name}")
+
+        except Exception as e:
+            self.master.error_handle("ERROR", f"Unable to download data:\n{e}", terminate=True)
 
         return
     
 
     def update_signals(self, signals: list) -> None:
         self._signals = signals
-        # update option menu
-        self._option_menu.destroy()
-        self._option_menu = customtkinter.CTkOptionMenu(self, values=self._signals, command=self._combo_callback)
-        self._option_menu.grid(row=2, column=1, padx=10, pady=5, sticky="nswe")
+        try:
+            # update option menu
+            self._option_menu.destroy()
+            self._option_menu = customtkinter.CTkOptionMenu(self, values=self._signals, command=self._combo_callback)
+            self._option_menu.grid(row=2, column=1, padx=10, pady=5, sticky="nswe")
+
+        except Exception as e:
+            self.master.error_handle("ERROR", f"Unable to update signals:\n{e}", terminate=True)
+
         return
 
 
@@ -608,8 +629,8 @@ class DatabaseFrame(customtkinter.CTkFrame):
                 self._labels.append(label)
                 self._entries.append((entry, name[1]))
 
-        except Exception:
-            self.master.error_handle("ERROR", "Unable to create GUI - database", terminate=True)
+        except Exception as e:
+            self.master.error_handle("ERROR", f"Unable to create GUI - database:\n{e}", terminate=True)
 
 
 
@@ -634,8 +655,8 @@ class DatabaseFrame(customtkinter.CTkFrame):
             with open(os.path.join("src", "config.json"), "w") as file:
                 json.dump(self.master.my_config, file, indent=4)
 
-        except Exception:
-            self.master.error_handle("WARNING", "Unable to save the settings", terminate=False)
+        except Exception as e:
+            self.master.error_handle("WARNING", f"Unable to save the settings:\n{e}", terminate=False)
             return False
 
         return True        
@@ -744,8 +765,8 @@ class ProcessFrame(customtkinter.CTkFrame):
             with open(os.path.join("src", "config.json"), "w") as file:
                 json.dump(self.master.my_config, file, indent=4)
         
-        except Exception:
-            self.master.error_handle("WARNING", "Unable to save the settings", terminate=False)
+        except Exception as e:
+            self.master.error_handle("WARNING", f"Unable to save the settings:\n{e}", terminate=False)
             return False
         
         return True
@@ -783,8 +804,8 @@ class TextboxFrame(customtkinter.CTkFrame):
             self._textbox.grid(row=1, column=0, sticky="nsew")
             self._textbox.configure(state="disabled", font=("Courier New", 12))
 
-        except Exception:
-            self.master.error_handle("ERROR", "Unable to create GUI - textbox", terminate=True)
+        except Exception as e:
+            self.master.error_handle("ERROR", f"Unable to create GUI - textbox:\n{e}", terminate=True)
 
 
     def write(self, msg: str = "\n") -> None:
@@ -840,8 +861,8 @@ class ProgressFrame(customtkinter.CTkFrame):
             self._progress.set(0)
             self._progress.grid_forget()
 
-        except Exception:
-            self.master.error_handle("ERROR", "Unable to create GUI - progress", terminate=True)
+        except Exception as e:
+            self.master.error_handle("ERROR", f"Unable to create GUI - progress:\n{e}", terminate=True)
 
 
     def show(self) -> None:
@@ -931,8 +952,8 @@ class ButtonsFrame(customtkinter.CTkFrame):
             self._btn_save_start = customtkinter.CTkButton(self, text="Save and Start", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self._btn_callback_save_start)
             self._btn_save_start.grid(row=0, column=3, padx=5, pady=5, sticky="nswe")
 
-        except Exception:
-            self.master.error_handle("ERROR", "Unable to create GUI - buttons", terminate=True)
+        except Exception as e:
+            self.master.error_handle("ERROR", f"Unable to create GUI - buttons:\n{e}", terminate=True)
 
 
     def _btn_callback_discard(self) -> None:
@@ -1068,7 +1089,7 @@ class App(customtkinter.CTk):
 
         except Exception as e:
             print()
-            print(f"ERROR while trying to initialize GUI window: {e}")
+            print(f"ERROR while trying to initialize GUI window:\n{e}")
 
 
     def exit_program(self) -> None:

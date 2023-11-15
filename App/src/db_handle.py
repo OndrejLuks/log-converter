@@ -16,20 +16,24 @@ import pandas as pd
 
 class DatabaseHandle:
     def __init__(self, config, communication: PipeCommunication, event):
-        # TODO ADD TRY - EXCEPT CLAUSE
         self._comm = communication
-        self._schema_name = config["database"]["schema_name"]
-        self._host = config["database"]["host"]
-        self._port = config["database"]["port"]
-        self._database = config["database"]["database"]
-        self._user = config["database"]["user"]
-        self._password = config["database"]["password"]
-        self._clean = config["settings"]["clean_upload"]
+        self._stop_event = event
+        
+        try:
+            self._schema_name = config["database"]["schema_name"]
+            self._host = config["database"]["host"]
+            self._port = config["database"]["port"]
+            self._database = config["database"]["database"]
+            self._user = config["database"]["user"]
+            self._password = config["database"]["password"]
+            self._clean = config["settings"]["clean_upload"]
+
+        except Exception as e:
+            self._comm.send_error("ERROR", f"Problem with creating db object:\n{e}", "T")
+            return
 
         self._conn_string = "postgresql://" + self._user + ":" + self._password + "@" + self._host + "/" + self._database
-
-        self._stop_event = event
-
+        
 # -----------------------------------------------------------------------------------------------------------
 
     def __del__(self):
@@ -140,15 +144,19 @@ class DatabaseHandle:
 # -----------------------------------------------------------------------------------------------------------
 
     def update_config(self, config) -> None:
-        self._schema_name = config["database"]["schema_name"]
-        self._host = config["database"]["host"]
-        self._port = config["database"]["port"]
-        self._database = config["database"]["database"]
-        self._user = config["database"]["user"]
-        self._password = config["database"]["password"]
-        self._clean = config["settings"]["clean_upload"]
+        try:
+            self._schema_name = config["database"]["schema_name"]
+            self._host = config["database"]["host"]
+            self._port = config["database"]["port"]
+            self._database = config["database"]["database"]
+            self._user = config["database"]["user"]
+            self._password = config["database"]["password"]
+            self._clean = config["settings"]["clean_upload"]
 
-        self._conn_string = "postgresql://" + self._user + ":" + self._password + "@" + self._host + "/" + self._database
+            self._conn_string = "postgresql://" + self._user + ":" + self._password + "@" + self._host + "/" + self._database
+
+        except Exception as e:
+            self._comm.send_error("WARNING", f"Problem with db config update:\n{e}", "F")
 
         return
 
