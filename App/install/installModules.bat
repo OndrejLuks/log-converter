@@ -15,6 +15,10 @@ pip install can_decoder
 pip install canedge_browser
 pip install mdf_iter
 pip install pytz
+pip install tk
+pip install tkcalendar
+pip install customtkinter
+pip install packaging
 
 echo:
 echo =======================
