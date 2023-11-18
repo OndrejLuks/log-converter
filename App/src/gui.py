@@ -198,6 +198,7 @@ class DateTimePickerFrame(customtkinter.CTkFrame):
 
         try:
             self.grid_columnconfigure(0, weight=1)
+            self.configure(fg_color="transparent")
 
             # title
             self._time_select_label = customtkinter.CTkLabel(self, text=title, fg_color="transparent")
@@ -233,8 +234,8 @@ class DownloadFrame(customtkinter.CTkFrame):
         try:
             self.grid_columnconfigure(0, weight=1)
             self.grid_columnconfigure(1, weight=2)
-
             self.grid_rowconfigure(7, weight=1)
+            self.configure(fg_color="transparent")
 
             self._signal = ""
             self._signals = ["none"]
@@ -354,6 +355,7 @@ class DatabaseFrame(customtkinter.CTkFrame):
 
             self.grid_columnconfigure(0, weight=1)
             self.grid_columnconfigure(1, weight=2)
+            self.configure(fg_color="transparent")
             
             # Frame title
             self._title = customtkinter.CTkLabel(self, text="Database configuration", fg_color=self.master.col_frame_title_bg, text_color=self.master.col_frame_title_tx, corner_radius=6)
@@ -440,6 +442,7 @@ class ProcessFrame(customtkinter.CTkFrame):
         try:
             self.grid_columnconfigure(0, weight=1)
             self.grid_columnconfigure(1, weight=2)
+            self.configure(fg_color="transparent")
 
             # Frame title
             self._title = customtkinter.CTkLabel(self, text="Process configuration", fg_color=self.master.col_frame_title_bg, text_color=self.master.col_frame_title_tx, corner_radius=6)
@@ -549,6 +552,7 @@ class TextboxFrame(customtkinter.CTkFrame):
         super().__init__(master)
 
         try:
+            self.configure(corner_radius=0)
             self.grid_columnconfigure(0, weight=1)
             self.grid_rowconfigure(1, weight=1)
 
@@ -783,6 +787,143 @@ class ButtonsFrame(customtkinter.CTkFrame):
 # ================================================================================================================================
 
 
+class NavigationFooterFrame(customtkinter.CTkFrame):
+    def __init__(self, master):
+        super().__init__(master)
+
+        self.configure(corner_radius=0, fg_color="transparent")
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
+
+        # button manual
+        self.btn_manual = customtkinter.CTkButton(self, corner_radius=0, height=40, border_spacing=10, text="Manual", fg_color="transparent", command=self.btn_callback_manual, text_color=("gray10", "gray90"), anchor="w")
+        self.btn_manual.grid(row=0, column=0, padx=0, pady=5, sticky="we")
+
+        # title
+        self.label = customtkinter.CTkLabel(self, text="Appearance", fg_color="transparent")
+        self.label.grid(row=1, column=0, padx=0, pady=0)
+
+        # appearance mode
+        self.appearance = customtkinter.CTkOptionMenu(self, values=["Light", "Dark", "System"], command=self.change_appearance_mode)
+        self.appearance.set("System")
+        self.appearance.grid(row=2, column=0, padx=20, pady=(5, 20), sticky="we")
+
+
+    def btn_callback_manual(self) -> None:
+        self.master._btn_callback_manual()
+        return
+
+    def deselect(self) -> None:
+        self.btn_manual.configure(fg_color="transparent")
+        return
+    
+    def select_manual(self) -> None:
+        self.btn_manual.configure(fg_color=("gray75", "gray25"))
+        return
+
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def change_appearance_mode(self, mode: str) -> None:
+        self.master.change_appearance_mode(mode)
+        return 
+
+
+# ================================================================================================================================
+
+
+class NavigationFrame(customtkinter.CTkFrame):
+    def __init__(self, master):
+        super().__init__(master)
+
+        self.configure(corner_radius=0)
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(5, weight=1)
+
+        self.btns = []
+
+        # title
+        self.label = customtkinter.CTkLabel(self, text="TITLE LOGO", fg_color="transparent")
+        self.label.grid(row=0, column=0, padx=20, pady=20)
+
+        # button Before start
+        self.btn_before_start = customtkinter.CTkButton(self, corner_radius=0, height=40, border_spacing=10, text="Before start", fg_color="transparent", command=self._btn_callback_before_start, text_color=("gray10", "gray90"), anchor="w")
+        self.btn_before_start.grid(row=1, column=0, sticky="we")
+        self.btns.append(self.btn_before_start)
+
+        # button Database config
+        self.btn_db_config = customtkinter.CTkButton(self, corner_radius=0, height=40, border_spacing=10, text="Database config", fg_color="transparent", command=self._btn_callback_db_config, text_color=("gray10", "gray90"), anchor="w")
+        self.btn_db_config.grid(row=2, column=0, sticky="we")
+        self.btns.append(self.btn_db_config)
+
+        # button Conversion config
+        self.btn_conv_config = customtkinter.CTkButton(self, corner_radius=0, height=40, border_spacing=10, text="Conversion config", fg_color="transparent", command=self._btn_callback_conv_config, text_color=("gray10", "gray90"), anchor="w")
+        self.btn_conv_config.grid(row=3, column=0, sticky="we")
+        self.btns.append(self.btn_conv_config)
+
+        # button Data download
+        self.btn_download = customtkinter.CTkButton(self, corner_radius=0, height=40, border_spacing=10, text="Download data", fg_color="transparent", command=self._btn_callback_download, text_color=("gray10", "gray90"), anchor="w")
+        self.btn_download.grid(row=4, column=0, sticky="we")
+        self.btns.append(self.btn_download)
+
+        # footer
+        self.footer = NavigationFooterFrame(self)
+        self.footer.grid(row=5, column=0, sticky="swe")
+
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def change_appearance_mode(self, mode: str) -> None:
+        self.master.change_appearance_mode(mode)
+        return
+    
+    def set_default(self) -> None:
+        self._btn_callback_before_start()
+        return
+    
+    def _btn_callback_before_start(self) -> None:
+        self._deselect_btns()
+        self.btn_before_start.configure(fg_color=("gray75", "gray25"))
+        self.master.load_frame("before-start")
+        return
+    
+    def _btn_callback_db_config(self) -> None:
+        self._deselect_btns()
+        self.btn_db_config.configure(fg_color=("gray75", "gray25"))
+        self.master.load_frame("db-config")
+        return
+    
+    def _btn_callback_conv_config(self) -> None:
+        self._deselect_btns()
+        self.btn_conv_config.configure(fg_color=("gray75", "gray25"))
+        self.master.load_frame("conv-config")
+        return
+    
+    def _btn_callback_download(self) -> None:
+        self._deselect_btns()
+        self.btn_download.configure(fg_color=("gray75", "gray25"))
+        self.master.load_frame("download")
+        return
+    
+    def _btn_callback_manual(self) -> None:
+        self._deselect_btns()
+        self.footer.select_manual()
+        self.master.load_frame("manual")
+        return
+
+    def _deselect_btns(self) -> None:
+        self.footer.deselect()
+        for btn in self.btns:
+            btn.configure(fg_color="transparent")
+
+        return
+        
+        
+
+
+
+
+# ================================================================================================================================
+
+
 class App(customtkinter.CTk):
     """Main GUI window class. Container for all of the frames.
     
@@ -832,32 +973,36 @@ class App(customtkinter.CTk):
             self.toplevel_window = None
 
             self.title("MF4 Signal converter")
-            self.minsize(900, 770)
+            self.minsize(900, 600)
             self.protocol("WM_DELETE_WINDOW", self._closing_handle)
 
             self.grid_columnconfigure(0, weight=1)
             self.grid_columnconfigure(1, weight=1)
-            self.grid_columnconfigure(2, weight=1)
-            self.grid_rowconfigure(1, weight=1)
+            self.grid_rowconfigure(0, weight=1)
 
-            self.database_frame = DatabaseFrame(self)
-            self.database_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nswe")
-            
-            self.process_frame = ProcessFrame(self)
-            self.process_frame.grid(row=0, column=1, padx=10, pady=10, sticky="nswe")
+            # navigation
+            self.navigation = NavigationFrame(self)
+            self.navigation.grid(row=0, column=0, rowspan=4, sticky="nswe")
 
+            # text box
             self.text_box = TextboxFrame(self)
-            self.text_box.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="nswe")
+            self.text_box.grid(row=1, column=1, padx=0, pady=10, sticky="nswe")
 
+            # progress frame
             self.progress_bar = ProgressFrame(self)
-            self.progress_bar.grid(row=2, column=0, columnspan=2, padx=0, pady=0, sticky="nswe")
+            self.progress_bar.grid(row=2, column=1, padx=0, pady=0, sticky="nswe")
 
+            # buttons
             self.button_frame = ButtonsFrame(self)
-            self.button_frame.grid(row=3, column=0, columnspan=2, padx=5, pady=(10, 15), sticky="nswe")
+            self.button_frame.grid(row=3, column=1, padx=5, pady=(10, 15), sticky="nswe")
 
+            # frames
+            self.database_frame = DatabaseFrame(self)
+            self.process_frame = ProcessFrame(self)
             self.download_frame = DownloadFrame(self)
-            self.download_frame.grid(row=0, column=2, rowspan=4, padx=10, pady=(10, 10), sticky="nswe")
 
+            # display default frame
+            self.navigation.set_default()
 
         except Exception as e:
             print()
@@ -1012,4 +1157,40 @@ class App(customtkinter.CTk):
             callback = self.kill_toplevel
         
         self.open_toplevel_ok(type, message, callback)
+        return
+    
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def change_appearance_mode(self, mode: str) -> None:
+        customtkinter.set_appearance_mode(mode)
+        return
+    
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def load_frame(self, name: str) -> None:
+        if name == "before-start":
+            pass
+        else:
+            pass
+
+        if name == "db-config":
+            self.database_frame.grid(row=0, column=1, padx=0, pady=0, sticky="nswe")
+        else:
+            self.database_frame.grid_forget()
+
+        if name == "conv-config":
+            self.process_frame.grid(row=0, column=1, padx=0, pady=0, sticky="nswe")
+        else:
+            self.process_frame.grid_forget()
+
+        if name == "download":
+            self.download_frame.grid(row=0, column=1, padx=0, pady=0, sticky="nswe")
+        else:
+            self.download_frame.grid_forget()
+
+        if name == "manual":
+            pass
+        else:
+            pass
+
         return
