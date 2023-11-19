@@ -138,6 +138,107 @@ class TopWindowExit(customtkinter.CTkToplevel):
 # ================================================================================================================================
 
 
+class FolderSelectorFrame(customtkinter.CTkFrame):
+    def __init__(self, master, str_label, str_btn, str_current):
+        super().__init__(master)
+
+        self._str_label = str_label
+        self._curr_path = "Current directory"
+
+        self.configure(fg_color="transparent")
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=5)
+        self.grid_columnconfigure(2, weight=5)
+
+        self._mf4_select_label = customtkinter.CTkLabel(self, text=(str_label + ":"), fg_color="transparent")
+        self._mf4_select_label.grid(row=0, column=0, columnspan=2, padx=10, pady=5, sticky="w")
+
+        self._btn_mf4 = customtkinter.CTkButton(self, text=str_btn, text_color=self.master.master.col_btn_tx, text_color_disabled=self.master.master.col_btn_dis_tx, command=self._btn_callback)
+        self._btn_mf4.grid(row=0, column=2, padx=10, pady=10, sticky="we")
+
+        self._mf4_current_label = customtkinter.CTkLabel(self, text=(str_current + ":"), fg_color="transparent")
+        self._mf4_current_label.grid(row=1, column=0, padx=10, pady=10, sticky="w")
+
+        self._mf4_current = customtkinter.CTkEntry(self, placeholder_text="Current directory here")
+        self._mf4_current.insert(0, self._curr_path)
+        self._mf4_current.grid(row=1, column=1, columnspan=2, padx=10, pady=10, sticky="we")
+
+    
+    def _btn_callback(self) -> None:
+        dir_path = filedialog.askdirectory(title=self._str_label, initialdir=".")
+
+        if dir_path:
+            self.change_curr_dir(dir_path)
+        
+        return
+    
+    def change_curr_dir(self, new_dir) -> None:
+        # clear the entry
+        self._mf4_current.delete(0, 'end')
+        # set new entry
+        self._curr_path = new_dir
+        self._mf4_current.insert(0, self._curr_path)
+        return
+
+    def save_curr_path(self, path_of: str) -> bool:
+
+        # update config
+        self.master.master.my_config["settings"][path_of] = self._curr_path
+
+        # write to the file:
+        try:
+            with open(os.path.join("src", "config.json"), "w") as file:
+                json.dump(self.master.master.my_config, file, indent=4)
+        
+        except Exception as e:
+            self.master.master.error_handle("WARNING", f"Unable to save the settings:\n{e}", terminate=False)
+            return False
+
+
+        return True
+
+
+# ================================================================================================================================
+
+
+class BeforeStartFrame(customtkinter.CTkFrame):
+    def __init__(self, master):
+        super().__init__(master)
+
+        self.configure(fg_color="transparent")
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=5)
+        self.grid_columnconfigure(2, weight=5)
+
+        # Frame title
+        self._title = customtkinter.CTkLabel(self, text="Before start", fg_color=self.master.col_frame_title_bg, text_color=self.master.col_frame_title_tx, corner_radius=6)
+        self._title.grid(row=0, column=0, columnspan=3, padx=10, pady=10, sticky="we")
+
+        # MF4 files
+        self._mf4_select = FolderSelectorFrame(self, "Select MF4 files root directory", "Select MF4 dir", "Current MF4 dir")
+        self._mf4_select.change_curr_dir(self.get_curr_dir_path("mf4_path"))
+        self._mf4_select.grid(row=1, column=0, columnspan=3, padx=0, pady=(0, 40), sticky="we")
+
+        # DBC files
+        self._dbc_select = FolderSelectorFrame(self, "Select DBC files root directory", "Select DBC dir", "Current DBC dir")
+        self._dbc_select.change_curr_dir(self.get_curr_dir_path("dbc_path"))
+        self._dbc_select.grid(row=2, column=0, columnspan=3, padx=0, pady=0, sticky="we")
+
+    
+    def get_curr_dir_path(self, path_of: str) -> str:
+        return self.master.get_curr_dir_path(path_of)
+    
+
+    def save_curr_paths(self) -> bool:
+        # bad stuff
+        # TODO get current paths from objects and save it here via master.update_confg
+        return self._mf4_select.save_curr_path("mf4_path") and self._dbc_select.save_curr_path("dbc_path")
+    
+
+
+# ================================================================================================================================
+
+
 class TimeSelectorFrame(customtkinter.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
@@ -233,8 +334,8 @@ class DownloadFrame(customtkinter.CTkFrame):
 
         try:
             self.grid_columnconfigure(0, weight=1)
-            self.grid_columnconfigure(1, weight=2)
-            self.grid_rowconfigure(7, weight=1)
+            self.grid_columnconfigure(1, weight=1)
+            self.grid_rowconfigure(6, weight=1)
             self.configure(fg_color="transparent")
 
             self._signal = ""
@@ -245,30 +346,44 @@ class DownloadFrame(customtkinter.CTkFrame):
             self._title.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="we")
 
             # load signals
-            self._sig_load_label = customtkinter.CTkLabel(self, text="Load signals:", fg_color="transparent")
-            self._sig_load_label.grid(row=1, column=0, padx=10, pady=5, sticky="w")
+            self._load_frame = customtkinter.CTkFrame(self)
+            self._load_frame.grid_columnconfigure(0, weight=1)
+            self._load_frame.grid_columnconfigure(1, weight=4)
+            self._load_frame.configure(fg_color="transparent", corner_radius=0)
 
-            self._btn_load = customtkinter.CTkButton(self, text="Load from DB", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self._btn_callback_load)
-            self._btn_load.grid(row=1, column=1, padx=10, pady=5, sticky="nswe")
+            self._sig_load_label = customtkinter.CTkLabel(self._load_frame, text="Load signals:", fg_color="transparent")
+            self._sig_load_label.grid(row=0, column=0, padx=10, pady=5, sticky="w")
+
+            self._btn_load = customtkinter.CTkButton(self._load_frame, text="Load from DB", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self._btn_callback_load)
+            self._btn_load.grid(row=0, column=1, padx=10, pady=5, sticky="nswe")
+
+            self._load_frame.grid(row=0, column=0, columnspan=2, padx=0, pady=0, sticky="we")
 
             # signal selection
-            self._sig_select_label = customtkinter.CTkLabel(self, text="Select signal:", fg_color="transparent")
-            self._sig_select_label.grid(row=2, column=0, padx=10, pady=5, sticky="w")
+            self._select_frame = customtkinter.CTkFrame(self)
+            self._select_frame.grid_columnconfigure(0, weight=1)
+            self._select_frame.grid_columnconfigure(1, weight=4)
+            self._select_frame.configure(fg_color="transparent", corner_radius=0)
+
+            self._sig_select_label = customtkinter.CTkLabel(self._select_frame, text="Select signal:", fg_color="transparent")
+            self._sig_select_label.grid(row=0, column=0, padx=10, pady=5, sticky="w")
             
-            self._option_menu = customtkinter.CTkOptionMenu(self, values=self._signals, command=self._combo_callback)
-            self._option_menu.grid(row=2, column=1, padx=10, pady=5, sticky="nswe")
+            self._option_menu = customtkinter.CTkOptionMenu(self._select_frame, values=self._signals, command=self._combo_callback)
+            self._option_menu.grid(row=0, column=1, padx=10, pady=5, sticky="nswe")
+
+            self._select_frame.grid(row=1, column=0, columnspan=2, padx=0, pady=0, sticky="we")
 
             # from date-time
             self._date_time_from = DateTimePickerFrame(self, "Select FROM time stamp:")
-            self._date_time_from.grid(row=5, column=0, columnspan=2, padx=0, pady=(10, 0), sticky="nswe")
+            self._date_time_from.grid(row=5, column=0, padx=(0, 10), pady=(10, 5), sticky="nswe")
 
             # to date-time
             self._date_time_to = DateTimePickerFrame(self, "Select TO time stamp:")
-            self._date_time_to.grid(row=6, column=0, columnspan=2, padx=0, pady=10, sticky="nswe")
+            self._date_time_to.grid(row=5, column=1, padx=(10, 0), pady=(10, 5), sticky="nswe")
 
             # download button
             self._btn_download = customtkinter.CTkButton(self, text="Download as csv", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self._btn_callback_download)
-            self._btn_download.grid(row=7, column=0, columnspan=2, padx=10, pady=10, sticky="swe")
+            self._btn_download.grid(row=6, column=0, columnspan=2, padx=200, pady=(10, 0), sticky="swe")
 
         except Exception as e:
             self.master.error_handle("ERROR", f"Unable to create GUI - download:\n{e}", terminate=True)
@@ -354,7 +469,7 @@ class DatabaseFrame(customtkinter.CTkFrame):
         try:
 
             self.grid_columnconfigure(0, weight=1)
-            self.grid_columnconfigure(1, weight=2)
+            self.grid_columnconfigure(1, weight=3)
             self.configure(fg_color="transparent")
             
             # Frame title
@@ -441,11 +556,11 @@ class ProcessFrame(customtkinter.CTkFrame):
 
         try:
             self.grid_columnconfigure(0, weight=1)
-            self.grid_columnconfigure(1, weight=2)
+            self.grid_columnconfigure(1, weight=3)
             self.configure(fg_color="transparent")
 
             # Frame title
-            self._title = customtkinter.CTkLabel(self, text="Process configuration", fg_color=self.master.col_frame_title_bg, text_color=self.master.col_frame_title_tx, corner_radius=6)
+            self._title = customtkinter.CTkLabel(self, text="Conversion configuration", fg_color=self.master.col_frame_title_bg, text_color=self.master.col_frame_title_tx, corner_radius=6)
             self._title.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="we")
 
             # define switch names
@@ -973,10 +1088,10 @@ class App(customtkinter.CTk):
             self.toplevel_window = None
 
             self.title("MF4 Signal converter")
-            self.minsize(900, 600)
+            self.minsize(900, 750)
             self.protocol("WM_DELETE_WINDOW", self._closing_handle)
 
-            self.grid_columnconfigure(0, weight=1)
+            # self.grid_columnconfigure(0, weight=1)
             self.grid_columnconfigure(1, weight=1)
             self.grid_rowconfigure(0, weight=1)
 
@@ -1000,6 +1115,7 @@ class App(customtkinter.CTk):
             self.database_frame = DatabaseFrame(self)
             self.process_frame = ProcessFrame(self)
             self.download_frame = DownloadFrame(self)
+            self.before_start_frame = BeforeStartFrame(self)
 
             # display default frame
             self.navigation.set_default()
@@ -1112,7 +1228,7 @@ class App(customtkinter.CTk):
 
     def save(self) -> None:
         """Saves all possible changes into the config.json file."""
-        if self.database_frame.save_to_json() and self.process_frame.save_to_json():
+        if self.database_frame.save_to_json() and self.process_frame.save_to_json() and self.before_start_frame.save_curr_paths():
             self.text_box.write(f"Successfully saved!\n")
             # update backend configuration
             self.comm.send_command("U-CONF")
@@ -1167,24 +1283,36 @@ class App(customtkinter.CTk):
     
 # --------------------------------------------------------------------------------------------------------------------------------
 
+    def get_curr_dir_path(self, path_of: str) -> str:
+        try:
+            output = self.my_config["settings"][path_of]
+
+        except Exception as e:
+            self.error_handle("WARNING", f"Failed to fetch current dir:\n{e}", False)
+            return ""
+        
+        return output
+
+# --------------------------------------------------------------------------------------------------------------------------------
+
     def load_frame(self, name: str) -> None:
         if name == "before-start":
-            pass
+            self.before_start_frame.grid(row=0, column=1, padx=20, pady=(20, 10), sticky="nswe")
         else:
-            pass
+            self.before_start_frame.grid_forget()
 
         if name == "db-config":
-            self.database_frame.grid(row=0, column=1, padx=0, pady=0, sticky="nswe")
+            self.database_frame.grid(row=0, column=1, padx=20, pady=(20, 10), sticky="nswe")
         else:
             self.database_frame.grid_forget()
 
         if name == "conv-config":
-            self.process_frame.grid(row=0, column=1, padx=0, pady=0, sticky="nswe")
+            self.process_frame.grid(row=0, column=1, padx=20, pady=(20, 10), sticky="nswe")
         else:
             self.process_frame.grid_forget()
 
         if name == "download":
-            self.download_frame.grid(row=0, column=1, padx=0, pady=0, sticky="nswe")
+            self.download_frame.grid(row=0, column=1, padx=20, pady=10, sticky="nswe")
         else:
             self.download_frame.grid_forget()
 

@@ -1,5 +1,7 @@
 {
     "settings": {
+        "mf4_path": "C:/Users/mrdox/OneDrive-CVUT/OneDrive - \u010cesk\u00e9 vysok\u00e9 u\u010den\u00ed technick\u00e9 v Praze/FIT/BAP/log-converter/App/install",
+        "dbc_path": "DBCfiles",
         "aggregate": true,
         "agg_max_skip_seconds": 3600,
         "move_done_files": false,
@@ -12,7 +14,7 @@
         "port": "5432",
         "database": "TestDB",
         "user": "user_sandbox",
-        "password": "Hovno123-",
+        "password": "TestPswDb",
         "schema_name": "mex_test"
     }
 }

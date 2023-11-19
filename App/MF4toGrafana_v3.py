@@ -53,3 +53,8 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+
+# TODO Move configuration updating into MASTER APP method "update_config(where, where, what)"
+# TODO Make DBC and MF4 paths read from config.json
