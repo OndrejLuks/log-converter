@@ -431,8 +431,8 @@ class DownloadFrame(customtkinter.CTkFrame):
         try:
             # update option menu
             self._option_menu.destroy()
-            self._option_menu = customtkinter.CTkOptionMenu(self, values=self._signals, command=self._combo_callback)
-            self._option_menu.grid(row=2, column=1, padx=10, pady=5, sticky="nswe")
+            self._option_menu = customtkinter.CTkOptionMenu(self._select_frame, values=self._signals, command=self._combo_callback)
+            self._option_menu.grid(row=0, column=1, padx=10, pady=5, sticky="nswe")
 
         except Exception as e:
             self.master.error_handle("ERROR", f"Unable to update signals:\n{e}", terminate=True)
