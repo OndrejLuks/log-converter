@@ -48,17 +48,20 @@ class Conversion():
 
         db_list = []
         try:
-            dir = os.listdir(os.path.join("DBCfiles"))
+            dir = os.listdir(self._config["settings"]["dbc_path"])
             if len(dir) == 0:
                 raise OSError
 
             for dbc_file in dir:
                 if dbc_file.endswith(".dbc"):
-                    db = can_decoder.load_dbc(os.path.join("DBCfiles", dbc_file))
+                    db = can_decoder.load_dbc(os.path.join(self._config["settings"]["dbc_path"], dbc_file))
                     db_list.append(db)
 
         except OSError:
             self._comm.send_error("ERROR", "Can't load DBC files. Check for file existance.", "T")
+
+        except Exception as e:
+            self._comm.send_error("ERROR", f"Problem with DBC files loading:\n{e}", "T")
 
         return db_list
 
@@ -254,7 +257,7 @@ class Conversion():
             return
 
         # load MF4 files
-        mf4_file_list, num_of_mf4_files = self._utils.get_MF4_files(os.path.join("SourceMF4"))
+        mf4_file_list, num_of_mf4_files = self._utils.get_MF4_files(self._config["settings"]["mf4_path"])
         num_of_done_mf4_files = 0
 
         try: 
@@ -316,7 +319,7 @@ class Conversion():
                 # MOVE DONE FILES if requested
                 if self._config["settings"]["move_done_files"]:
                     self._comm.send_to_print("   - moving the file...")
-                    self._utils.move_done_file(file, "SourceMF4")
+                    self._utils.move_done_file(file, self._config["settings"]["mf4_path"])
 
                 num_of_done_mf4_files += 1
                 self._comm.send_command(f"PROG#{round((num_of_done_mf4_files / num_of_mf4_files), 2)}")

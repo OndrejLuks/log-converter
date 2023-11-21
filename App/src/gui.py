@@ -143,25 +143,23 @@ class FolderSelectorFrame(customtkinter.CTkFrame):
         super().__init__(master)
 
         self._str_label = str_label
-        self._curr_path = "Current directory"
 
         self.configure(fg_color="transparent")
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=5)
         self.grid_columnconfigure(2, weight=5)
 
-        self._mf4_select_label = customtkinter.CTkLabel(self, text=(str_label + ":"), fg_color="transparent")
-        self._mf4_select_label.grid(row=0, column=0, columnspan=2, padx=10, pady=5, sticky="w")
+        self._select_label = customtkinter.CTkLabel(self, text=(str_label + ":"), fg_color="transparent")
+        self._select_label.grid(row=0, column=0, columnspan=2, padx=10, pady=5, sticky="w")
 
-        self._btn_mf4 = customtkinter.CTkButton(self, text=str_btn, text_color=self.master.master.col_btn_tx, text_color_disabled=self.master.master.col_btn_dis_tx, command=self._btn_callback)
-        self._btn_mf4.grid(row=0, column=2, padx=10, pady=10, sticky="we")
+        self._btn = customtkinter.CTkButton(self, text=str_btn, text_color=self.master.master.col_btn_tx, text_color_disabled=self.master.master.col_btn_dis_tx, command=self._btn_callback)
+        self._btn.grid(row=0, column=2, padx=10, pady=10, sticky="we")
 
-        self._mf4_current_label = customtkinter.CTkLabel(self, text=(str_current + ":"), fg_color="transparent")
-        self._mf4_current_label.grid(row=1, column=0, padx=10, pady=10, sticky="w")
+        self._current_label = customtkinter.CTkLabel(self, text=(str_current + ":"), fg_color="transparent")
+        self._current_label.grid(row=1, column=0, padx=10, pady=10, sticky="w")
 
-        self._mf4_current = customtkinter.CTkEntry(self, placeholder_text="Current directory here")
-        self._mf4_current.insert(0, self._curr_path)
-        self._mf4_current.grid(row=1, column=1, columnspan=2, padx=10, pady=10, sticky="we")
+        self._current = customtkinter.CTkEntry(self, placeholder_text="Current directory here")
+        self._current.grid(row=1, column=1, columnspan=2, padx=10, pady=10, sticky="we")
 
     
     def _btn_callback(self) -> None:
@@ -174,28 +172,13 @@ class FolderSelectorFrame(customtkinter.CTkFrame):
     
     def change_curr_dir(self, new_dir) -> None:
         # clear the entry
-        self._mf4_current.delete(0, 'end')
+        self._current.delete(0, 'end')
         # set new entry
-        self._curr_path = new_dir
-        self._mf4_current.insert(0, self._curr_path)
+        self._current.insert(0, new_dir)
         return
 
-    def save_curr_path(self, path_of: str) -> bool:
-
-        # update config
-        self.master.master.my_config["settings"][path_of] = self._curr_path
-
-        # write to the file:
-        try:
-            with open(os.path.join("src", "config.json"), "w") as file:
-                json.dump(self.master.master.my_config, file, indent=4)
-        
-        except Exception as e:
-            self.master.master.error_handle("WARNING", f"Unable to save the settings:\n{e}", terminate=False)
-            return False
-
-
-        return True
+    def get_curr_dir(self) -> str:
+        return str(self._current.get())
 
 
 # ================================================================================================================================
@@ -230,11 +213,25 @@ class BeforeStartFrame(customtkinter.CTkFrame):
     
 
     def save_curr_paths(self) -> bool:
-        # bad stuff
-        # TODO get current paths from objects and save it here via master.update_confg
-        return self._mf4_select.save_curr_path("mf4_path") and self._dbc_select.save_curr_path("dbc_path")
-    
+        mf4_path = self._mf4_select.get_curr_dir()
+        dbc_path = self._dbc_select.get_curr_dir()
 
+        if len(mf4_path) == 0:
+            self.master.error_handle("WARNING", "Path to MF4 files is blank!", False)
+            return False
+        
+        if len(dbc_path) == 0:
+            self.master.error_handle("WARNING", "Path to DBC files is blank!", False)
+            return False
+        
+        if not self.master.update_local_config("settings", "mf4_path", mf4_path):
+            return False
+        
+        if not self.master.update_local_config("settings", "dbc_path", dbc_path):
+            return False
+        
+        return self.master.write_config_to_file() and self.master.write_config_to_file() 
+    
 
 # ================================================================================================================================
 
@@ -490,7 +487,7 @@ class DatabaseFrame(customtkinter.CTkFrame):
             for i, name in enumerate(self.entry_names):
                 label = customtkinter.CTkLabel(self, text=name[0], fg_color="transparent")
                 label.grid(row=i+1, column=0, padx=15, pady=10, sticky="w")
-                entry = customtkinter.CTkEntry(self, placeholder_text=self.master.my_config["database"][name[1]])
+                entry = customtkinter.CTkEntry(self, placeholder_text=self.master.get_config_value("database", name[1]))
                 entry.grid(row=i+1, column=1, padx=10, pady=10, sticky="we")
 
                 self._labels.append(label)
@@ -504,7 +501,7 @@ class DatabaseFrame(customtkinter.CTkFrame):
     def refresh(self) -> None:
         """Updates dynamic elements of the GUI based on config.json content."""
         for entry in self._entries:
-            entry[0].configure(placeholder_text=self.master.my_config["database"][entry[1]])
+            entry[0].configure(placeholder_text=self.master.get_config_value("database", entry[1]))
 
         return
 
@@ -512,22 +509,14 @@ class DatabaseFrame(customtkinter.CTkFrame):
     
     def save_to_json(self) -> bool:
         """Saves database settings changes into the config.json file"""
-        try:
-            # update config
-            for entry in self._entries:
-                val = str(entry[0].get())
-                if not len(val) == 0:
-                    self.master.my_config["database"][entry[1]] = val
 
-            # write to the file:
-            with open(os.path.join("src", "config.json"), "w") as file:
-                json.dump(self.master.my_config, file, indent=4)
+        for entry in self._entries:
+            val = str(entry[0].get())
+            if not len(val) == 0:
+                if not self.master.update_local_config("database", entry[1], val):
+                    return False
 
-        except Exception as e:
-            self.master.error_handle("WARNING", f"Unable to save the settings:\n{e}", terminate=False)
-            return False
-
-        return True        
+        return self.master.write_config_to_file()       
 
 
 # ================================================================================================================================   
@@ -576,7 +565,7 @@ class ProcessFrame(customtkinter.CTkFrame):
                 switch.grid(row=i+1, column=0, columnspan=2, padx=10, pady=10, sticky="w")
 
                 # set default switch position
-                if self.master.my_config["settings"][name[1]]:
+                if self.master.get_config_value("settings", name[1]):
                     switch.select()
 
                 self._switches.append((switch, name[1]))
@@ -589,7 +578,7 @@ class ProcessFrame(customtkinter.CTkFrame):
             for i, name in enumerate(entry_names):
                 label = customtkinter.CTkLabel(self, text=name[0], fg_color="transparent")
                 label.grid(row=i+1+len(self._switches), column=0, padx=10, pady=10, sticky="w")
-                entry = customtkinter.CTkEntry(self, placeholder_text=self.master.my_config["settings"][name[1]])
+                entry = customtkinter.CTkEntry(self, placeholder_text=self.master.get_config_value("settings", name[1]))
                 entry.grid(row=i+1+len(self._switches), column=1, padx=10, pady=10, sticky="we")
 
                 self._labels.append(label)
@@ -603,7 +592,7 @@ class ProcessFrame(customtkinter.CTkFrame):
     def refresh(self) -> None:
         """Updates dynamic elements of the GUI based on config.json content."""
         for entry in self._entries:
-            entry[0].configure(placeholder_text=self.master.my_config["settings"][entry[1]])
+            entry[0].configure(placeholder_text=self.master.get_config_value("settings", entry[1]))
 
         return
 
@@ -615,9 +604,11 @@ class ProcessFrame(customtkinter.CTkFrame):
         for switch in self._switches:
             val = int(switch[0].get())
             if val == 1:
-                self.master.my_config["settings"][switch[1]] = True
+                if not self.master.update_local_config("settings", switch[1], True):
+                    return False
             if val == 0:
-                self.master.my_config["settings"][switch[1]] = False
+                if not self.master.update_local_config("settings", switch[1], False):
+                    return False
 
         for entry in self._entries:
             val = str(entry[0].get())
@@ -631,18 +622,10 @@ class ProcessFrame(customtkinter.CTkFrame):
                     return False
                 
                 # save
-                self.master.my_config["settings"][entry[1]] = val
+                if not self.master.update_local_config("settings", entry[1], val):
+                    return False
 
-        # write to the file:
-        try:
-            with open(os.path.join("src", "config.json"), "w") as file:
-                json.dump(self.master.my_config, file, indent=4)
-        
-        except Exception as e:
-            self.master.error_handle("WARNING", f"Unable to save the settings:\n{e}", terminate=False)
-            return False
-        
-        return True
+        return self.master.write_config_to_file()
 
 
 # ================================================================================================================================
@@ -1241,6 +1224,43 @@ class App(customtkinter.CTk):
 
         return
 
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def update_local_config(self, domain: str, field: str, content: str) -> bool:
+        try:
+            self.my_config[domain][field] = content
+
+        except Exception as e:
+            self.error_handle("WARNING", f"Problem with updating local settings:\n{e}", False)
+            return False
+        
+        return True
+
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def write_config_to_file(self) -> bool:
+        try:
+            with open(os.path.join("src", "config.json"), "w") as file:
+                json.dump(self.my_config, file, indent=4)
+
+        except Exception as e:
+            self.error_handle("WARNING", f"Problem with writting config to file:\n{e}", False)
+            return False
+        
+        return True
+
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def get_config_value(self, domain: str, field: str):
+        try:
+            val = self.my_config[domain][field]
+
+        except Exception as e:
+            self.error_handle("WARNING", f"Problem with fetching local settings:\n{e}", False)
+            return ""
+        
+        return val
+        
 # --------------------------------------------------------------------------------------------------------------------------------
 
     def set_communication(self, communication) -> None:
