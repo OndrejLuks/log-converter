@@ -7,6 +7,7 @@
 
 from tkcalendar import Calendar
 from tkinter import filedialog
+from PIL import Image
 import customtkinter
 import json
 import time
@@ -466,7 +467,7 @@ class DatabaseFrame(customtkinter.CTkFrame):
         try:
 
             self.grid_columnconfigure(0, weight=1)
-            self.grid_columnconfigure(1, weight=3)
+            self.grid_columnconfigure(1, weight=4)
             self.configure(fg_color="transparent")
             
             # Frame title
@@ -522,7 +523,7 @@ class DatabaseFrame(customtkinter.CTkFrame):
 # ================================================================================================================================   
 
 
-class ProcessFrame(customtkinter.CTkFrame):
+class ConversionFrame(customtkinter.CTkFrame):
     """Class representing the frame for process settings.
     
     Child of customtkinter.CTkFrame.
@@ -553,9 +554,9 @@ class ProcessFrame(customtkinter.CTkFrame):
             self._title.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="we")
 
             # define switch names
-            switch_names = [("Aggregate", "aggregate"),
+            switch_names = [("Aggregate raw data", "aggregate"),
                             ("Move done files", "move_done_files"),
-                            ("Write time info", "write_time_info"),
+                            ("Write time info into MF4-info.csv", "write_time_info"),
                             ("Clean upload", "clean_upload")]
             self._switches = []
 
@@ -571,7 +572,7 @@ class ProcessFrame(customtkinter.CTkFrame):
                 self._switches.append((switch, name[1]))
 
             # define entry names
-            entry_names = [("Agg. max skip seconds", "agg_max_skip_seconds")]
+            entry_names = [("Seconds to skip when value is consistent", "agg_max_skip_seconds")]
             self._entries = []
             self._labels = []
             # create entries
@@ -893,8 +894,12 @@ class NavigationFooterFrame(customtkinter.CTkFrame):
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
+        # load media
+        self._ic_help = customtkinter.CTkImage(light_image=Image.open(os.path.join("src", "media", "ic-hlp-l.png")),
+                                        dark_image=Image.open(os.path.join("src", "media", "ic-hlp-d.png")), size=(20, 20))
+
         # button manual
-        self.btn_manual = customtkinter.CTkButton(self, corner_radius=0, height=40, border_spacing=10, text="Manual", fg_color="transparent", command=self.btn_callback_manual, text_color=("gray10", "gray90"), anchor="w")
+        self.btn_manual = customtkinter.CTkButton(self, corner_radius=0, height=40, border_spacing=10, text="Manual", fg_color="transparent", command=self.btn_callback_manual, text_color=("gray10", "gray90"), anchor="w", image=self._ic_help)
         self.btn_manual.grid(row=0, column=0, padx=0, pady=5, sticky="we")
 
         # title
@@ -939,27 +944,40 @@ class NavigationFrame(customtkinter.CTkFrame):
 
         self.btns = []
 
+        # load media
+        self._logo = customtkinter.CTkImage(Image.open(os.path.join("src", "media", "logo.png")), size=(180, 135))
+        self._ic_before_start = customtkinter.CTkImage(light_image=Image.open(os.path.join("src", "media", "ic-st-l.png")),
+                                                       dark_image=Image.open(os.path.join("src", "media", "ic-st-d.png")), size=(20, 20))
+        self._ic_db = customtkinter.CTkImage(light_image=Image.open(os.path.join("src", "media", "ic-db-l.png")),
+                                             dark_image=Image.open(os.path.join("src", "media", "ic-db-d.png")), size=(20, 20))
+        self._ic_conv = customtkinter.CTkImage(light_image=Image.open(os.path.join("src", "media", "ic-conv-l.png")),
+                                               dark_image=Image.open(os.path.join("src", "media", "ic-conv-d.png")), size=(20, 20))
+        self._ic_download = customtkinter.CTkImage(light_image=Image.open(os.path.join("src", "media", "ic-dwn-l.png")),
+                                                   dark_image=Image.open(os.path.join("src", "media", "ic-dwn-d.png")), size=(20, 20))
+
         # title
-        self.label = customtkinter.CTkLabel(self, text="TITLE LOGO", fg_color="transparent")
+        # self.label = customtkinter.CTkLabel(self, text="TITLE LOGO", fg_color="transparent")
+
+        self.label = customtkinter.CTkLabel(self, text="", image=self._logo)
         self.label.grid(row=0, column=0, padx=20, pady=20)
 
         # button Before start
-        self.btn_before_start = customtkinter.CTkButton(self, corner_radius=0, height=40, border_spacing=10, text="Before start", fg_color="transparent", command=self._btn_callback_before_start, text_color=("gray10", "gray90"), anchor="w")
+        self.btn_before_start = customtkinter.CTkButton(self, corner_radius=0, height=40, border_spacing=10, text="Before start", fg_color="transparent", command=self._btn_callback_before_start, text_color=("gray10", "gray90"), anchor="w", image=self._ic_before_start)
         self.btn_before_start.grid(row=1, column=0, sticky="we")
         self.btns.append(self.btn_before_start)
 
         # button Database config
-        self.btn_db_config = customtkinter.CTkButton(self, corner_radius=0, height=40, border_spacing=10, text="Database config", fg_color="transparent", command=self._btn_callback_db_config, text_color=("gray10", "gray90"), anchor="w")
+        self.btn_db_config = customtkinter.CTkButton(self, corner_radius=0, height=40, border_spacing=10, text="Database config", fg_color="transparent", command=self._btn_callback_db_config, text_color=("gray10", "gray90"), anchor="w", image=self._ic_db)
         self.btn_db_config.grid(row=2, column=0, sticky="we")
         self.btns.append(self.btn_db_config)
 
         # button Conversion config
-        self.btn_conv_config = customtkinter.CTkButton(self, corner_radius=0, height=40, border_spacing=10, text="Conversion config", fg_color="transparent", command=self._btn_callback_conv_config, text_color=("gray10", "gray90"), anchor="w")
+        self.btn_conv_config = customtkinter.CTkButton(self, corner_radius=0, height=40, border_spacing=10, text="Conversion config", fg_color="transparent", command=self._btn_callback_conv_config, text_color=("gray10", "gray90"), anchor="w", image=self._ic_conv)
         self.btn_conv_config.grid(row=3, column=0, sticky="we")
         self.btns.append(self.btn_conv_config)
 
         # button Data download
-        self.btn_download = customtkinter.CTkButton(self, corner_radius=0, height=40, border_spacing=10, text="Download data", fg_color="transparent", command=self._btn_callback_download, text_color=("gray10", "gray90"), anchor="w")
+        self.btn_download = customtkinter.CTkButton(self, corner_radius=0, height=40, border_spacing=10, text="Download data", fg_color="transparent", command=self._btn_callback_download, text_color=("gray10", "gray90"), anchor="w", image=self._ic_download)
         self.btn_download.grid(row=4, column=0, sticky="we")
         self.btns.append(self.btn_download)
 
@@ -1032,7 +1050,7 @@ class App(customtkinter.CTk):
     - my_config : json
     - toplevel_window
     - database_frame : DatabaseFrame
-    - process_frame : ProcessFrame
+    - process_frame : ConversionFrame
     - text_box : TextboxFrame
     - progress_bar : ProgressFrame
     - button_frame : ButtonsFrame
@@ -1096,7 +1114,7 @@ class App(customtkinter.CTk):
 
             # frames
             self.database_frame = DatabaseFrame(self)
-            self.process_frame = ProcessFrame(self)
+            self.process_frame = ConversionFrame(self)
             self.download_frame = DownloadFrame(self)
             self.before_start_frame = BeforeStartFrame(self)
 

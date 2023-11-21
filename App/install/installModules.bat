@@ -19,6 +19,7 @@ pip install tk
 pip install tkcalendar
 pip install customtkinter
 pip install packaging
+pip install Pillow
 
 echo:
 echo =======================
