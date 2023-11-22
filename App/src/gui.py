@@ -185,6 +185,21 @@ class FolderSelectorFrame(customtkinter.CTkFrame):
 # ================================================================================================================================
 
 
+class ManualFrame(customtkinter.CTkFrame):
+    def __init__(self, master):
+        super().__init__(master)
+
+        self.configure(fg_color="transparent")
+        self.grid_columnconfigure(0, weight=1)
+
+        # Frame title
+        self._title = customtkinter.CTkLabel(self, text="How to use", fg_color=self.master.col_frame_title_bg, text_color=self.master.col_frame_title_tx, corner_radius=6)
+        self._title.grid(row=0, column=0, columnspan=3, padx=10, pady=10, sticky="we")
+
+
+# ================================================================================================================================
+
+
 class BeforeStartFrame(customtkinter.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
@@ -1117,6 +1132,7 @@ class App(customtkinter.CTk):
             self.process_frame = ConversionFrame(self)
             self.download_frame = DownloadFrame(self)
             self.before_start_frame = BeforeStartFrame(self)
+            self.manual_frame = ManualFrame(self)
 
             # display default frame
             self.navigation.set_default()
@@ -1355,8 +1371,8 @@ class App(customtkinter.CTk):
             self.download_frame.grid_forget()
 
         if name == "manual":
-            pass
+            self.manual_frame.grid(row=0, column=1, padx=20, pady=(20, 10), sticky="nswe")
         else:
-            pass
+            self.manual_frame.grid_forget()
 
         return

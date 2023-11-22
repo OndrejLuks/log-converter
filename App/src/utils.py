@@ -145,17 +145,16 @@ class Utils():
 
     def open_config(self, path: str):
         """Loads configure json file (config.json) from root directory. Returns json object."""
-        self._comm.send_to_print("Reading config file ... ", end='')
 
         try:
             with open(path, "r") as file:
                 data = json.load(file)
 
         except FileNotFoundError:
-            self._comm.send_error("ERROR", f"Can't read {path} file. Check for file existance.", "T")
+            print()
+            print(f"ERROR while reading {path} file. Check for file existance.")
             return None
 
-        self._comm.send_to_print("done!")
         return data
     
 # --------------------------------------------------------------------------------------------------------------------------------

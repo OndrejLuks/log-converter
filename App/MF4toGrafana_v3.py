@@ -53,3 +53,6 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+# TODO App exitting when config is not loaded is broken!
