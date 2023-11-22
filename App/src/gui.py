@@ -194,7 +194,12 @@ class ManualFrame(customtkinter.CTkFrame):
 
         # Frame title
         self._title = customtkinter.CTkLabel(self, text="How to use", fg_color=self.master.col_frame_title_bg, text_color=self.master.col_frame_title_tx, corner_radius=6)
-        self._title.grid(row=0, column=0, columnspan=3, padx=10, pady=10, sticky="we")
+        self._title.grid(row=0, column=0, padx=10, pady=10, sticky="we")
+
+        # text
+        self._text = customtkinter.CTkTextbox(self, corner_radius=0, fg_color="transparent", activate_scrollbars=False, wrap="word")
+        self._text.grid(row=1, column=0, padx=10, pady=10, sticky="nswe")
+        self._text.insert("end", "TEST\ntest\nTest\n - test?\n")
 
 
 # ================================================================================================================================
@@ -497,7 +502,6 @@ class DatabaseFrame(customtkinter.CTkFrame):
                         ("Password", "password"),
                         ("Schema", "schema_name")]
             self._entries = []
-            self._labels = []
 
             # create entries
             for i, name in enumerate(self.entry_names):
@@ -506,7 +510,6 @@ class DatabaseFrame(customtkinter.CTkFrame):
                 entry = customtkinter.CTkEntry(self, placeholder_text=self.master.get_config_value("database", name[1]))
                 entry.grid(row=i+1, column=1, padx=10, pady=10, sticky="we")
 
-                self._labels.append(label)
                 self._entries.append((entry, name[1]))
 
         except Exception as e:
@@ -568,37 +571,24 @@ class ConversionFrame(customtkinter.CTkFrame):
             self._title = customtkinter.CTkLabel(self, text="Conversion configuration", fg_color=self.master.col_frame_title_bg, text_color=self.master.col_frame_title_tx, corner_radius=6)
             self._title.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="we")
 
-            # define switch names
-            switch_names = [("Aggregate raw data", "aggregate"),
-                            ("Move done files", "move_done_files"),
-                            ("Write time info into MF4-info.csv", "write_time_info"),
-                            ("Clean upload", "clean_upload")]
+            # create switches
             self._switches = []
 
-            # create switches
-            for i, name in enumerate(switch_names):
-                switch = customtkinter.CTkSwitch(self, text=name[0])
-                switch.grid(row=i+1, column=0, columnspan=2, padx=10, pady=10, sticky="w")
+            self._swch_aggregate = self._create_switch(1, 0, "Aggregate raw data", ("settings", "aggregate"))
+            self._swch_move = self._create_switch(2, 0, "Move done files", ("settings", "move_done_files"))
+            self._swch_write_info = self._create_switch(3, 0, "Write time info into MF4-info.csv", ("settings", "write_time_info"))
+            self._swch_clean_up = self._create_switch(4, 0, "Clean database upload", ("settings", "clean_upload"))
 
-                # set default switch position
-                if self.master.get_config_value("settings", name[1]):
-                    switch.select()
-
-                self._switches.append((switch, name[1]))
-
-            # define entry names
-            entry_names = [("Seconds to skip when value is consistent", "agg_max_skip_seconds")]
-            self._entries = []
-            self._labels = []
             # create entries
-            for i, name in enumerate(entry_names):
-                label = customtkinter.CTkLabel(self, text=name[0], fg_color="transparent")
-                label.grid(row=i+1+len(self._switches), column=0, padx=10, pady=10, sticky="w")
-                entry = customtkinter.CTkEntry(self, placeholder_text=self.master.get_config_value("settings", name[1]))
-                entry.grid(row=i+1+len(self._switches), column=1, padx=10, pady=10, sticky="we")
+            self._entries = []
 
-                self._labels.append(label)
-                self._entries.append((entry, name[1]))
+            self._en_label_1 = customtkinter.CTkLabel(self, text="Seconds to skip when value is consistent", fg_color="transparent")
+            self._en_label_1.grid(row=i+1+len(self._switches), column=0, padx=10, pady=10, sticky="w")
+
+            self._entry_agg = customtkinter.CTkEntry(self, placeholder_text=self.master.get_config_value("settings", "agg_max_skip_seconds"))
+            self._entry_agg.grid(row=i+1+len(self._switches), column=1, padx=10, pady=10, sticky="we")
+
+            self._entries.append((entry, name[1]))
         
         except Exception as e:
             self.master.error_handle("ERROR", f"Unable to create GUI - process\n{e}", terminate=True)
@@ -611,6 +601,19 @@ class ConversionFrame(customtkinter.CTkFrame):
             entry[0].configure(placeholder_text=self.master.get_config_value("settings", entry[1]))
 
         return
+    
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def _create_switch(self, r_id: int, col_id: int, label: str, config: tuple, callback: callable = None) -> customtkinter.CTkSwitch:
+        new_switch = customtkinter.CTkSwitch(self, text=label, command=callback)
+        new_switch.grid(row=r_id, column=col_id, columnspan=2, padx=10, pady=10, sticky="w")
+
+        # IT HAS TO SAVE BOTH SWITCH AND THE LABEL OF SETTINGS!
+        self._switches.append(new_switch)
+        if self.master.get_config_value(config[0], config[1]):
+            new_switch.select()
+
+        return new_switch
 
 # --------------------------------------------------------------------------------------------------------------------------------
 
