@@ -407,7 +407,7 @@ class DateTimePickerFrame(customtkinter.CTkFrame):
             self._time_select_label.grid(row=0, column=0, padx=10, pady=(5, 0), sticky="w")
 
             # callendar
-            self._calendar = Calendar(self, selectmode="day", showweeknumbers=False, cursor="hand2", date_pattern="y-mm-dd", borderwidth=0, bordercolor="white")
+            self._calendar = Calendar(self, selectmode="day", locale="en", showweeknumbers=False, cursor="hand2", date_pattern="y-mm-dd", borderwidth=0, bordercolor="white")
             self._calendar.grid(row=2, column=0, padx=10, pady=5, sticky="we")
 
             # time
