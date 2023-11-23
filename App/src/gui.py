@@ -162,6 +162,7 @@ class FolderSelectorFrame(customtkinter.CTkFrame):
         self._current = customtkinter.CTkEntry(self, placeholder_text="Current directory here")
         self._current.grid(row=1, column=1, columnspan=2, padx=10, pady=10, sticky="we")
 
+# --------------------------------------------------------------------------------------------------------------------------------
     
     def _btn_callback(self) -> None:
         dir_path = filedialog.askdirectory(title=self._str_label, initialdir=".")
@@ -170,13 +171,17 @@ class FolderSelectorFrame(customtkinter.CTkFrame):
             self.change_curr_dir(dir_path)
         
         return
-    
+
+# --------------------------------------------------------------------------------------------------------------------------------
+
     def change_curr_dir(self, new_dir) -> None:
         # clear the entry
         self._current.delete(0, 'end')
         # set new entry
         self._current.insert(0, new_dir)
         return
+
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def get_curr_dir(self) -> str:
         return str(self._current.get())
@@ -191,15 +196,96 @@ class ManualFrame(customtkinter.CTkFrame):
 
         self.configure(fg_color="transparent")
         self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=1)
 
+        self._row_num = 0
+        
         # Frame title
         self._title = customtkinter.CTkLabel(self, text="How to use", fg_color=self.master.col_frame_title_bg, text_color=self.master.col_frame_title_tx, corner_radius=6)
-        self._title.grid(row=0, column=0, padx=10, pady=10, sticky="we")
+        self._title.grid(row=self._row_num, column=0, padx=10, pady=10, sticky="we")
 
-        # text
-        self._text = customtkinter.CTkTextbox(self, corner_radius=0, fg_color="transparent", activate_scrollbars=False, wrap="word")
-        self._text.grid(row=1, column=0, padx=10, pady=10, sticky="nswe")
-        self._text.insert("end", "TEST\ntest\nTest\n - test?\n")
+        self._row_num += 1
+
+        self._scrollable_frame = customtkinter.CTkScrollableFrame(self, fg_color="transparent", corner_radius=0)
+        self._scrollable_frame.grid_columnconfigure(0, weight=1)
+        self._scrollable_frame.grid(row=self._row_num, column=0, padx=10, pady=0, sticky="nswe")
+
+        # IMPORTANT INFORMATION
+        self._ii_lines = []
+        ii_source_notes = [
+            "    - Any changes will not be considered unless [Save] or [Save and Start] button is pressed.",
+            "    - Loaded text in entry elements represents the current configuration. No need to rewrite it."
+        ]
+        self._h_ii = self._add_heading("IMPORTANT INFORMATION")
+        for source_note in ii_source_notes:
+            self._ii_lines.append(self._add_note(source_note))
+
+        # Database
+        self._db_lines = []
+        db_source_notes = [
+            "    - Converted signals are autimatically loaded into a PostgreSQL database.",
+            "    - Connection is established based on provided configuration.",
+            "    - Schema will be created or appended according to the name."
+        ]
+        self._h_db = self._add_heading("Database configuration")
+        for source_note in db_source_notes:
+            self._db_lines.append(self._add_note(source_note))
+
+        # Conversion
+        self._conversion_lines = []
+        conversion_source_notes = [
+            "    - [Aggregate raw data] option",
+            "        - Turns on or off aggregation of raw converted data before upload to the dabatase.",
+            "        - Aggregation does not alter original MF4 source files.",
+            "        - Aggregation does not alter data values.",
+            "        - Aggregation will only remove duplicite entries of same value over time.",
+            "    - [Seconds to skip when value is consistent] entry",
+            "        - Visible only if [Aggregate raw data] is selected.",
+            "        - Represents maximum amount of seconds of data to remove when aggregating.",
+            "        - E. g. if set to 10 and data have duplicite values over more than 10 seconds,",
+            "          aggregation will not remove every 10th sec record of those data",
+            "    - [Move done files] option",
+            "        - Moves processed MF4 files from root directory into DoneMF4 folder.",
+            "    - [Write time info into MF4-info.csv] option",
+            "        - Extracts first and last time stamp of data record in each MF4 file that is being processed.",
+            "    - [Clean database upload] option",
+            "        - Deletes given schema from the database with all its contents and creates a new one."
+        ]
+        self._h_conv = self._add_heading("Conversion configuration")
+        for source_note in conversion_source_notes:
+            self._conversion_lines.append(self._add_note(source_note))
+
+        # Data download
+        self._download_lines = []
+        download_source_notes = [
+            "    - Selected data are fetched right from the database.",
+            "    - Only 1 signal per-time is possible to download.",
+            "    - Only CSV format is supported."
+        ]
+        self._h_down = self._add_heading("Data download")
+        for source_note in download_source_notes:
+            self._download_lines.append(self._add_note(source_note))
+
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def _add_heading(self, string: str) -> customtkinter.CTkLabel:
+        bold_font = customtkinter.CTkFont(weight="bold")
+        self._row_num += 1
+
+        new_heading = customtkinter.CTkLabel(self._scrollable_frame, fg_color="transparent", font=bold_font, text=string)
+        new_heading.grid(row=self._row_num, column=0, padx=0, pady=(10, 0), sticky="w")
+        
+        return new_heading
+
+# --------------------------------------------------------------------------------------------------------------------------------
+    
+    def _add_note(self, string: str) -> customtkinter.CTkLabel:
+        self._row_num += 1
+
+        new_note = customtkinter.CTkLabel(self._scrollable_frame, fg_color="transparent", text=string)
+        new_note.grid(row=self._row_num, column=0, padx=0, pady=0, sticky="w")
+
+        return new_note
 
 
 # ================================================================================================================================
@@ -220,18 +306,15 @@ class BeforeStartFrame(customtkinter.CTkFrame):
 
         # MF4 files
         self._mf4_select = FolderSelectorFrame(self, "Select MF4 files root directory", "Select MF4 dir", "Current MF4 dir")
-        self._mf4_select.change_curr_dir(self.get_curr_dir_path("mf4_path"))
+        self._mf4_select.change_curr_dir(self.master.get_config_value("settings", "mf4_path"))
         self._mf4_select.grid(row=1, column=0, columnspan=3, padx=0, pady=(0, 40), sticky="we")
 
         # DBC files
         self._dbc_select = FolderSelectorFrame(self, "Select DBC files root directory", "Select DBC dir", "Current DBC dir")
-        self._dbc_select.change_curr_dir(self.get_curr_dir_path("dbc_path"))
+        self._dbc_select.change_curr_dir(self.master.get_config_value("settings", "dbc_path"))
         self._dbc_select.grid(row=2, column=0, columnspan=3, padx=0, pady=0, sticky="we")
-
     
-    def get_curr_dir_path(self, path_of: str) -> str:
-        return self.master.get_curr_dir_path(path_of)
-    
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def save_curr_paths(self) -> bool:
         mf4_path = self._mf4_select.get_curr_dir()
@@ -386,7 +469,7 @@ class DownloadFrame(customtkinter.CTkFrame):
             self._sig_select_label = customtkinter.CTkLabel(self._select_frame, text="Select signal:", fg_color="transparent")
             self._sig_select_label.grid(row=0, column=0, padx=10, pady=5, sticky="w")
             
-            self._option_menu = customtkinter.CTkOptionMenu(self._select_frame, values=self._signals, command=self._combo_callback)
+            self._option_menu = customtkinter.CTkOptionMenu(self._select_frame, values=self._signals, dynamic_resizing=False, command=self._combo_callback)
             self._option_menu.grid(row=0, column=1, padx=10, pady=5, sticky="nswe")
 
             self._select_frame.grid(row=1, column=0, columnspan=2, padx=0, pady=0, sticky="we")
@@ -452,7 +535,7 @@ class DownloadFrame(customtkinter.CTkFrame):
         try:
             # update option menu
             self._option_menu.destroy()
-            self._option_menu = customtkinter.CTkOptionMenu(self._select_frame, values=self._signals, command=self._combo_callback)
+            self._option_menu = customtkinter.CTkOptionMenu(self._select_frame, values=self._signals, dynamic_resizing=False, command=self._combo_callback)
             self._option_menu.grid(row=0, column=1, padx=10, pady=5, sticky="nswe")
 
         except Exception as e:
@@ -573,22 +656,17 @@ class ConversionFrame(customtkinter.CTkFrame):
 
             # create switches
             self._switches = []
-
-            self._swch_aggregate = self._create_switch(1, 0, "Aggregate raw data", ("settings", "aggregate"))
+            self._swch_aggregate = self._create_switch(1, 0, "Aggregate raw data", ("settings", "aggregate"), self._agg_seconds_grid)
             self._swch_move = self._create_switch(2, 0, "Move done files", ("settings", "move_done_files"))
             self._swch_write_info = self._create_switch(3, 0, "Write time info into MF4-info.csv", ("settings", "write_time_info"))
             self._swch_clean_up = self._create_switch(4, 0, "Clean database upload", ("settings", "clean_upload"))
 
             # create entries
             self._entries = []
+            self._entry_agg_frame = self._create_entry(5, 0, "Seconds to skip when value is consistent", ("settings", "agg_max_skip_seconds"))
 
-            self._en_label_1 = customtkinter.CTkLabel(self, text="Seconds to skip when value is consistent", fg_color="transparent")
-            self._en_label_1.grid(row=i+1+len(self._switches), column=0, padx=10, pady=10, sticky="w")
-
-            self._entry_agg = customtkinter.CTkEntry(self, placeholder_text=self.master.get_config_value("settings", "agg_max_skip_seconds"))
-            self._entry_agg.grid(row=i+1+len(self._switches), column=1, padx=10, pady=10, sticky="we")
-
-            self._entries.append((entry, name[1]))
+            # decide wether or not to display the agg seconds entry
+            self._agg_seconds_grid()
         
         except Exception as e:
             self.master.error_handle("ERROR", f"Unable to create GUI - process\n{e}", terminate=True)
@@ -598,22 +676,52 @@ class ConversionFrame(customtkinter.CTkFrame):
     def refresh(self) -> None:
         """Updates dynamic elements of the GUI based on config.json content."""
         for entry in self._entries:
-            entry[0].configure(placeholder_text=self.master.get_config_value("settings", entry[1]))
+            entry[0].configure(placeholder_text=self.master.get_config_value(entry[1][0], entry[1][1]))
 
         return
     
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def _agg_seconds_grid(self) -> None:
+        val = self._swch_aggregate.get()
+
+        if val == 1:
+            self._entry_agg_frame[0].grid(row=self._entry_agg_frame[1][0], column=self._entry_agg_frame[1][1], padx=0, pady=0, sticky="we")
+
+        if val == 0:
+            self._entry_agg_frame[0].grid_forget()
+        
+        return
+
 # --------------------------------------------------------------------------------------------------------------------------------
 
     def _create_switch(self, r_id: int, col_id: int, label: str, config: tuple, callback: callable = None) -> customtkinter.CTkSwitch:
         new_switch = customtkinter.CTkSwitch(self, text=label, command=callback)
         new_switch.grid(row=r_id, column=col_id, columnspan=2, padx=10, pady=10, sticky="w")
 
-        # IT HAS TO SAVE BOTH SWITCH AND THE LABEL OF SETTINGS!
-        self._switches.append(new_switch)
+        # saving switch in a tuple together with config (also a tuple)
+        self._switches.append((new_switch, config))
         if self.master.get_config_value(config[0], config[1]):
             new_switch.select()
 
         return new_switch
+    
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def _create_entry(self, r_id: int, col_id: int, label: str, config: tuple) -> tuple:
+        entry_frame = customtkinter.CTkFrame(self, fg_color="transparent")
+        entry_frame.grid_columnconfigure(0, weight=1)
+        entry_frame.grid_columnconfigure(1, weight=3)
+
+        en_label = customtkinter.CTkLabel(entry_frame, text=label, fg_color="transparent")
+        en_label.grid(row=0, column=0, padx=10, pady=10, sticky="w")
+
+        new_entry = customtkinter.CTkEntry(entry_frame, placeholder_text=self.master.get_config_value(config[0], config[1]))
+        new_entry.grid(row=0, column=1, padx=10, pady=10, sticky="we")
+
+        self._entries.append((new_entry, config))
+
+        return (entry_frame, (r_id, col_id))
 
 # --------------------------------------------------------------------------------------------------------------------------------
 
@@ -623,10 +731,12 @@ class ConversionFrame(customtkinter.CTkFrame):
         for switch in self._switches:
             val = int(switch[0].get())
             if val == 1:
-                if not self.master.update_local_config("settings", switch[1], True):
+                # save
+                if not self.master.update_local_config(switch[1][0], switch[1][1], True):
                     return False
             if val == 0:
-                if not self.master.update_local_config("settings", switch[1], False):
+                # save
+                if not self.master.update_local_config(switch[1][0], switch[1][1], False):
                     return False
 
         for entry in self._entries:
@@ -641,7 +751,7 @@ class ConversionFrame(customtkinter.CTkFrame):
                     return False
                 
                 # save
-                if not self.master.update_local_config("settings", entry[1], val):
+                if not self.master.update_local_config(entry[1][0], entry[1][1], val):
                     return False
 
         return self.master.write_config_to_file()
@@ -910,6 +1020,7 @@ class NavigationFooterFrame(customtkinter.CTkFrame):
 
         self.configure(corner_radius=0, fg_color="transparent")
         self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=5)
         self.grid_rowconfigure(0, weight=1)
 
         # load media
@@ -918,25 +1029,30 @@ class NavigationFooterFrame(customtkinter.CTkFrame):
 
         # button manual
         self.btn_manual = customtkinter.CTkButton(self, corner_radius=0, height=40, border_spacing=10, text="Manual", fg_color="transparent", command=self.btn_callback_manual, text_color=("gray10", "gray90"), anchor="w", image=self._ic_help)
-        self.btn_manual.grid(row=0, column=0, padx=0, pady=5, sticky="we")
+        self.btn_manual.grid(row=0, column=0, columnspan=2, padx=0, pady=5, sticky="we")
 
         # title
-        self.label = customtkinter.CTkLabel(self, text="Appearance", fg_color="transparent")
-        self.label.grid(row=1, column=0, padx=0, pady=0)
+        self.label = customtkinter.CTkLabel(self, text="Theme", fg_color="transparent")
+        self.label.grid(row=1, column=0, padx=(15, 10), pady=(5, 20), sticky="w")
 
         # appearance mode
         self.appearance = customtkinter.CTkOptionMenu(self, values=["Light", "Dark", "System"], command=self.change_appearance_mode)
         self.appearance.set("System")
-        self.appearance.grid(row=2, column=0, padx=20, pady=(5, 20), sticky="we")
+        self.appearance.grid(row=1, column=1, padx=(0, 20), pady=(5, 20), sticky="w")
 
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def btn_callback_manual(self) -> None:
         self.master._btn_callback_manual()
         return
 
+# --------------------------------------------------------------------------------------------------------------------------------
+
     def deselect(self) -> None:
         self.btn_manual.configure(fg_color="transparent")
         return
+    
+# --------------------------------------------------------------------------------------------------------------------------------
     
     def select_manual(self) -> None:
         self.btn_manual.configure(fg_color=("gray75", "gray25"))
@@ -1008,40 +1124,54 @@ class NavigationFrame(customtkinter.CTkFrame):
     def change_appearance_mode(self, mode: str) -> None:
         self.master.change_appearance_mode(mode)
         return
+
+# --------------------------------------------------------------------------------------------------------------------------------
     
     def set_default(self) -> None:
         self._btn_callback_before_start()
         return
+
+# --------------------------------------------------------------------------------------------------------------------------------
     
     def _btn_callback_before_start(self) -> None:
         self._deselect_btns()
         self.btn_before_start.configure(fg_color=("gray75", "gray25"))
         self.master.load_frame("before-start")
         return
+
+# --------------------------------------------------------------------------------------------------------------------------------
     
     def _btn_callback_db_config(self) -> None:
         self._deselect_btns()
         self.btn_db_config.configure(fg_color=("gray75", "gray25"))
         self.master.load_frame("db-config")
         return
+
+# --------------------------------------------------------------------------------------------------------------------------------
     
     def _btn_callback_conv_config(self) -> None:
         self._deselect_btns()
         self.btn_conv_config.configure(fg_color=("gray75", "gray25"))
         self.master.load_frame("conv-config")
         return
+
+# --------------------------------------------------------------------------------------------------------------------------------
     
     def _btn_callback_download(self) -> None:
         self._deselect_btns()
         self.btn_download.configure(fg_color=("gray75", "gray25"))
         self.master.load_frame("download")
         return
+
+# --------------------------------------------------------------------------------------------------------------------------------
     
     def _btn_callback_manual(self) -> None:
         self._deselect_btns()
         self.footer.select_manual()
         self.master.load_frame("manual")
         return
+    
+# --------------------------------------------------------------------------------------------------------------------------------
 
     def _deselect_btns(self) -> None:
         self.footer.deselect()
@@ -1050,10 +1180,6 @@ class NavigationFrame(customtkinter.CTkFrame):
 
         return
         
-        
-
-
-
 
 # ================================================================================================================================
 
@@ -1337,18 +1463,6 @@ class App(customtkinter.CTk):
     def change_appearance_mode(self, mode: str) -> None:
         customtkinter.set_appearance_mode(mode)
         return
-    
-# --------------------------------------------------------------------------------------------------------------------------------
-
-    def get_curr_dir_path(self, path_of: str) -> str:
-        try:
-            output = self.my_config["settings"][path_of]
-
-        except Exception as e:
-            self.error_handle("WARNING", f"Failed to fetch current dir:\n{e}", False)
-            return ""
-        
-        return output
 
 # --------------------------------------------------------------------------------------------------------------------------------
 
