@@ -38,6 +38,8 @@ class TopWindowYesNo(customtkinter.CTkToplevel):
             self.resizable(False, False)
             self.title(type)
             self.configure(fg_color=self.master.col_popup_yn_bg)
+            # disable the [x] closing button
+            self.protocol("WM_DELETE_WINDOW", self.closing_handle)
 
             self.grid_columnconfigure((0, 1), weight=1)
             
@@ -62,6 +64,11 @@ class TopWindowYesNo(customtkinter.CTkToplevel):
         
         except Exception as e:
             self.master.text_box.write(f"ERROR While opening toplevel pop-up:\n{e}")
+
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def closing_handle(self) -> None:
+        return
 
 
 # ================================================================================================================================
@@ -92,6 +99,8 @@ class TopWindowOk(customtkinter.CTkToplevel):
             self.title(type)
             self.configure(fg_color=self.master.col_popup_ok_bg)
             self.grid_columnconfigure(0, weight=1)
+            # disable the [x] closing button
+            self.protocol("WM_DELETE_WINDOW", self.closing_handle)
         
             # bring the window into the foregroud
             self.after(100, self.lift)
@@ -109,6 +118,11 @@ class TopWindowOk(customtkinter.CTkToplevel):
 
         return
 
+# --------------------------------------------------------------------------------------------------------------------------------
+    
+    def closing_handle(self) -> None:
+        return
+
 
 # ================================================================================================================================         
 
@@ -122,6 +136,8 @@ class TopWindowExit(customtkinter.CTkToplevel):
             self.resizable(False, False)
             self.title("Information")
             self.grid_columnconfigure(0, weight=1)
+            # disable the [x] closing button
+            self.protocol("WM_DELETE_WINDOW", self.closing_handle)
         
             # bring the window into the foregroud
             self.after(100, self.lift)
@@ -134,6 +150,11 @@ class TopWindowExit(customtkinter.CTkToplevel):
         
         except Exception as e:
             self.master.text_box.write(f"ERROR While opening toplevel pop-up:\n{e}")
+
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def closing_handle(self) -> None:
+        return
 
 
 # ================================================================================================================================
