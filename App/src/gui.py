@@ -114,6 +114,7 @@ class TopWindowOk(customtkinter.CTkToplevel):
             self._btn_ok.grid(row=1, column=0, padx=10, pady=10, sticky="swe")
         
         except Exception as e:
+            self.destroy()
             self.master.text_box.write(f"ERROR While opening toplevel pop-up:\n{e}")
 
         return
@@ -1252,6 +1253,7 @@ class App(customtkinter.CTk):
             self.toplevel_window = None
 
             self.title("MF4 Signal converter")
+            self.iconbitmap(os.path.join("src", "media", "icon-logo.ico"))
             self.minsize(900, 750)
             self.protocol("WM_DELETE_WINDOW", self._closing_handle)
 
