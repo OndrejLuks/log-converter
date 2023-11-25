@@ -151,8 +151,7 @@ class Utils():
                 data = json.load(file)
 
         except FileNotFoundError:
-            print()
-            print(f"ERROR while reading {path} file. Check for file existance.")
+            self._comm.send_error("ERROR", f"Problem with opening config.json", "T")
             return None
 
         return data
@@ -202,3 +201,15 @@ class Utils():
             return False
             
         return True
+
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def flush_config(self, path: str, config) -> None:
+        try:
+            with open(path, "w") as file:
+                json.dump(config, file, indent=4)
+
+        except Exception as e:
+            self._comm.send_error("WARNING", f"Problem with writting config to file:\n{e}", False)
+
+        return

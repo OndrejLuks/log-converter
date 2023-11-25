@@ -316,7 +316,7 @@ class BeforeStartFrame(customtkinter.CTkFrame):
     
 # --------------------------------------------------------------------------------------------------------------------------------
 
-    def save_curr_paths(self) -> bool:
+    def save_locally(self) -> bool:
         mf4_path = self._mf4_select.get_curr_dir()
         dbc_path = self._dbc_select.get_curr_dir()
 
@@ -334,7 +334,7 @@ class BeforeStartFrame(customtkinter.CTkFrame):
         if not self.master.update_local_config("settings", "dbc_path", dbc_path):
             return False
         
-        return self.master.write_config_to_file() and self.master.write_config_to_file() 
+        return True
     
 
 # ================================================================================================================================
@@ -609,7 +609,7 @@ class DatabaseFrame(customtkinter.CTkFrame):
 
 # --------------------------------------------------------------------------------------------------------------------------------
     
-    def save_to_json(self) -> bool:
+    def save_locally(self) -> bool:
         """Saves database settings changes into the config.json file"""
 
         for entry in self._entries:
@@ -618,7 +618,7 @@ class DatabaseFrame(customtkinter.CTkFrame):
                 if not self.master.update_local_config("database", entry[1], val):
                     return False
 
-        return self.master.write_config_to_file()       
+        return True
 
 
 # ================================================================================================================================   
@@ -701,7 +701,7 @@ class ConversionFrame(customtkinter.CTkFrame):
 
         # saving switch in a tuple together with config (also a tuple)
         self._switches.append((new_switch, config))
-        if self.master.get_config_value(config[0], config[1]):
+        if self.master.get_config_value(config[0], config[1]) == "true":
             new_switch.select()
 
         return new_switch
@@ -725,18 +725,18 @@ class ConversionFrame(customtkinter.CTkFrame):
 
 # --------------------------------------------------------------------------------------------------------------------------------
 
-    def save_to_json(self) -> bool:
+    def save_locally(self) -> bool:
         """Saves process settings changes into the config.json file"""
         # update config
         for switch in self._switches:
             val = int(switch[0].get())
             if val == 1:
                 # save
-                if not self.master.update_local_config(switch[1][0], switch[1][1], True):
+                if not self.master.update_local_config(switch[1][0], switch[1][1], "true"):
                     return False
             if val == 0:
                 # save
-                if not self.master.update_local_config(switch[1][0], switch[1][1], False):
+                if not self.master.update_local_config(switch[1][0], switch[1][1], "false"):
                     return False
 
         for entry in self._entries:
@@ -754,7 +754,7 @@ class ConversionFrame(customtkinter.CTkFrame):
                 if not self.master.update_local_config(entry[1][0], entry[1][1], val):
                     return False
 
-        return self.master.write_config_to_file()
+        return True
 
 
 # ================================================================================================================================
@@ -1191,7 +1191,6 @@ class App(customtkinter.CTk):
     
     Attributes
     ----------
-    - my_config : json
     - toplevel_window
     - database_frame : DatabaseFrame
     - process_frame : ConversionFrame
@@ -1229,7 +1228,6 @@ class App(customtkinter.CTk):
             self.col_btn_tx = "white"
             self.col_btn_dis_tx = "#1d4566"
 
-            self.my_config = self.open_config()
             self.toplevel_window = None
 
             self.title("MF4 Signal converter")
@@ -1240,35 +1238,9 @@ class App(customtkinter.CTk):
             self.grid_columnconfigure(1, weight=1)
             self.grid_rowconfigure(0, weight=1)
 
-            # navigation
-            self.navigation = NavigationFrame(self)
-            self.navigation.grid(row=0, column=0, rowspan=4, sticky="nswe")
-
-            # text box
-            self.text_box = TextboxFrame(self)
-            self.text_box.grid(row=1, column=1, padx=0, pady=10, sticky="nswe")
-
-            # progress frame
-            self.progress_bar = ProgressFrame(self)
-            self.progress_bar.grid(row=2, column=1, padx=0, pady=0, sticky="nswe")
-
-            # buttons
-            self.button_frame = ButtonsFrame(self)
-            self.button_frame.grid(row=3, column=1, padx=5, pady=(10, 15), sticky="nswe")
-
-            # frames
-            self.database_frame = DatabaseFrame(self)
-            self.process_frame = ConversionFrame(self)
-            self.download_frame = DownloadFrame(self)
-            self.before_start_frame = BeforeStartFrame(self)
-            self.manual_frame = ManualFrame(self)
-
-            # display default frame
-            self.navigation.set_default()
-
         except Exception as e:
             print()
-            print(f"ERROR while trying to initialize GUI window:\n{e}")
+            print(f"ERROR while trying to initialize main GUI window:\n{e}")
 
 # --------------------------------------------------------------------------------------------------------------------------------
 
@@ -1276,6 +1248,12 @@ class App(customtkinter.CTk):
         self.kill_toplevel()
         self.open_toplevel_exit()
         self.comm.send_command("END")
+        return
+
+# --------------------------------------------------------------------------------------------------------------------------------    
+
+    def set_communication(self, communication) -> None:
+        self.comm = communication
         return
 
 # --------------------------------------------------------------------------------------------------------------------------------
@@ -1373,15 +1351,21 @@ class App(customtkinter.CTk):
 # --------------------------------------------------------------------------------------------------------------------------------
 
     def save(self) -> None:
-        """Saves all possible changes into the config.json file."""
-        if self.database_frame.save_to_json() and self.process_frame.save_to_json() and self.before_start_frame.save_curr_paths():
-            self.text_box.write(f"Successfully saved!\n")
-            # update backend configuration
-            self.comm.send_command("U-CONF")
-        else:
-            self.text_box.write(f"Failed to save.\n")
+        # 1st: update local configs
+        #   - several methods to each objects
 
-        # redraw 
+        if not (self.database_frame.save_locally() and self.process_frame.save_locally() and self.before_start_frame.save_locally()):
+            self.text_box.write("Failed to update local settings.")
+            return
+
+        # 2nd: flush settings to the file
+        #   - take local settings file and flush it
+
+        if not self.flush_config_to_file():
+            self.text_box.write("Failed to write settings to the file.")
+            return
+
+        # 3rd: redraw
         self.database_frame.refresh()
         self.process_frame.refresh()
 
@@ -1390,46 +1374,56 @@ class App(customtkinter.CTk):
 # --------------------------------------------------------------------------------------------------------------------------------
 
     def update_local_config(self, domain: str, field: str, content: str) -> bool:
+        
+        # Update local will send particular parametres to backend and update local backend config
+        
         try:
-            self.my_config[domain][field] = content
+            self.comm.send_command(f"U-CONF#{domain}#{field}#{content}")
 
         except Exception as e:
-            self.error_handle("WARNING", f"Problem with updating local settings:\n{e}", False)
+            self.error_handle("WARNING", f"Problem with requesting of updating local settings:\n{e}", False)
             return False
         
         return True
 
 # --------------------------------------------------------------------------------------------------------------------------------
 
-    def write_config_to_file(self) -> bool:
+    def flush_config_to_file(self) -> bool:
+
+        # write config to file will send command to backend to dump config into file
+
         try:
-            with open(os.path.join("src", "config.json"), "w") as file:
-                json.dump(self.my_config, file, indent=4)
+            self.comm.send_command("FLUSH-CONF")
 
         except Exception as e:
-            self.error_handle("WARNING", f"Problem with writting config to file:\n{e}", False)
+            self.error_handle("WARNING", f"Problem with requesting of writting config to file:\n{e}", False)
             return False
         
         return True
 
 # --------------------------------------------------------------------------------------------------------------------------------
 
-    def get_config_value(self, domain: str, field: str):
+    def get_config_value(self, domain: str, field: str) -> str:
+
+        # this method will comunicate with backend back-to-back so that requested data are received
+        value = ""
+
         try:
-            val = self.my_config[domain][field]
+            self.comm.send_command(f"FETCH-CONF#{domain}#{field}")
+
+            while True:
+                event = self.comm.receive()
+
+                messages = event.split("#")
+                if (len(messages) == 2) and (messages[0] == "C-VAL"):
+                    value = messages[1]
+                    break
 
         except Exception as e:
-            self.error_handle("WARNING", f"Problem with fetching local settings:\n{e}", False)
+            self.error_handle("WARNING", f"Problem with requesting of fetching local settings:\n{e}", False)
             return ""
-        
-        return val
-        
-# --------------------------------------------------------------------------------------------------------------------------------
 
-    def set_communication(self, communication) -> None:
-        """Sets the connection stream"""
-        self.comm = communication
-        return
+        return value
 
 # --------------------------------------------------------------------------------------------------------------------------------
 
@@ -1492,4 +1486,38 @@ class App(customtkinter.CTk):
         else:
             self.manual_frame.grid_forget()
 
+        return
+    
+
+    def init(self) -> None:
+        try:
+            # navigation
+            self.navigation = NavigationFrame(self)
+            self.navigation.grid(row=0, column=0, rowspan=4, sticky="nswe")
+
+            # text box
+            self.text_box = TextboxFrame(self)
+            self.text_box.grid(row=1, column=1, padx=0, pady=10, sticky="nswe")
+
+            # progress frame
+            self.progress_bar = ProgressFrame(self)
+            self.progress_bar.grid(row=2, column=1, padx=0, pady=0, sticky="nswe")
+
+            # buttons
+            self.button_frame = ButtonsFrame(self)
+            self.button_frame.grid(row=3, column=1, padx=5, pady=(10, 15), sticky="nswe")
+
+            # frames
+            self.database_frame = DatabaseFrame(self)
+            self.process_frame = ConversionFrame(self)
+            self.download_frame = DownloadFrame(self)
+            self.before_start_frame = BeforeStartFrame(self)
+            self.manual_frame = ManualFrame(self)
+
+            # display default frame
+            self.navigation.set_default()
+
+        except Exception as e:
+            self.error_handle("ERROR", f"Failed to initialize gui frames:\n{e}", True)
+        
         return

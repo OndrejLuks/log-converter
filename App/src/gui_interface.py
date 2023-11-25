@@ -39,7 +39,6 @@ class AppInterface():
         """Constructior of AppInterface"""
         self.app = app
         self.comm = PipeCommunication(pipe, None)
-
         self.app.set_communication(self.comm)
 
 # --------------------------------------------------------------------------------------------------------------------------------
@@ -77,6 +76,9 @@ class AppInterface():
             messages = event.split("#")
 
             match messages[0]:
+                case "INIT":
+                    self.app.init()
+
                 case "FINISH":
                     self.enable_buttons()
                     self.hide_progress_bar()
@@ -114,6 +116,10 @@ class AppInterface():
 
                 case "ACK":
                     self.send_ack()
+
+                case "TERMINATE":
+                    self.app.kill_main_window()
+                    break
 
                 case "END":
                     break

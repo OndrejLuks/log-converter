@@ -39,10 +39,12 @@ def main():
     conn1, conn2 = multiprocessing.Pipe()
 
     app_gui = gui.App()
+
     app_interface = gui_interface.AppInterface(app_gui, conn1)
 
     proc = multiprocessing.Process(target=run_backend, args=(conn2, ))
     proc.start()
+
 
     # blocking function
     app_interface.run()
@@ -53,6 +55,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-# TODO App exitting when config is not loaded is broken!

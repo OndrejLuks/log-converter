@@ -126,7 +126,7 @@ class Conversion():
                 return None
 
             # write time info if required
-            if self._config["settings"]["write_time_info"]:
+            if self._config["settings"]["write_time_info"] == "true":
                 self._comm.send_to_print("   - writing time information into MF4-info.csv...")
                 # check if df is not empty
                 if df_phys.shape[0] > 0:
@@ -175,7 +175,7 @@ class Conversion():
                     idx_array.append(idx-1)
                     idx_array.append(idx)
                     previous = idx
-                elif (time_diff > timedelta(seconds=self._config["settings"]["agg_max_skip_seconds"])):
+                elif (time_diff > timedelta(seconds=int(self._config["settings"]["agg_max_skip_seconds"]))):
                     idx_array.append(idx)
                     previous = idx
 
@@ -228,7 +228,7 @@ class Conversion():
     
     def check_db_override(self) -> None:
         # check DB override
-        if self._config["settings"]["clean_upload"]:
+        if self._config["settings"]["clean_upload"] == "true":
             type = "WARNING!"
             msg = 'With "Clean upload" enabled, the whole current database will be erased!'
             ques = "Do you really want to proceed?"
@@ -279,7 +279,7 @@ class Conversion():
                     return
 
                 # AGGREGATE if requested
-                if self._config["settings"]["aggregate"]:
+                if self._config["settings"]["aggregate"] == "true":
                     agg_threads = []
                     self._comm.send_to_print("   - aggregating...")
                     # run each signal in a different thread
@@ -317,7 +317,7 @@ class Conversion():
                     return
     
                 # MOVE DONE FILES if requested
-                if self._config["settings"]["move_done_files"]:
+                if self._config["settings"]["move_done_files"] == "true":
                     self._comm.send_to_print("   - moving the file...")
                     self._utils.move_done_file(file, self._config["settings"]["mf4_path"])
 

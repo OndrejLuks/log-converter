@@ -18,12 +18,17 @@ import threading
 class BackendHandle():
     def __init__(self, connection):
         self._threads = []
+        self._fault = False
         self._stop_event = threading.Event()
 
         self._comm = PipeCommunication(connection, self._stop_event)
         self._utils = Utils(self._comm)
         
+
         self._config = self._utils.open_config("src/config.json")
+        if self._config == None:
+            self._fault = True
+            return
 
         self._db = DatabaseHandle(self._config, self._comm, self._stop_event)
         self._conv = Conversion(self._utils, self._comm, self._db, self._stop_event, self._threads, self._config)
@@ -32,6 +37,10 @@ class BackendHandle():
 
     def run(self):
         try:
+            # initialize GUI frames 
+            if not self._fault:
+                self._comm.send_command("INIT")
+            
             while True:
                 event = self._comm.receive()
 
@@ -48,6 +57,19 @@ class BackendHandle():
                         self._threads.append(thr_proc)
 
                     case "U-CONF":
+                        if len(messages) == 4:
+                            self._update_config_value(messages[1], messages[2], messages[3])
+                        else:
+                            self._comm.send_error("WARNING", "Blank config update requested!", False)
+
+                    case "FETCH-CONF":
+                        if len(messages) == 3:
+                            self._fetch_conf_value(messages[1], messages[2])
+                        else:
+                            self._comm.send_error("WARNING", "Blank config fetch requested!", False)
+
+                    case "FLUSH-CONF":
+                        self._utils.flush_config("src/config.json", self._config)
                         self._update_configs()
 
                     case "FETCH-SIG":
@@ -93,6 +115,29 @@ class BackendHandle():
         self._db.update_config(self._config)
         self._conv.update_config(self._config)
         self._comm.send_to_print("Settings updated.")
+
+        return
+
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def _update_config_value(self, domain: str, field: str, content: str) -> None:
+        try:
+            self._config[domain][field] = str(content)
+
+        except Exception as e:
+            self._comm.send_error("WARNING", f"Problem with updating local settings:\n{e}", "F")
+
+        return
+
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def _fetch_conf_value(self, domain: str, field: str) -> None:
+        try:
+            value = str(self._config[domain][field])
+            self._comm.send_command(f"C-VAL#{value}")
+
+        except Exception as e:
+            self._comm.send_error("WARNING", f"Problem with fetching local settings:\n{e}", "F")
 
         return
 
