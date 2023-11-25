@@ -36,12 +36,12 @@ class BackendHandle():
 # --------------------------------------------------------------------------------------------------------------------------------
 
     def run(self):
-        try:
-            # initialize GUI frames 
-            if not self._fault:
-                self._comm.send_command("INIT")
-            
-            while True:
+        # initialize GUI frames 
+        if not self._fault:
+            self._comm.send_command("INIT")
+        
+        while True:
+            try:
                 event = self._comm.receive()
 
                 # tokenize the message by '#'
@@ -88,10 +88,9 @@ class BackendHandle():
                     case _:
                         self._comm.send_to_print("Unknown command to the process")
 
-        except Exception as e:
-            self._comm.send_error("ERROR", f"Problem in main backend loop:\n{e}", "F")
-            self._thread_cleanup()
-        
+            except Exception as e:
+                self._comm.send_error("ERROR", f"Problem in main backend loop:\n{e}", "T")
+    
         self._comm.send_command("END")
         return
 
@@ -148,16 +147,17 @@ class BackendHandle():
         tbl_names = self._db.get_table_names()
         self._db.finish()
 
-        if len(tbl_names) == 0:
-            self._comm.send_error("WARNING", "No signals found!", "F")
-            return
-        
-        self._comm.send_command("U-SIG")
-        
-        for tbl in tbl_names:
-            self._comm.send_command(tbl)
+        if not tbl_names == None:
+            if len(tbl_names) == 0:
+                self._comm.send_error("WARNING", "No signals found!", "F")
+                return
+            
+            self._comm.send_command("U-SIG")
+            
+            for tbl in tbl_names:
+                self._comm.send_command(tbl)
 
-        self._comm.send_command("U-SIG-END")
+            self._comm.send_command("U-SIG-END")
         
         return
 
