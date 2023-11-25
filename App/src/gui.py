@@ -1259,6 +1259,10 @@ class App(customtkinter.CTk):
             self.grid_columnconfigure(1, weight=1)
             self.grid_rowconfigure(0, weight=1)
 
+            # Loading ... label
+            self._load_label = customtkinter.CTkLabel(self, text="Loading...", fg_color="transparent")
+            self._load_label.grid(row=0, column=1, padx=10, pady=50, sticky="nwe")
+
         except Exception as e:
             print()
             print(f"ERROR while trying to initialize main GUI window:\n{e}")
@@ -1512,6 +1516,9 @@ class App(customtkinter.CTk):
 
     def init(self) -> None:
         try:
+            # remove loading label
+            self._load_label.grid_forget()
+
             # navigation
             self.navigation = NavigationFrame(self)
             self.navigation.grid(row=0, column=0, rowspan=4, sticky="nswe")
