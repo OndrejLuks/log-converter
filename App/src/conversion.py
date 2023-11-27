@@ -262,6 +262,9 @@ class Conversion():
 
         try: 
             for file in mf4_file_list:
+                # clear the output textbox
+                self._comm.send_command("CLS")
+
                 # thread end check
                 if self._stop_event.is_set():
                     print("Process thread stopped.")

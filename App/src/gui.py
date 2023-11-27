@@ -836,7 +836,14 @@ class TextboxFrame(customtkinter.CTkFrame):
         # make the textbox non-writeable
         self._textbox.configure(state="disabled")
         return
-
+    
+# --------------------------------------------------------------------------------------------------------------------------------
+    
+    def clear(self) -> None:
+        self._textbox.configure(state="normal")
+        self._textbox.delete("0.0", "end")
+        self._textbox.configure(state="disabled")
+        return
 
 # ================================================================================================================================
 

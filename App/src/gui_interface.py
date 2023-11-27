@@ -93,6 +93,9 @@ class AppInterface():
                     else:
                         self.generate_pop_up_error("WARNING", "Blank message print requested!", False)
 
+                case "CLS":
+                    self.clear_textbox()
+
                 case "PROG":
                     if len(messages) == 2:
                         self.update_progress_bar(float(messages[1]))
@@ -209,6 +212,12 @@ class AppInterface():
         None"""
         
         self.app.text_box.write(message)
+        return
+    
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def clear_textbox(self) -> None:
+        self.app.text_box.clear()
         return
 
 # --------------------------------------------------------------------------------------------------------------------------------
