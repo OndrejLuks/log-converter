@@ -39,7 +39,7 @@ class Conversion():
         self._threads = thrs
 
         self._config = config
-        self._dbc_list = self.create_dbc_list()
+        self._dbc_list = None
         
 # --------------------------------------------------------------------------------------------------------------------------------
 
@@ -246,6 +246,9 @@ class Conversion():
         """Function that handles MF4 files process from conversion to upload"""
 
         self._comm.send_command("START")
+
+        # load DBC files
+        self._dbc_list = self.create_dbc_list()
 
         # prepare the database
         self._db.connect()

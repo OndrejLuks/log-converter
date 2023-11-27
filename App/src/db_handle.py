@@ -6,7 +6,7 @@
 # ================================================================================================================================
 
 from sqlalchemy.exc import IntegrityError, ProgrammingError
-from sqlalchemy import create_engine, schema, inspect, Table, select
+from sqlalchemy import create_engine, schema, inspect
 from sqlalchemy.sql import text
 from .communication import PipeCommunication
 import pandas as pd

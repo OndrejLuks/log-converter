@@ -11,9 +11,11 @@
 # ==========================================================================================================================
 
 
-from src import gui, gui_interface, backend_handle
+from src import gui, gui_interface, defs
 import warnings
 import multiprocessing
+
+multiprocessing.freeze_support()
 
 
 # ==========================================================================================================================
@@ -26,11 +28,7 @@ def _warning_handler(message, category, filename, lineo, file=None, line=None) -
 
 # ==========================================================================================================================
 
-def run_backend(connection) -> None:
-    backend = backend_handle.BackendHandle(connection)
-    backend.run()
-    
-    return
+
 
     
 def main():
@@ -42,7 +40,7 @@ def main():
 
     app_interface = gui_interface.AppInterface(app_gui, conn1)
 
-    proc = multiprocessing.Process(target=run_backend, args=(conn2, ))
+    proc = multiprocessing.Process(target=defs.run_backend, args=(conn2, ))
     proc.start()
 
 

@@ -187,7 +187,7 @@ class FolderSelectorFrame(customtkinter.CTkFrame):
 # --------------------------------------------------------------------------------------------------------------------------------
     
     def _btn_callback(self) -> None:
-        dir_path = filedialog.askdirectory(title=self._str_label, initialdir=".")
+        dir_path = filedialog.askdirectory(title=self._str_label)
 
         if dir_path:
             self.change_curr_dir(dir_path)
