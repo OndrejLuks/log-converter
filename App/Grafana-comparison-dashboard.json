@@ -17,7 +17,7 @@
   },
   "editable": true,
   "fiscalYearStartMonth": 0,
-  "graphTooltip": 1,
+  "graphTooltip": 2,
   "id": 30,
   "links": [],
   "liveNow": false,
@@ -54,8 +54,10 @@
       },
       "id": 4,
       "options": {
+        "alwaysVisibleFilter": false,
         "autoScroll": false,
         "displayMode": "minimize",
+        "emptyValue": true,
         "favorites": true,
         "filter": true,
         "groupSelection": false,
@@ -108,8 +110,10 @@
       },
       "id": 3,
       "options": {
+        "alwaysVisibleFilter": false,
         "autoScroll": false,
         "displayMode": "minimize",
+        "emptyValue": true,
         "favorites": true,
         "filter": true,
         "groupSelection": false,
@@ -765,8 +769,10 @@
       },
       "id": 9,
       "options": {
+        "alwaysVisibleFilter": false,
         "autoScroll": false,
         "displayMode": "minimize",
+        "emptyValue": true,
         "favorites": true,
         "filter": true,
         "groupSelection": false,
@@ -809,8 +815,10 @@
       },
       "id": 11,
       "options": {
+        "alwaysVisibleFilter": false,
         "autoScroll": false,
         "displayMode": "minimize",
+        "emptyValue": true,
         "favorites": true,
         "filter": true,
         "groupSelection": false,
@@ -1465,8 +1473,10 @@
       },
       "id": 10,
       "options": {
+        "alwaysVisibleFilter": false,
         "autoScroll": false,
         "displayMode": "minimize",
+        "emptyValue": true,
         "favorites": true,
         "filter": true,
         "groupSelection": false,
@@ -1509,8 +1519,10 @@
       },
       "id": 12,
       "options": {
+        "alwaysVisibleFilter": false,
         "autoScroll": false,
         "displayMode": "minimize",
+        "emptyValue": true,
         "favorites": true,
         "filter": true,
         "groupSelection": false,
@@ -1519,7 +1531,7 @@
         "showName": false,
         "statusSort": false,
         "sticky": false,
-        "variable": "comparison_3_left"
+        "variable": "comparison_3_right"
       },
       "targets": [
         {
@@ -2165,8 +2177,10 @@
       },
       "id": 13,
       "options": {
+        "alwaysVisibleFilter": false,
         "autoScroll": false,
         "displayMode": "minimize",
+        "emptyValue": true,
         "favorites": true,
         "filter": true,
         "groupSelection": false,
@@ -2209,8 +2223,10 @@
       },
       "id": 14,
       "options": {
+        "alwaysVisibleFilter": false,
         "autoScroll": false,
         "displayMode": "minimize",
+        "emptyValue": true,
         "favorites": true,
         "filter": true,
         "groupSelection": false,
@@ -2865,8 +2881,10 @@
       },
       "id": 15,
       "options": {
+        "alwaysVisibleFilter": false,
         "autoScroll": false,
         "displayMode": "minimize",
+        "emptyValue": true,
         "favorites": true,
         "filter": true,
         "groupSelection": false,
@@ -2909,8 +2927,10 @@
       },
       "id": 16,
       "options": {
+        "alwaysVisibleFilter": false,
         "autoScroll": false,
         "displayMode": "minimize",
+        "emptyValue": true,
         "favorites": true,
         "filter": true,
         "groupSelection": false,
@@ -3833,6 +3853,6 @@
   "timezone": "",
   "title": "E19e Gen II - Comparison view",
   "uid": "aaacc697-080c-4efc-8636-d11aa6a7e510",
-  "version": 96,
+  "version": 99,
   "weekStart": ""
 }
