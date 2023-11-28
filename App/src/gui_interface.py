@@ -38,8 +38,10 @@ class AppInterface():
     def __init__(self, app: App, pipe):
         """Constructior of AppInterface"""
         self.app = app
+        self.thr_event = threading.Event()
         self.comm = PipeCommunication(pipe, None)
         self.app.set_communication(self.comm)
+        self.app.thr_event = self.thr_event
 
 # --------------------------------------------------------------------------------------------------------------------------------
     
@@ -75,9 +77,12 @@ class AppInterface():
             # tolekize the message by '#'
             messages = event.split("#")
 
+            print(messages)
+
             match messages[0]:
                 case "INIT":
-                    self.app.init()
+                    init_thr = threading.Thread(target=self.app.init)
+                    init_thr.start()
 
                 case "FINISH":
                     self.enable_buttons()
@@ -116,6 +121,12 @@ class AppInterface():
 
                 case "U-SIG":
                     self.update_signals()
+
+                case "C-VAL":
+                    if len(messages) == 2:
+                        self.set_conf_value(messages[1])
+                    else:
+                        self.generate_pop_up_error("WARNING", "Blank config value update requested!", False)
 
                 case "ACK":
                     self.send_ack()
@@ -195,6 +206,13 @@ class AppInterface():
     def kill_pop_up(self) -> None:
         """Closes the currently open toplevel pop-up"""
         self.app.kill_toplevel()
+        return
+
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def set_conf_value(self, val: str) -> None:
+        self.app.curr_conf_val = val
+        self.thr_event.set()
         return
 
 # --------------------------------------------------------------------------------------------------------------------------------

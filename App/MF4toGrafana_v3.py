@@ -29,8 +29,6 @@ def _warning_handler(message, category, filename, lineo, file=None, line=None) -
 # ==========================================================================================================================
 
 
-
-    
 def main():
     warnings.showwarning = _warning_handler
 

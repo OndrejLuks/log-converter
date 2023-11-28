@@ -68,6 +68,7 @@ class TopWindowYesNo(customtkinter.CTkToplevel):
 # --------------------------------------------------------------------------------------------------------------------------------
 
     def closing_handle(self) -> None:
+        # do nothing means the exit [X] button will be disabled
         return
 
 
@@ -156,6 +157,49 @@ class TopWindowExit(customtkinter.CTkToplevel):
 
     def closing_handle(self) -> None:
         return
+
+
+# ================================================================================================================================
+
+
+class TopWindowEntry(customtkinter.CTkToplevel):
+    def __init__(self, master, title: str, message: str, btn_callback_ok: callable, btn_callback_cancel: callable):
+        super().__init__(master)
+
+        try:
+            self.minsize(300, 150)
+            self.resizable(True, False)
+            self.title(title)
+
+            self.grid_columnconfigure((0, 1), weight=1)
+            
+            # bring the window into the foregroud
+            self.after(100, self.lift)
+
+            # Message
+            self._msg = customtkinter.CTkLabel(self, text=message, fg_color="transparent")
+            self._msg.grid(row=0, column=0, columnspan=2, padx=10, pady=(20, 0), sticky="nswe")
+
+            # entry
+            self._entry = customtkinter.CTkEntry(self, show="*")
+            self._entry.grid(row=1, column=0, columnspan=2, padx=10, pady=5, sticky="nswe")
+
+            # Ok button
+            self._btn_yes = customtkinter.CTkButton(self, text="Ok", text_color=self.master.col_btn_tx, command=btn_callback_ok)
+            self._btn_yes.grid(row=2, column=0, padx=10, pady=10, sticky="nswe")
+
+            # Cancel button
+            self._btn_no = customtkinter.CTkButton(self, text="Cancel", text_color=self.master.col_btn_tx, command=btn_callback_cancel)
+            self._btn_no.grid(row=2, column=1, padx=10, pady=10, sticky="nswe")
+
+
+        except Exception as e:
+            self.master.text_box.write(f"ERROR While opening toplevel pop-up:\n{e}")
+
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def get_entry_val(self) -> str:
+        return self._entry.get()
 
 
 # ================================================================================================================================
@@ -625,7 +669,8 @@ class DatabaseFrame(customtkinter.CTkFrame):
     def refresh(self) -> None:
         """Updates dynamic elements of the GUI based on config.json content."""
         for entry in self._entries:
-            entry[0].configure(placeholder_text=self.master.get_config_value("database", entry[1]))
+            print(self.master.get_config_value("database", entry[1]))
+            #entry[0].configure(placeholder_text=self.master.get_config_value("database", entry[1]))
 
         return
 
@@ -1118,6 +1163,9 @@ class NavigationFrame(customtkinter.CTkFrame):
 
         self.btns = []
 
+        # define colors
+        self.col_btn_tx = self.master.col_btn_tx
+
         # load media
         self._logo = customtkinter.CTkImage(Image.open(os.path.join("src", "media", "logo.png")), size=(180, 135))
         self._ic_before_start = customtkinter.CTkImage(light_image=Image.open(os.path.join("src", "media", "ic-st-l.png")),
@@ -1214,9 +1262,7 @@ class NavigationFrame(customtkinter.CTkFrame):
 # --------------------------------------------------------------------------------------------------------------------------------
 
     def _btn_callback_admin(self) -> None:
-        
-        # TODO New class for entry
-
+        self.master.open_toplevel_entry("Enter the password", "Enter the admin password below:", self.master.handle_admin_mode)
         return
 
 # --------------------------------------------------------------------------------------------------------------------------------
@@ -1259,6 +1305,10 @@ class App(customtkinter.CTk):
         super().__init__()
 
         self.comm = None
+        self.toplevel_window = None
+        self.curr_conf_val = None
+        self.thr_event = None
+        self.admin_mode = False
 
         try:
             # set colors
@@ -1275,8 +1325,6 @@ class App(customtkinter.CTk):
             self.col_progress_bar = "#21cc29"
             self.col_btn_tx = "white"
             self.col_btn_dis_tx = "#1d4566"
-
-            self.toplevel_window = None
 
             self.title("MF4 Signal converter")
             self.iconbitmap(os.path.join("src", "media", "icon-logo.ico"))
@@ -1403,6 +1451,43 @@ class App(customtkinter.CTk):
 
 # --------------------------------------------------------------------------------------------------------------------------------
 
+    def open_toplevel_entry(self, title: str, message: str, callback_ok: callable, callback_cancel: callable = None) -> None:
+        # check for window existance
+        if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
+            # assign toplevel kill if cancel callback is not specified
+            if callback_cancel == None:
+                callback_cancel = self.kill_toplevel
+
+            # create toplevel window
+            self.toplevel_window = TopWindowEntry(self, title, message, callback_ok, callback_cancel)
+            # position the toplevel window relatively to the main window
+            self.toplevel_window.geometry("+%d+%d" %(self.winfo_x()+200, self.winfo_y()+200))
+
+        return
+
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def handle_admin_mode(self) -> None:
+        if isinstance(self.toplevel_window, TopWindowEntry):
+            # get user typed password
+            entered_pswd = self.toplevel_window.get_entry_val()
+            self.kill_toplevel()
+
+            # get correct password
+            correct_pswd = self.get_config_value("settings", "admin_pswd")
+           
+            if correct_pswd == entered_pswd:
+                self.admin_mode = True
+                self.text_box.write("Successfully switched to ADMIN MODE.\n")
+                self.title(f"{self.title()} - ADMIN MODE")
+
+            else:
+                self.text_box.write("Incorrect password.\n")
+        
+        return
+
+# --------------------------------------------------------------------------------------------------------------------------------
+
     def save(self) -> None:
         # 1st: update local configs
         #   - several methods to each objects
@@ -1417,9 +1502,14 @@ class App(customtkinter.CTk):
         if not self.flush_config_to_file():
             self.text_box.write("Failed to write settings to the file.")
             return
+        
+        print("ALL GOOD")
 
         # 3rd: redraw
         self.database_frame.refresh()
+
+        print("Oh goodie")
+
         self.process_frame.refresh()
 
         return
@@ -1457,20 +1547,17 @@ class App(customtkinter.CTk):
 # --------------------------------------------------------------------------------------------------------------------------------
 
     def get_config_value(self, domain: str, field: str) -> str:
-
-        # this method will comunicate with backend back-to-back so that requested data are received
         value = ""
 
         try:
             self.comm.send_command(f"FETCH-CONF#{domain}#{field}")
 
-            while True:
-                event = self.comm.receive()
+            # wait for a signal that the new config info is really fetched
+            self.thr_event.wait(timeout=5)
+            self.thr_event.clear()
 
-                messages = event.split("#")
-                if (len(messages) == 2) and (messages[0] == "C-VAL"):
-                    value = messages[1]
-                    break
+            value = self.curr_conf_val
+            self.curr_conf_val = None
 
         except Exception as e:
             self.error_handle("WARNING", f"Problem with requesting of fetching local settings:\n{e}", False)
