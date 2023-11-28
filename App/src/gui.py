@@ -1058,16 +1058,20 @@ class NavigationFooterFrame(customtkinter.CTkFrame):
 
         # button manual
         self.btn_manual = customtkinter.CTkButton(self, corner_radius=0, height=40, border_spacing=10, text="Manual", fg_color="transparent", command=self.btn_callback_manual, text_color=("gray10", "gray90"), anchor="w", image=self._ic_help)
-        self.btn_manual.grid(row=0, column=0, columnspan=2, padx=0, pady=5, sticky="we")
+        self.btn_manual.grid(row=0, column=0, columnspan=2, sticky="we")
+
+        # button enable admin mode
+        self.btn_admin = customtkinter.CTkButton(self, corner_radius=0, height=40, border_spacing=10, text="Admin mode", fg_color="transparent", command=self.btn_callback_admin, text_color=("gray10", "gray90"), anchor="w", image=self._ic_help)
+        self.btn_admin.grid(row=1, column=0, pady=(0, 5), columnspan=2, sticky="we")
 
         # title
         self.label = customtkinter.CTkLabel(self, text="Theme", fg_color="transparent")
-        self.label.grid(row=1, column=0, padx=(15, 10), pady=(5, 20), sticky="w")
+        self.label.grid(row=2, column=0, padx=(15, 10), pady=(5, 20), sticky="w")
 
         # appearance mode
         self.appearance = customtkinter.CTkOptionMenu(self, values=["Light", "Dark", "System"], command=self.change_appearance_mode)
         self.appearance.set("System")
-        self.appearance.grid(row=1, column=1, padx=(0, 20), pady=(5, 20), sticky="w")
+        self.appearance.grid(row=2, column=1, padx=(0, 20), pady=(5, 20), sticky="w")
 
 # --------------------------------------------------------------------------------------------------------------------------------
 
@@ -1077,8 +1081,15 @@ class NavigationFooterFrame(customtkinter.CTkFrame):
 
 # --------------------------------------------------------------------------------------------------------------------------------
 
+    def btn_callback_admin(self) -> None:
+        self.master._btn_callback_admin()
+        return
+
+# --------------------------------------------------------------------------------------------------------------------------------
+
     def deselect(self) -> None:
         self.btn_manual.configure(fg_color="transparent")
+        self.btn_admin.configure(fg_color="transparent")
         return
     
 # --------------------------------------------------------------------------------------------------------------------------------
@@ -1200,6 +1211,14 @@ class NavigationFrame(customtkinter.CTkFrame):
         self.master.load_frame("manual")
         return
     
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def _btn_callback_admin(self) -> None:
+        
+        # TODO New class for entry
+
+        return
+
 # --------------------------------------------------------------------------------------------------------------------------------
 
     def _deselect_btns(self) -> None:
