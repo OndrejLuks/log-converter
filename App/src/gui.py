@@ -512,33 +512,13 @@ class DownloadFrame(customtkinter.CTkFrame):
             self._title = customtkinter.CTkLabel(self, text="Data download", fg_color=self.master.col_frame_title_bg, text_color=self.master.col_frame_title_tx, corner_radius=6)
             self._title.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="we")
 
-            # load signals
-            self._load_frame = customtkinter.CTkFrame(self)
-            self._load_frame.grid_columnconfigure(0, weight=1)
-            self._load_frame.grid_columnconfigure(1, weight=4)
-            self._load_frame.configure(fg_color="transparent", corner_radius=0)
-
-            self._sig_load_label = customtkinter.CTkLabel(self._load_frame, text="Load signals:", fg_color="transparent")
-            self._sig_load_label.grid(row=0, column=0, padx=10, pady=5, sticky="w")
-
-            self._btn_load = customtkinter.CTkButton(self._load_frame, text="Load from DB", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self._btn_callback_load)
-            self._btn_load.grid(row=0, column=1, padx=10, pady=5, sticky="nswe")
-
-            self._load_frame.grid(row=0, column=0, columnspan=2, padx=0, pady=0, sticky="we")
+            # signal load
+            self._btn_load = customtkinter.CTkButton(self, text="Update signal names", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self._btn_callback_load, width=200)
+            self._btn_load.grid(row=1, column=0, padx=10, pady=5, sticky="ns")
 
             # signal selection
-            self._select_frame = customtkinter.CTkFrame(self)
-            self._select_frame.grid_columnconfigure(0, weight=1)
-            self._select_frame.grid_columnconfigure(1, weight=4)
-            self._select_frame.configure(fg_color="transparent", corner_radius=0)
-
-            self._sig_select_label = customtkinter.CTkLabel(self._select_frame, text="Select signal:", fg_color="transparent")
-            self._sig_select_label.grid(row=0, column=0, padx=10, pady=5, sticky="w")
-            
-            self._option_menu = customtkinter.CTkOptionMenu(self._select_frame, values=self._signals, dynamic_resizing=False, command=self._combo_callback)
-            self._option_menu.grid(row=0, column=1, padx=10, pady=5, sticky="nswe")
-
-            self._select_frame.grid(row=1, column=0, columnspan=2, padx=0, pady=0, sticky="we")
+            self._option_menu = customtkinter.CTkOptionMenu(self, values=self._signals, dynamic_resizing=False, command=self._combo_callback, width=200)
+            self._option_menu.grid(row=1, column=1, padx=10, pady=5, sticky="ns")
 
             # from date-time
             self._date_time_from = DateTimePickerFrame(self, "Select FROM time stamp:")
@@ -549,8 +529,8 @@ class DownloadFrame(customtkinter.CTkFrame):
             self._date_time_to.grid(row=5, column=1, padx=(10, 0), pady=(10, 5), sticky="nswe")
 
             # download button
-            self._btn_download = customtkinter.CTkButton(self, text="Download as csv", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self._btn_callback_download)
-            self._btn_download.grid(row=6, column=0, columnspan=2, padx=200, pady=(10, 0), sticky="swe")
+            self._btn_download = customtkinter.CTkButton(self, text="Download as csv", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self._btn_callback_download, width=200)
+            self._btn_download.grid(row=6, column=0, columnspan=2, padx=10, pady=(10, 0), sticky="s")
 
         except Exception as e:
             self.master.error_handle("ERROR", f"Unable to create GUI - download:\n{e}", terminate=True)
@@ -601,8 +581,8 @@ class DownloadFrame(customtkinter.CTkFrame):
         try:
             # update option menu
             self._option_menu.destroy()
-            self._option_menu = customtkinter.CTkOptionMenu(self._select_frame, values=self._signals, dynamic_resizing=False, command=self._combo_callback)
-            self._option_menu.grid(row=0, column=1, padx=10, pady=5, sticky="nswe")
+            self._option_menu = customtkinter.CTkOptionMenu(self, values=self._signals, dynamic_resizing=False, command=self._combo_callback, width=200)
+            self._option_menu.grid(row=1, column=1, padx=10, pady=5, sticky="ns")
 
         except Exception as e:
             self.master.error_handle("ERROR", f"Unable to update signals:\n{e}", terminate=True)
