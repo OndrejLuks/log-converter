@@ -1,11 +1,12 @@
 {
     "settings": {
-        "mf4_path": "C:/Users/mrdox/OneDrive-CVUT/OneDrive - \u010cesk\u00e9 vysok\u00e9 u\u010den\u00ed technick\u00e9 v Praze/FIT/BAP/log-converter/App/SourceMF4",
+        "mf4_path": "SourceMF4",
         "dbc_path": "DBCfiles",
         "aggregate": "true",
         "agg_max_skip_seconds": "3600",
         "move_done_files": "false",
         "write_time_info": "true",
+        "admin_pswd": "BoDoBobldr",
         "_comment": "clean_upload means data will not append, OLD SCHEMA WILL BE DELETED",
         "clean_upload": "true"
     },
@@ -14,7 +15,7 @@
         "port": "5432",
         "database": "TestDB",
         "user": "user_sandbox",
-        "password": "TestPswDb",
+        "password": "Hovno123-",
         "schema_name": "mex_test"
     }
 }

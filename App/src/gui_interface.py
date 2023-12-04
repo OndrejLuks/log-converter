@@ -77,8 +77,6 @@ class AppInterface():
             # tolekize the message by '#'
             messages = event.split("#")
 
-            print(messages)
-
             match messages[0]:
                 case "INIT":
                     init_thr = threading.Thread(target=self.app.init)

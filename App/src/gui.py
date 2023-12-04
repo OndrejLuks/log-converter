@@ -9,7 +9,7 @@ from tkcalendar import Calendar
 from tkinter import filedialog
 from PIL import Image
 import customtkinter
-import json
+import threading
 import time
 import os
 
@@ -644,22 +644,26 @@ class DatabaseFrame(customtkinter.CTkFrame):
             self._title.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="we")
             
             # define entry names
-            self.entry_names = [("Host", "host"),
-                        ("Port", "port"),
-                        ("Database", "database"),
-                        ("User", "user"),
-                        ("Password", "password"),
-                        ("Schema", "schema_name")]
+            self.entry_names = [("Host", "host", "admin"),
+                        ("Port", "port", "admin"),
+                        ("Database", "database", "admin"),
+                        ("User", "user", "admin"),
+                        ("Password", "password", "admin"),
+                        ("Schema", "schema_name", "user")]
             self._entries = []
 
             # create entries
             for i, name in enumerate(self.entry_names):
                 label = customtkinter.CTkLabel(self, text=name[0], fg_color="transparent")
-                label.grid(row=i+1, column=0, padx=15, pady=10, sticky="w")
                 entry = customtkinter.CTkEntry(self, placeholder_text=self.master.get_config_value("database", name[1]))
-                entry.grid(row=i+1, column=1, padx=10, pady=10, sticky="we")
-
                 self._entries.append((entry, name[1]))
+
+                if name[2] == "admin" and not self.master.admin_mode:
+                    # don't display created entry
+                    continue
+
+                label.grid(row=i+1, column=0, padx=15, pady=10, sticky="w")
+                entry.grid(row=i+1, column=1, padx=10, pady=10, sticky="we")
 
         except Exception as e:
             self.master.error_handle("ERROR", f"Unable to create GUI - database:\n{e}", terminate=True)
@@ -669,8 +673,7 @@ class DatabaseFrame(customtkinter.CTkFrame):
     def refresh(self) -> None:
         """Updates dynamic elements of the GUI based on config.json content."""
         for entry in self._entries:
-            print(self.master.get_config_value("database", entry[1]))
-            #entry[0].configure(placeholder_text=self.master.get_config_value("database", entry[1]))
+            entry[0].configure(placeholder_text=self.master.get_config_value("database", entry[1]))
 
         return
 
@@ -726,7 +729,9 @@ class ConversionFrame(customtkinter.CTkFrame):
             self._swch_aggregate = self._create_switch(1, 0, "Aggregate raw data", ("settings", "aggregate"), self._agg_seconds_grid)
             self._swch_move = self._create_switch(2, 0, "Move done files", ("settings", "move_done_files"))
             self._swch_write_info = self._create_switch(3, 0, "Write time info into MF4-info.csv", ("settings", "write_time_info"))
-            self._swch_clean_up = self._create_switch(4, 0, "Clean database upload", ("settings", "clean_upload"))
+
+            if self.master.admin_mode:
+                self._swch_clean_up = self._create_switch(4, 0, "Clean database upload", ("settings", "clean_upload"))
 
             # create entries
             self._entries = []
@@ -872,14 +877,15 @@ class TextboxFrame(customtkinter.CTkFrame):
         - msg : str
             - message to be printed
         """
-        # make the textbox writeable
-        self._textbox.configure(state="normal")
-        # insert message at the end
-        self._textbox.insert("end", msg)
-        # scroll to the end
-        self._textbox.see("end")
-        # make the textbox non-writeable
-        self._textbox.configure(state="disabled")
+        with self.master.thr_lock:
+            # make the textbox writeable
+            self._textbox.configure(state="normal")
+            # insert message at the end
+            self._textbox.insert("end", msg)
+            # scroll to the end
+            self._textbox.see("end")
+            # make the textbox non-writeable
+            self._textbox.configure(state="disabled")
         return
     
 # --------------------------------------------------------------------------------------------------------------------------------
@@ -1100,13 +1106,15 @@ class NavigationFooterFrame(customtkinter.CTkFrame):
         # load media
         self._ic_help = customtkinter.CTkImage(light_image=Image.open(os.path.join("src", "media", "ic-hlp-l.png")),
                                         dark_image=Image.open(os.path.join("src", "media", "ic-hlp-d.png")), size=(20, 20))
+        self._ic_admin = customtkinter.CTkImage(light_image=Image.open(os.path.join("src", "media", "ic-adm-l.png")),
+                                        dark_image=Image.open(os.path.join("src", "media", "ic-adm-d.png")), size=(20, 20))
 
         # button manual
         self.btn_manual = customtkinter.CTkButton(self, corner_radius=0, height=40, border_spacing=10, text="Manual", fg_color="transparent", command=self.btn_callback_manual, text_color=("gray10", "gray90"), anchor="w", image=self._ic_help)
         self.btn_manual.grid(row=0, column=0, columnspan=2, sticky="we")
 
         # button enable admin mode
-        self.btn_admin = customtkinter.CTkButton(self, corner_radius=0, height=40, border_spacing=10, text="Admin mode", fg_color="transparent", command=self.btn_callback_admin, text_color=("gray10", "gray90"), anchor="w", image=self._ic_help)
+        self.btn_admin = customtkinter.CTkButton(self, corner_radius=0, height=40, border_spacing=10, text="Admin mode", fg_color="transparent", command=self.btn_callback_admin, text_color=("gray10", "gray90"), anchor="w", image=self._ic_admin)
         self.btn_admin.grid(row=1, column=0, pady=(0, 5), columnspan=2, sticky="we")
 
         # title
@@ -1148,6 +1156,12 @@ class NavigationFooterFrame(customtkinter.CTkFrame):
     def change_appearance_mode(self, mode: str) -> None:
         self.master.change_appearance_mode(mode)
         return 
+    
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def disable_admin(self) -> None:
+        self.btn_admin.configure(state="disabled")
+        return
 
 
 # ================================================================================================================================
@@ -1267,6 +1281,12 @@ class NavigationFrame(customtkinter.CTkFrame):
 
 # --------------------------------------------------------------------------------------------------------------------------------
 
+    def disable_admin(self) -> None:
+        self.footer.disable_admin()
+        return
+
+# --------------------------------------------------------------------------------------------------------------------------------
+
     def _deselect_btns(self) -> None:
         self.footer.deselect()
         for btn in self.btns:
@@ -1287,7 +1307,7 @@ class App(customtkinter.CTk):
     ----------
     - toplevel_window
     - database_frame : DatabaseFrame
-    - process_frame : ConversionFrame
+    - conversion_frame : ConversionFrame
     - text_box : TextboxFrame
     - progress_bar : ProgressFrame
     - button_frame : ButtonsFrame
@@ -1309,6 +1329,8 @@ class App(customtkinter.CTk):
         self.curr_conf_val = None
         self.thr_event = None
         self.admin_mode = False
+        self.threads = []
+        self.thr_lock = threading.Lock()
 
         try:
             # set colors
@@ -1345,9 +1367,27 @@ class App(customtkinter.CTk):
 
 # --------------------------------------------------------------------------------------------------------------------------------
 
+    def spawn_working_thread(self, fc: callable, args: set=()) -> None:
+        new_thr = threading.Thread(target=fc, args=args)
+        new_thr.start()
+        self.threads.append(new_thr)
+        return
+
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def join_threads(self) -> None:
+        for thr in self.threads:
+            if thr.is_alive():
+                thr.join()
+
+        return
+
+# --------------------------------------------------------------------------------------------------------------------------------
+
     def exit_program(self) -> None:
         self.kill_toplevel()
         self.open_toplevel_exit()
+        self.join_threads()
         self.comm.send_command("END")
         return
 
@@ -1365,21 +1405,6 @@ class App(customtkinter.CTk):
         self.kill_toplevel()
         self.quit()
         return
-
-# --------------------------------------------------------------------------------------------------------------------------------
-
-    def open_config(self):
-        """Loads configure json file (config.json) from root directory. Returns json object."""
-        try:
-            with open(os.path.join("src", "config.json"), "r") as file:
-                data = json.load(file)
-
-        except FileNotFoundError:
-            print()
-            print("ERROR while reading src\\config.json file. Check for file existance.")
-            self.exit_program()
-    
-        return data
 
 # --------------------------------------------------------------------------------------------------------------------------------
 
@@ -1468,11 +1493,16 @@ class App(customtkinter.CTk):
 # --------------------------------------------------------------------------------------------------------------------------------
 
     def handle_admin_mode(self) -> None:
+        self._handle_admin_mode()
+        return
+
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def _handle_admin_mode(self) -> None:
         if isinstance(self.toplevel_window, TopWindowEntry):
             # get user typed password
             entered_pswd = self.toplevel_window.get_entry_val()
-            self.kill_toplevel()
-
+            
             # get correct password
             correct_pswd = self.get_config_value("settings", "admin_pswd")
            
@@ -1480,19 +1510,33 @@ class App(customtkinter.CTk):
                 self.admin_mode = True
                 self.text_box.write("Successfully switched to ADMIN MODE.\n")
                 self.title(f"{self.title()} - ADMIN MODE")
+                self.navigation.disable_admin()
+
+                # reset database frame and conversion frame
+                self.database_frame = DatabaseFrame(self)
+                self.conversion_frame = ConversionFrame(self)
+                # change current view to startup screen
+                self.navigation._btn_callback_before_start()
 
             else:
                 self.text_box.write("Incorrect password.\n")
         
+        self.kill_toplevel()
         return
 
 # --------------------------------------------------------------------------------------------------------------------------------
 
     def save(self) -> None:
+        self.spawn_working_thread(fc=self._save)
+        return
+
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def _save(self) -> None:
         # 1st: update local configs
         #   - several methods to each objects
 
-        if not (self.database_frame.save_locally() and self.process_frame.save_locally() and self.before_start_frame.save_locally()):
+        if not (self.database_frame.save_locally() and self.conversion_frame.save_locally() and self.before_start_frame.save_locally()):
             self.text_box.write("Failed to update local settings.")
             return
 
@@ -1502,15 +1546,10 @@ class App(customtkinter.CTk):
         if not self.flush_config_to_file():
             self.text_box.write("Failed to write settings to the file.")
             return
-        
-        print("ALL GOOD")
 
         # 3rd: redraw
         self.database_frame.refresh()
-
-        print("Oh goodie")
-
-        self.process_frame.refresh()
+        self.conversion_frame.refresh()
 
         return
 
@@ -1553,7 +1592,7 @@ class App(customtkinter.CTk):
             self.comm.send_command(f"FETCH-CONF#{domain}#{field}")
 
             # wait for a signal that the new config info is really fetched
-            self.thr_event.wait(timeout=5)
+            self.thr_event.wait(timeout=3)
             self.thr_event.clear()
 
             value = self.curr_conf_val
@@ -1612,9 +1651,9 @@ class App(customtkinter.CTk):
             self.database_frame.grid_forget()
 
         if name == "conv-config":
-            self.process_frame.grid(row=0, column=1, padx=20, pady=(20, 10), sticky="nswe")
+            self.conversion_frame.grid(row=0, column=1, padx=20, pady=(20, 10), sticky="nswe")
         else:
-            self.process_frame.grid_forget()
+            self.conversion_frame.grid_forget()
 
         if name == "download":
             self.download_frame.grid(row=0, column=1, padx=20, pady=10, sticky="nswe")
@@ -1652,7 +1691,7 @@ class App(customtkinter.CTk):
 
             # frames
             self.database_frame = DatabaseFrame(self)
-            self.process_frame = ConversionFrame(self)
+            self.conversion_frame = ConversionFrame(self)
             self.download_frame = DownloadFrame(self)
             self.before_start_frame = BeforeStartFrame(self)
             self.manual_frame = ManualFrame(self)
@@ -1664,3 +1703,4 @@ class App(customtkinter.CTk):
             self.error_handle("ERROR", f"Failed to initialize gui frames:\n{e}", True)
         
         return
+    
