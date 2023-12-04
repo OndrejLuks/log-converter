@@ -204,6 +204,61 @@ class TopWindowEntry(customtkinter.CTkToplevel):
 
 # ================================================================================================================================
 
+class TopWindowDateTime(customtkinter.CTkToplevel):
+    def __init__(self, master, btn_callback_ok: callable, btn_callback_cancel: callable):
+        super().__init__(master)
+
+        try:
+            self.title("Time filter selector")
+            self.minsize(500, 200)
+            self.resizable(False, False)
+            self.grid_columnconfigure((0, 1), weight=1)
+
+            # bring the window into the foregroud
+            self.after(200, self.lift)
+
+            # load image
+            self._image = customtkinter.CTkImage(Image.open(os.path.join("src", "media", "date_time_selector.png")), size=(500, 100))
+
+            # Message
+            self._msg = customtkinter.CTkLabel(self, text="Select desired dates and type times below", fg_color=self.master.col_frame_title_bg, text_color=self.master.col_frame_title_tx, corner_radius=6)
+            self._msg.grid(row=0, column=0, columnspan=2, padx=10, pady=(20, 5), sticky="nswe")
+
+            # from date-time
+            self._date_time_from = DateTimePickerFrame(self, "From:")
+            self._date_time_from.grid(row=1, column=0, padx=(5, 10), pady=5, sticky="nswe")
+
+            # to date-time
+            self._date_time_to = DateTimePickerFrame(self, "To:")
+            self._date_time_to.grid(row=1, column=1, padx=(10, 5), pady=5, sticky="nswe")
+
+            # image
+            self._image = customtkinter.CTkLabel(self, text="", image=self._image)
+            self._image.grid(row=2, column=0, columnspan=2, padx=0, pady=0)
+
+            # buttons
+            self._btns_frame = customtkinter.CTkFrame(self, corner_radius=0)
+            self._btns_frame.grid_columnconfigure((0, 1), weight=1)
+
+            self._btn_yes = customtkinter.CTkButton(self._btns_frame, text="Ok", text_color=self.master.col_btn_tx, command=btn_callback_ok)
+            self._btn_yes.grid(row=0, column=0, padx=10, pady=10, sticky="nswe")
+
+            self._btn_no = customtkinter.CTkButton(self._btns_frame, text="Cancel", text_color=self.master.col_btn_tx, command=btn_callback_cancel)
+            self._btn_no.grid(row=0, column=1, padx=10, pady=10, sticky="nswe")
+
+            self._btns_frame.grid(row=3, column=0, columnspan=2, padx=0, pady=0, sticky="swe")
+
+        except Exception as e:
+            self.master.text_box.write(f"ERROR While opening toplevel pop-up:\n{e}")
+
+# --------------------------------------------------------------------------------------------------------------------------------
+    
+    def get_values(self) -> list:
+        return [self._date_time_from.get_values(), self._date_time_to.get_values()]
+        
+
+# ================================================================================================================================
+
 
 class FolderSelectorFrame(customtkinter.CTkFrame):
     def __init__(self, master, str_label, str_btn, str_current):
@@ -470,15 +525,15 @@ class DateTimePickerFrame(customtkinter.CTkFrame):
 
             # title
             self._time_select_label = customtkinter.CTkLabel(self, text=title, fg_color="transparent")
-            self._time_select_label.grid(row=0, column=0, padx=10, pady=(5, 0), sticky="w")
+            self._time_select_label.grid(row=0, column=0, padx=10, pady=(5, 0), sticky="nsw")
 
             # callendar
             self._calendar = Calendar(self, selectmode="day", locale="en", showweeknumbers=False, cursor="hand2", date_pattern="y-mm-dd", borderwidth=0, bordercolor="white")
-            self._calendar.grid(row=2, column=0, padx=10, pady=5, sticky="we")
+            self._calendar.grid(row=1, column=0, padx=10, pady=(0, 5), sticky="we")
 
             # time
             self._time_entry = TimeSelectorFrame(self)
-            self._time_entry.grid(row=3, column=0, padx=10, pady=5, sticky="we")
+            self._time_entry.grid(row=2, column=0, padx=10, pady=(5,10), sticky="we")
         
         except Exception as e:
             self.master.master.error_handle("ERROR", f"Unable to create GUI - date entry:\n{e}", terminate=True)
@@ -486,10 +541,17 @@ class DateTimePickerFrame(customtkinter.CTkFrame):
 # --------------------------------------------------------------------------------------------------------------------------------
 
     def get_values(self) -> dict:
-        time_val = self._time_entry.get_values()
-        date_val = self._calendar.get_date().split("-")
-        return {"date" : {"y" : date_val[0], "m" : date_val[1], "d" : date_val[2]},
-                "time" : {"h" : time_val[0], "m" : time_val[1], "s" : time_val[2]}}
+        try:
+            time_val = self._time_entry.get_values()
+            date_val = self._calendar.get_date().split("-")
+            output = {"date" : {"y" : date_val[0], "m" : date_val[1], "d" : date_val[2]},
+                      "time" : {"h" : time_val[0], "m" : time_val[1], "s" : time_val[2]}}
+            
+        except Exception as e:
+            self.master.master.error_handle("ERROR", f"Problem with fetching date and time:\n{e}", terminate=True)
+            return None
+
+        return output
 
 
 # ================================================================================================================================
@@ -505,28 +567,37 @@ class DownloadFrame(customtkinter.CTkFrame):
             self.grid_rowconfigure(6, weight=1)
             self.configure(fg_color="transparent")
 
-            self._signal = ""
+            self._selected_signals = []
+            self._from_str = ""
+            self._to_str = ""
             self._signals = ["none"]
 
             # frame title
             self._title = customtkinter.CTkLabel(self, text="Data download", fg_color=self.master.col_frame_title_bg, text_color=self.master.col_frame_title_tx, corner_radius=6)
             self._title.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="we")
 
-            # signal load
+            # btn signal load
             self._btn_load = customtkinter.CTkButton(self, text="Update signal names", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self._btn_callback_load, width=200)
-            self._btn_load.grid(row=1, column=0, padx=10, pady=5, sticky="ns")
+            self._btn_load.grid(row=1, column=1, padx=10, pady=(10, 5), sticky="ns")
 
             # signal selection
-            self._option_menu = customtkinter.CTkOptionMenu(self, values=self._signals, dynamic_resizing=False, command=self._combo_callback, width=200)
-            self._option_menu.grid(row=1, column=1, padx=10, pady=5, sticky="ns")
+            self._btn_select_signals = customtkinter.CTkButton(self, text="Select signals", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self._btn_callback_select_sig, width=200)
+            self._btn_select_signals.grid(row=2, column=1, padx=10, pady=5, sticky="ns")
+            self._btn_select_signals.configure(state="disabled")
 
-            # from date-time
-            self._date_time_from = DateTimePickerFrame(self, "Select FROM time stamp:")
-            self._date_time_from.grid(row=5, column=0, padx=(0, 10), pady=(10, 5), sticky="nswe")
+            # btn select time filter
+            self._btn_time_filter = customtkinter.CTkButton(self, text="Set time filter", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self._btn_callback_time_filter, width=200)
+            self._btn_time_filter.grid(row=3, column=1, padx=10, pady=5, sticky="ns")
+            self._btn_time_filter.configure(state="disabled")
 
-            # to date-time
-            self._date_time_to = DateTimePickerFrame(self, "Select TO time stamp:")
-            self._date_time_to.grid(row=5, column=1, padx=(10, 0), pady=(10, 5), sticky="nswe")
+            # textbox label
+            self._title = customtkinter.CTkLabel(self, text="Current selection for download:", fg_color="transparent")
+            self._title.grid(row=4, column=0, columnspan=2, padx=10, pady=(20, 2), sticky="we")
+            
+            # textbox
+            self._textbox = customtkinter.CTkTextbox(self, activate_scrollbars=True, wrap="word", height=100)
+            self._textbox.grid(row=5, column=0, columnspan=2, padx=50, pady=0, sticky="nsew")
+            self._textbox.configure(state="disabled", font=("Courier New", 12))
 
             # download button
             self._btn_download = customtkinter.CTkButton(self, text="Download as csv", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self._btn_callback_download, width=200)
@@ -534,12 +605,6 @@ class DownloadFrame(customtkinter.CTkFrame):
 
         except Exception as e:
             self.master.error_handle("ERROR", f"Unable to create GUI - download:\n{e}", terminate=True)
-
-# --------------------------------------------------------------------------------------------------------------------------------
-
-    def _combo_callback(self, choice) -> None:
-        self._signal = str(choice)
-        return
 
 # --------------------------------------------------------------------------------------------------------------------------------
 
@@ -551,23 +616,50 @@ class DownloadFrame(customtkinter.CTkFrame):
 
 # --------------------------------------------------------------------------------------------------------------------------------
 
+    def _btn_callback_time_filter(self) -> None:
+        self.master.open_toplevel_date_time(self._time_filter_update)
+        return
+
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def _time_filter_update(self) -> None:
+        if isinstance(self.master.toplevel_window, TopWindowDateTime):
+            time_values = self.master.toplevel_window.get_values()
+            self.master.kill_toplevel()
+
+            if time_values[0] and time_values[1]:
+                from_t = time_values[0]
+                to_t = time_values[1]
+
+                # format "yyyy-mm-dd hh-ss-mm"
+                self._from_str = f"{from_t['date']['y']}-{from_t['date']['m']}-{from_t['date']['d']} {from_t['time']['h']}:{from_t['time']['m']}:{from_t['time']['s']}"
+                self._to_str = f"{to_t['date']['y']}-{to_t['date']['m']}-{to_t['date']['d']} {to_t['time']['h']}:{to_t['time']['m']}:{to_t['time']['s']}"
+
+                # print to table
+                self._print_current_selection()
+        return
+
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def _btn_callback_select_sig(self) -> None:
+        return
+
+# --------------------------------------------------------------------------------------------------------------------------------
+
     def _btn_callback_download(self) -> None:
-        if self._signal == "":
+        if len(self._selected_signals) == 0:
             self.master.error_handle("WARNING", "Signal not selected!", False)
+            return
+        
+        if self._from_str == "" or self._to_str == "":
+            self.master.error_handle("WARNING", "Time filter not selected!", False)
             return
 
         try:
             file_path = filedialog.asksaveasfile(defaultextension=".csv", filetypes=[("CSV files", "*.csv")])
 
             if file_path:
-                from_t = self._date_time_from.get_values()
-                to_t = self._date_time_to.get_values()
-
-                # format "yyyy-mm-dd hh-ss-mm"
-                from_str = f"{from_t['date']['y']}-{from_t['date']['m']}-{from_t['date']['d']} {from_t['time']['h']}:{from_t['time']['m']}:{from_t['time']['s']}"
-                to_str = f"{to_t['date']['y']}-{to_t['date']['m']}-{to_t['date']['d']} {to_t['time']['h']}:{to_t['time']['m']}:{to_t['time']['s']}"
-
-                self.master.comm.send_command(f"DOWNL#{self._signal}#{from_str}#{to_str}#{file_path.name}")
+                self.master.comm.send_command(f"DOWNL#{self._signal}#{self._from_str}#{self._to_str}#{file_path.name}")
 
         except Exception as e:
             self.master.error_handle("ERROR", f"Unable to download data:\n{e}", terminate=True)
@@ -577,16 +669,41 @@ class DownloadFrame(customtkinter.CTkFrame):
 # --------------------------------------------------------------------------------------------------------------------------------
 
     def update_signals(self, signals: list) -> None:
+        # called from the interface
         self._signals = signals
         try:
-            # update option menu
-            self._option_menu.destroy()
-            self._option_menu = customtkinter.CTkOptionMenu(self, values=self._signals, dynamic_resizing=False, command=self._combo_callback, width=200)
-            self._option_menu.grid(row=1, column=1, padx=10, pady=5, sticky="ns")
+            # enable buttons
+            self._btn_select_signals.configure(state="normal")
+            self._btn_time_filter.configure(state="normal")
 
         except Exception as e:
             self.master.error_handle("ERROR", f"Unable to update signals:\n{e}", terminate=True)
 
+        return
+    
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def _print_current_selection(self) -> None:
+        # make the textbox writeable
+        self._textbox.configure(state="normal")
+        # clear contents
+        self._textbox.delete("0.0", "end")
+        # insert message at the end
+        self._textbox.insert("end", "Selected signals:\n")
+
+        for idx, sig in enumerate(self._selected_signals):
+            self._textbox.insert("end", sig)
+            if idx < len(self._selected_signals) - 1:
+                self._textbox.insert("end", ", ")
+
+        self._textbox.insert("end", "\n\n")
+
+        self._textbox.insert("end", "Selected time filters:")
+        self._textbox.insert("end", f"   FROM: {self._from_str}\n")
+        self._textbox.insert("end", f"                         TO:   {self._to_str}\n")
+
+        # make the textbox non-writeable
+        self._textbox.configure(state="disabled")
         return
 
 
@@ -1465,6 +1582,22 @@ class App(customtkinter.CTk):
 
             # create toplevel window
             self.toplevel_window = TopWindowEntry(self, title, message, callback_ok, callback_cancel)
+            # position the toplevel window relatively to the main window
+            self.toplevel_window.geometry("+%d+%d" %(self.winfo_x()+200, self.winfo_y()+200))
+
+        return
+
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def open_toplevel_date_time(self, callback_ok: callable, callback_cancel: callable = None) -> None:
+        # check for window existance
+        if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
+            # assign toplevel kill if cancel callback is not specified
+            if callback_cancel == None:
+                callback_cancel = self.kill_toplevel
+
+            # create toplevel window
+            self.toplevel_window = TopWindowDateTime(self, callback_ok, callback_cancel)
             # position the toplevel window relatively to the main window
             self.toplevel_window.geometry("+%d+%d" %(self.winfo_x()+200, self.winfo_y()+200))
 
