@@ -177,22 +177,24 @@ class DatabaseHandle:
 
     def save_data(self, tables_str: str, from_time: str, to_time: str, file_path: str) -> None:
         self._comm.send_to_print("Downloading data ...")
+        self.connect()
 
         tables = tables_str.split(";")
-        combined_data_frame = pd.DataFrame()
+        combined_data_frame = pd.DataFrame(columns=["time_stamp"])
 
         try:
             for tbl in tables:
                 qry = f"SELECT * FROM {self._schema_name}.\"{tbl}\" WHERE time_stamp >= '{from_time}' AND time_stamp <= '{to_time}'"
 
-                # TODO - this is broken
-
                 result = self.querry(qry, True)
                 data_frame = pd.DataFrame(result)
-                print(data_frame)
-                combined_data_frame = combined_data_frame.merge(data_frame, on="time_stamp", how="outer")
+                if not data_frame.empty:
+                    combined_data_frame = combined_data_frame.merge(data_frame, on="time_stamp", how="outer")
 
+            self.finish()
+            combined_data_frame.sort_values(by="time_stamp", inplace=True)
             combined_data_frame.to_csv(file_path, index=False)
+
             self._comm.send_to_print(f"SUCCESS: Selected data saved to {file_path}")
 
         except Exception as e:

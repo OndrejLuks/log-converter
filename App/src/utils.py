@@ -8,6 +8,7 @@
 
 from .communication import PipeCommunication
 from datetime import datetime
+import threading
 import os
 import pytz
 import json
@@ -213,3 +214,10 @@ class Utils():
             self._comm.send_error("WARNING", f"Problem with writting config to file:\n{e}", False)
 
         return
+
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def spawn_working_thread(self, fc: callable, args: set=()) -> threading.Thread:
+        new_thr = threading.Thread(target=fc, args=args)
+        new_thr.start()
+        return new_thr

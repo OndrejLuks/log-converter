@@ -173,8 +173,5 @@ class BackendHandle():
             self._comm.send_error("WARNING", "FROM time is set after TO time.", "F")
             return
 
-        self._db.connect()
-        self._db.save_data(sigs, from_str, to_str, file_name)
-        self._db.finish()
-        
+        self._threads.append(self._utils.spawn_working_thread(fc=self._db.save_data, args=(sigs, from_str, to_str, file_name)))
         return
