@@ -77,7 +77,7 @@ class BackendHandle():
 
                     case "DOWNL":
                         if len(messages) == 5:
-                            self._download_signal(sig=messages[1], from_str=messages[2], to_str=messages[3], file_name=messages[4])
+                            self._download_signal(sigs=messages[1], from_str=messages[2], to_str=messages[3], file_name=messages[4])
                         else:
                             self._comm.send_error("WARNING", "Blank download requested!", False)
 
@@ -163,7 +163,7 @@ class BackendHandle():
 
 # --------------------------------------------------------------------------------------------------------------------------------
 
-    def _download_signal(self, sig: str, from_str: str, to_str: str, file_name: str) -> None:
+    def _download_signal(self, sigs: str, from_str: str, to_str: str, file_name: str) -> None:
 
         if not (self._utils.time_valid(from_str) and self._utils.time_valid(to_str)):
             self._comm.send_error("WARNING", "Entered time values are not real.", "F")
@@ -174,7 +174,7 @@ class BackendHandle():
             return
 
         self._db.connect()
-        self._db.save_data(sig, from_str, to_str, file_name)
+        self._db.save_data(sigs, from_str, to_str, file_name)
         self._db.finish()
         
         return

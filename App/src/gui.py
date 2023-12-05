@@ -260,6 +260,74 @@ class TopWindowDateTime(customtkinter.CTkToplevel):
 # ================================================================================================================================
 
 
+class TopWindowSignalSelect(customtkinter.CTkToplevel):
+    def __init__(self, master, signals: list, btn_callback_ok: callable, btn_callback_cancel: callable):
+        super().__init__(master)
+
+        try:
+            self.title("Signal selector")
+            self.minsize(400, 500)
+            self.resizable(False, True)
+            self.grid_columnconfigure((0, 1), weight=1)
+            self.grid_rowconfigure(1, weight=1)
+
+            # bring the window into the foregroud
+            self.after(100, self.lift)
+
+            self._sig_checkboxes = []
+
+            # Loading
+            self._msg = customtkinter.CTkLabel(self, text="Loading...", fg_color=self.master.col_frame_title_bg, text_color=self.master.col_frame_title_tx, corner_radius=6)
+            self._msg.grid(row=0, column=0, columnspan=2, padx=10, pady=(20, 10), sticky="nswe")
+
+            # Signal choices
+            self._scrollable_frame = customtkinter.CTkScrollableFrame(self, fg_color="transparent", corner_radius=0)
+            self._scrollable_frame.grid_columnconfigure(0, weight=1)
+            self._scrollable_frame.grid(row=1, column=0, columnspan=2, padx=10, pady=0, sticky="nswe")
+
+            sig_row_id = 0
+
+            for sig in signals:
+                new_checkbox = customtkinter.CTkCheckBox(self._scrollable_frame, text=sig, checkbox_width=20, checkbox_height=20)
+                new_checkbox.grid(row=sig_row_id, column=0, padx=10, pady=1, sticky="nsw")
+                sig_row_id += 1
+                self._sig_checkboxes.append((new_checkbox, sig))
+
+            # buttons
+            self._btns_frame = customtkinter.CTkFrame(self, corner_radius=0)
+            self._btns_frame.grid_columnconfigure((0, 1), weight=1)
+
+            self._btn_yes = customtkinter.CTkButton(self._btns_frame, text="Ok", text_color=self.master.col_btn_tx, command=btn_callback_ok)
+            self._btn_yes.grid(row=0, column=0, padx=10, pady=10, sticky="nswe")
+
+            self._btn_no = customtkinter.CTkButton(self._btns_frame, text="Cancel", text_color=self.master.col_btn_tx, command=btn_callback_cancel)
+            self._btn_no.grid(row=0, column=1, padx=10, pady=10, sticky="nswe")
+
+            self._btns_frame.grid(row=2, column=0, columnspan=2, padx=0, pady=0, sticky="swe")
+
+            # Message
+            self._msg.grid_forget()
+            self._msg = customtkinter.CTkLabel(self, text="Select desired signals to download", fg_color=self.master.col_frame_title_bg, text_color=self.master.col_frame_title_tx, corner_radius=6)
+            self._msg.grid(row=0, column=0, columnspan=2, padx=10, pady=(20, 10), sticky="nswe")
+
+        except Exception as e:
+            self.master.text_box.write(f"ERROR While opening toplevel pop-up:\n{e}")
+
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def get_selected_signals(self) -> list:
+        output = []
+
+        for box in self._sig_checkboxes:
+            if box[0].get() == 1:
+                output.append(box[1])
+
+        return output
+
+
+# ================================================================================================================================
+
+
 class FolderSelectorFrame(customtkinter.CTkFrame):
     def __init__(self, master, str_label, str_btn, str_current):
         super().__init__(master)
@@ -506,7 +574,6 @@ class TimeSelectorFrame(customtkinter.CTkFrame):
             if not len(val) == 0:
                 output.append(val)
             else:
-                self.master.master.master.text_box.write(f"WARNING: Time {entry[1]} missing, 00 set as default!\n")
                 output.append("00")
 
         return output
@@ -576,23 +643,35 @@ class DownloadFrame(customtkinter.CTkFrame):
             self._title = customtkinter.CTkLabel(self, text="Data download", fg_color=self.master.col_frame_title_bg, text_color=self.master.col_frame_title_tx, corner_radius=6)
             self._title.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="we")
 
+            # label signal load
+            self._label_btn_load = customtkinter.CTkLabel(self, text="1)  Update current signal names")
+            self._label_btn_load.grid(row=1, column=0, padx=10, pady=(10, 5), sticky="nsw")
+
             # btn signal load
             self._btn_load = customtkinter.CTkButton(self, text="Update signal names", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self._btn_callback_load, width=200)
-            self._btn_load.grid(row=1, column=1, padx=10, pady=(10, 5), sticky="ns")
+            self._btn_load.grid(row=1, column=1, padx=10, pady=(10, 5), sticky="nse")
+
+            # label signal select
+            self._label_btn_select = customtkinter.CTkLabel(self, text="2)  Select signals to download")
+            self._label_btn_select.grid(row=2, column=0, padx=10, pady=5, sticky="nsw")
 
             # signal selection
             self._btn_select_signals = customtkinter.CTkButton(self, text="Select signals", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self._btn_callback_select_sig, width=200)
-            self._btn_select_signals.grid(row=2, column=1, padx=10, pady=5, sticky="ns")
+            self._btn_select_signals.grid(row=2, column=1, padx=10, pady=5, sticky="nse")
             self._btn_select_signals.configure(state="disabled")
+
+            # label time filter
+            self._label_btn_time_filter = customtkinter.CTkLabel(self, text="3)  Select time range of downloaded data")
+            self._label_btn_time_filter.grid(row=3, column=0, padx=10, pady=5, sticky="nsw")
 
             # btn select time filter
             self._btn_time_filter = customtkinter.CTkButton(self, text="Set time filter", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self._btn_callback_time_filter, width=200)
-            self._btn_time_filter.grid(row=3, column=1, padx=10, pady=5, sticky="ns")
+            self._btn_time_filter.grid(row=3, column=1, padx=10, pady=5, sticky="nse")
             self._btn_time_filter.configure(state="disabled")
 
             # textbox label
-            self._title = customtkinter.CTkLabel(self, text="Current selection for download:", fg_color="transparent")
-            self._title.grid(row=4, column=0, columnspan=2, padx=10, pady=(20, 2), sticky="we")
+            self._label_txtbox = customtkinter.CTkLabel(self, text="Current selection for download:", fg_color="transparent")
+            self._label_txtbox.grid(row=4, column=0, columnspan=2, padx=10, pady=(20, 2), sticky="we")
             
             # textbox
             self._textbox = customtkinter.CTkTextbox(self, activate_scrollbars=True, wrap="word", height=100)
@@ -612,6 +691,8 @@ class DownloadFrame(customtkinter.CTkFrame):
         self._signals.clear()
         # fetch signals from the database
         self.master.comm.send_command("FETCH-SIG")
+        # print current selection
+        self._print_current_selection()
         return
 
 # --------------------------------------------------------------------------------------------------------------------------------
@@ -635,13 +716,27 @@ class DownloadFrame(customtkinter.CTkFrame):
                 self._from_str = f"{from_t['date']['y']}-{from_t['date']['m']}-{from_t['date']['d']} {from_t['time']['h']}:{from_t['time']['m']}:{from_t['time']['s']}"
                 self._to_str = f"{to_t['date']['y']}-{to_t['date']['m']}-{to_t['date']['d']} {to_t['time']['h']}:{to_t['time']['m']}:{to_t['time']['s']}"
 
-                # print to table
+                # print current selection
                 self._print_current_selection()
         return
 
 # --------------------------------------------------------------------------------------------------------------------------------
 
+    def _selected_signals_update(self) -> None:
+        if isinstance(self.master.toplevel_window, TopWindowSignalSelect):
+            # get selected signals
+            self._selected_signals = self.master.toplevel_window.get_selected_signals()
+            self.master.kill_toplevel()
+
+            # print current selection
+            self._print_current_selection()
+        
+        return
+
+# --------------------------------------------------------------------------------------------------------------------------------
+
     def _btn_callback_select_sig(self) -> None:
+        self.master.spawn_working_thread(fc=self.master.open_toplevel_signal_select, args=(self._signals, self._selected_signals_update))
         return
 
 # --------------------------------------------------------------------------------------------------------------------------------
@@ -658,8 +753,14 @@ class DownloadFrame(customtkinter.CTkFrame):
         try:
             file_path = filedialog.asksaveasfile(defaultextension=".csv", filetypes=[("CSV files", "*.csv")])
 
+            signals_str = ""
+            for idx, sig in enumerate(self._selected_signals):
+                signals_str = signals_str + sig
+                if idx < len(self._selected_signals) - 1:
+                    signals_str = signals_str + ";"
+
             if file_path:
-                self.master.comm.send_command(f"DOWNL#{self._signal}#{self._from_str}#{self._to_str}#{file_path.name}")
+                self.master.comm.send_command(f"DOWNL#{signals_str}#{self._from_str}#{self._to_str}#{file_path.name}")
 
         except Exception as e:
             self.master.error_handle("ERROR", f"Unable to download data:\n{e}", terminate=True)
@@ -1605,13 +1706,23 @@ class App(customtkinter.CTk):
 
 # --------------------------------------------------------------------------------------------------------------------------------
 
-    def handle_admin_mode(self) -> None:
-        self._handle_admin_mode()
+    def open_toplevel_signal_select(self, signals: list, callback_ok: callable, callback_cancel: callable = None) -> None:
+        # check for window existance
+        if self.toplevel_window is None or not self.toplevel_window.winfo_exists():
+            # assign toplevel kill if cancel callback is not specified
+            if callback_cancel == None:
+                callback_cancel = self.kill_toplevel
+
+            # create toplevel window
+            self.toplevel_window = TopWindowSignalSelect(self, signals, callback_ok, callback_cancel)
+            # position the toplevel window relatively to the main window
+            self.toplevel_window.geometry("+%d+%d" %(self.winfo_x()+200, self.winfo_y()+200))
+
         return
 
 # --------------------------------------------------------------------------------------------------------------------------------
 
-    def _handle_admin_mode(self) -> None:
+    def handle_admin_mode(self) -> None:
         if isinstance(self.toplevel_window, TopWindowEntry):
             # get user typed password
             entered_pswd = self.toplevel_window.get_entry_val()
@@ -1769,7 +1880,7 @@ class App(customtkinter.CTk):
             self.conversion_frame.grid_forget()
 
         if name == "download":
-            self.download_frame.grid(row=0, column=1, padx=20, pady=10, sticky="nswe")
+            self.download_frame.grid(row=0, column=1, padx=20, pady=(20, 10), sticky="nswe")
         else:
             self.download_frame.grid_forget()
 
