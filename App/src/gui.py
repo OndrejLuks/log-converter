@@ -925,7 +925,7 @@ class ConversionFrame(customtkinter.CTkFrame):
             # create switches
             self._switches = []
             self._swch_aggregate = self._create_switch(1, 0, "Aggregate raw data", ("settings", "aggregate"), self._agg_seconds_grid)
-            self._swch_move = self._create_switch(2, 0, "Move done files", ("settings", "move_done_files"))
+            self._swch_move = self._create_switch(2, 0, "Move done files", ("settings", "move_done_files"), self._move_done_dest_grid)
             self._swch_write_info = self._create_switch(3, 0, "Write time info into MF4-info.csv", ("settings", "write_time_info"))
 
             if self.master.admin_mode:
@@ -935,8 +935,13 @@ class ConversionFrame(customtkinter.CTkFrame):
             self._entries = []
             self._entry_agg_frame = self._create_entry(5, 0, "Seconds to skip when value is consistent", ("settings", "agg_max_skip_seconds"))
 
+            # ask for done destination
+            self._done_dest_select = FolderSelectorFrame(self, "Select destination folder for done files", "Select destination", "Current destination")
+            self._done_dest_select.change_curr_dir(self.master.get_config_value("settings", "done_path"))
+
             # decide wether or not to display the agg seconds entry
             self._agg_seconds_grid()
+            self._move_done_dest_grid()
         
         except Exception as e:
             self.master.error_handle("ERROR", f"Unable to create GUI - process\n{e}", terminate=True)
@@ -960,6 +965,19 @@ class ConversionFrame(customtkinter.CTkFrame):
 
         if val == 0:
             self._entry_agg_frame[0].grid_forget()
+        
+        return
+
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def _move_done_dest_grid(self) -> None:
+        val = self._swch_move.get()
+
+        if val == 1:
+            self._done_dest_select.grid(row=6, column=0, columnspan=3, padx=0, pady=(20, 40), sticky="we")
+
+        if val == 0:
+            self._done_dest_select.grid_forget()
         
         return
 
@@ -1023,6 +1041,16 @@ class ConversionFrame(customtkinter.CTkFrame):
                 # save
                 if not self.master.update_local_config(entry[1][0], entry[1][1], val):
                     return False
+        
+        if self._swch_move.get() == 1:
+            done_dest_dir = self._done_dest_select.get_curr_dir()
+
+            if len(done_dest_dir) == 0:
+                self.master.error_handle("WARNING", "Destination for done files not selected!", False)
+                return False
+            
+            if not self.master.update_local_config("settings", "done_path", done_dest_dir):
+                return False
 
         return True
 
@@ -1761,14 +1789,14 @@ class App(customtkinter.CTk):
         #   - several methods to each objects
 
         if not (self.database_frame.save_locally() and self.conversion_frame.save_locally() and self.before_start_frame.save_locally()):
-            self.text_box.write("Failed to update local settings.")
+            self.text_box.write("Failed to update local settings.\n")
             return
 
         # 2nd: flush settings to the file
         #   - take local settings file and flush it
 
         if not self.flush_config_to_file():
-            self.text_box.write("Failed to write settings to the file.")
+            self.text_box.write("Failed to write settings to the file.\n")
             return
 
         # 3rd: redraw

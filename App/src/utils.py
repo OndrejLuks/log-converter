@@ -110,17 +110,19 @@ class Utils():
 
 # --------------------------------------------------------------------------------------------------------------------------------
 
-    def move_done_file(self, file: os.path, source_top_level) -> None:
+    def move_done_file(self, src_file: os.path, src_dir: os.path, dst_dir: os.path) -> None:
         """Moves given file from SourceMF4 folder to DoneMF4 folder"""
-        # get target file path
-        target_file = file.replace(source_top_level, "DoneMF4")
+
+        head, root_folder = os.path.split(src_dir)
+        target_file = os.path.join(dst_dir, root_folder, os.path.relpath(src_file, start=src_dir))
+        print(target_file)
         # get and create target directory
         target_dir = os.path.dirname(target_file)
         self.create_dir(target_dir)
 
         try:
             # move the file
-            shutil.move(file, target_file)
+            shutil.move(src_file, target_file)
 
         except Exception as e:
             self._comm.send_error("WARNING", f"Problem with file movement:\n{e}", "F")

@@ -325,7 +325,7 @@ class Conversion():
                 # MOVE DONE FILES if requested
                 if self._config["settings"]["move_done_files"] == "true":
                     self._comm.send_to_print("   - moving the file...")
-                    self._utils.move_done_file(file, self._config["settings"]["mf4_path"])
+                    self._utils.move_done_file(file, self._config["settings"]["mf4_path"], self._config["settings"]["done_path"])
 
                 num_of_done_mf4_files += 1
                 self._comm.send_command(f"PROG#{round((num_of_done_mf4_files / num_of_mf4_files), 2)}")
