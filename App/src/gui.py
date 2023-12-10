@@ -1407,7 +1407,7 @@ class NavigationFrame(customtkinter.CTkFrame):
         self.col_btn_tx = self.master.col_btn_tx
 
         # load media
-        self._logo = customtkinter.CTkImage(Image.open(os.path.join("src", "media", "logo.png")), size=(180, 135))
+        self._logo = customtkinter.CTkImage(Image.open(os.path.join("src", "media", "logo.png")), size=(226, 170))
         self._ic_before_start = customtkinter.CTkImage(light_image=Image.open(os.path.join("src", "media", "ic-st-l.png")),
                                                        dark_image=Image.open(os.path.join("src", "media", "ic-st-d.png")), size=(20, 20))
         self._ic_db = customtkinter.CTkImage(light_image=Image.open(os.path.join("src", "media", "ic-db-l.png")),
@@ -1421,7 +1421,7 @@ class NavigationFrame(customtkinter.CTkFrame):
         # self.label = customtkinter.CTkLabel(self, text="TITLE LOGO", fg_color="transparent")
 
         self.label = customtkinter.CTkLabel(self, text="", image=self._logo)
-        self.label.grid(row=0, column=0, padx=20, pady=20)
+        self.label.grid(row=0, column=0, padx=0, pady=0)
 
         # button Before start
         self.btn_before_start = customtkinter.CTkButton(self, corner_radius=0, height=40, border_spacing=10, text="Before start", fg_color="transparent", command=self._btn_callback_before_start, text_color=("gray10", "gray90"), anchor="w", image=self._ic_before_start)
@@ -1574,7 +1574,7 @@ class App(customtkinter.CTk):
             self.col_btn_tx = "white"
             self.col_btn_dis_tx = "#1d4566"
 
-            self.title("MF4 Signal converter")
+            self.title("BobLoader MF4")
             self.iconbitmap(os.path.join("src", "media", "icon-logo.ico"))
             self.minsize(900, 750)
             self.protocol("WM_DELETE_WINDOW", self._closing_handle)
