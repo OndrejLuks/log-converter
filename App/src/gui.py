@@ -403,7 +403,9 @@ class ManualFrame(customtkinter.CTkFrame):
         self._ii_lines = []
         ii_source_notes = [
             "    - Any changes will not be considered unless [Save] or [Save and Start] button is pressed.",
-            "    - Loaded text in entry elements represents the current configuration. No need to rewrite it."
+            "    - Loaded text in entry elements represents the current configuration. No need to rewrite it.",
+            "    - Some features are available only in ADMIN MODE. Look out for [admin] label in this guide.",
+            "    - [Start] button will start the MF4 conversion and upload process"
         ]
         self._h_ii = self._add_heading("IMPORTANT INFORMATION")
         for source_note in ii_source_notes:
@@ -412,9 +414,9 @@ class ManualFrame(customtkinter.CTkFrame):
         # Database
         self._db_lines = []
         db_source_notes = [
-            "    - Converted signals are autimatically loaded into a PostgreSQL database.",
-            "    - Connection is established based on provided configuration.",
-            "    - Schema will be created or appended according to the name."
+            "    - Converted signals are automatically loaded into a PostgreSQL database from where Grafana operates.",
+            "    - Connection is established based on provided configuration. [admin]",
+            "    - Schema will be created or appended according to the name you provide."
         ]
         self._h_db = self._add_heading("Database configuration")
         for source_note in db_source_notes:
@@ -428,17 +430,21 @@ class ManualFrame(customtkinter.CTkFrame):
             "        - Aggregation does not alter original MF4 source files.",
             "        - Aggregation does not alter data values.",
             "        - Aggregation will only remove duplicite entries of same value over time.",
+            "    - [Move done files] option",
+            "        - Moves processed MF4 files from root directory into the chosen folder.",
+            "    - [Write time info into MF4-info.csv] option",
+            "        - Extracts first and last time stamp of data record in each MF4 file that is being processed.",
+            "    - [Clean database upload] option",
+            "        - [admin]",
+            "        - Deletes given schema from the database with all its contents and creates a new one.",
             "    - [Seconds to skip when value is consistent] entry",
             "        - Visible only if [Aggregate raw data] is selected.",
             "        - Represents maximum amount of seconds of data to remove when aggregating.",
             "        - E. g. if set to 10 and data have duplicite values over more than 10 seconds,",
             "          aggregation will not remove every 10th sec record of those data",
-            "    - [Move done files] option",
-            "        - Moves processed MF4 files from root directory into DoneMF4 folder.",
-            "    - [Write time info into MF4-info.csv] option",
-            "        - Extracts first and last time stamp of data record in each MF4 file that is being processed.",
-            "    - [Clean database upload] option",
-            "        - Deletes given schema from the database with all its contents and creates a new one."
+            "    - [Select destination folder for done files] button",
+            "        - Visible only if [Move done files] is selected.",
+            "        - Sets destination where processed MF4 files will be moved"
         ]
         self._h_conv = self._add_heading("Conversion configuration")
         for source_note in conversion_source_notes:
@@ -448,8 +454,15 @@ class ManualFrame(customtkinter.CTkFrame):
         self._download_lines = []
         download_source_notes = [
             "    - Selected data are fetched right from the database.",
-            "    - Only 1 signal per-time is possible to download.",
-            "    - Only CSV format is supported."
+            "    - Multiple signals can be downloaded at once",
+            "    - Only CSV format is supported.",
+            "    - [Update signal names] button",
+            "        - updates internal record of signals stored in the database",
+            "    - [Select signals] button",
+            "        - lets you pick desired signals to download",
+            "    - [Set time filter] button",
+            "        - lets you pick time filter for selected signals",
+            "    - Both Signals and Time filter must be chosen in order to download"
         ]
         self._h_down = self._add_heading("Data download")
         for source_note in download_source_notes:

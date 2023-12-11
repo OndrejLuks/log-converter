@@ -19,3 +19,7 @@ HOW TO MAKE PYTHON SCRIPTS PACKAGED INTO .EXE
 			
 	- CREATING A BATCH FILE
 		- python build_setup.py build
+		
+		
+- ANOTHER LEVEL
+	- Inno Setup for installer creation
