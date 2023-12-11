@@ -218,7 +218,7 @@ class TopWindowDateTime(customtkinter.CTkToplevel):
             self.after(400, self.lift)
 
             # load image
-            self._image = customtkinter.CTkImage(Image.open(os.path.join("src", "media", "date_time_selector.png")), size=(500, 74))
+            self._image = customtkinter.CTkImage(Image.open(os.path.join("src", "media", "date_time_selector.png")), size=(480, 74))
 
             # Message
             self._msg = customtkinter.CTkLabel(self, text="Select desired dates and type times below", fg_color=self.master.col_frame_title_bg, text_color=self.master.col_frame_title_tx, corner_radius=6)

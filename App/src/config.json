@@ -1,8 +1,8 @@
 {
     "settings": {
-        "mf4_path": "C:/Users/mrdox/OneDrive-CVUT/OneDrive - \u010cesk\u00e9 vysok\u00e9 u\u010den\u00ed technick\u00e9 v Praze/FIT/BAP/log-converter/App/SourceMF4",
-        "dbc_path": "C:/Users/mrdox/OneDrive-CVUT/OneDrive - \u010cesk\u00e9 vysok\u00e9 u\u010den\u00ed technick\u00e9 v Praze/FIT/BAP/log-converter/App/DBCfiles",
-        "done_path": "C:/Users/mrdox/Desktop",
+        "mf4_path": "C:/Users/ondrejluks/Desktop/Repos/log-converter/App/SourceMF4",
+        "dbc_path": "C:/Users/ondrejluks/Desktop/Repos/log-converter/App/DBCfiles",
+        "done_path": "C:/Users/ondrejluks/Desktop",
         "aggregate": "true",
         "agg_max_skip_seconds": "3600",
         "move_done_files": "true",
@@ -16,7 +16,7 @@
         "port": "5432",
         "database": "TestDB",
         "user": "user_sandbox",
-        "password": "TestPswd",
+        "password": "Hovno123-",
         "schema_name": "mex_test"
     }
 }
