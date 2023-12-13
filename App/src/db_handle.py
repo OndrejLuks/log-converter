@@ -26,7 +26,11 @@ class DatabaseHandle:
             self._database = config["database"]["database"]
             self._user = config["database"]["user"]
             self._password = config["database"]["password"]
-            self._clean = config["settings"]["clean_upload"]
+
+            if config["settings"]["clean_upload"] == "true":
+                self._clean = True
+            else:
+                self._clean = False
 
         except Exception as e:
             self._comm.send_error("ERROR", f"Problem with creating db object:\n{e}", "T")
@@ -151,7 +155,11 @@ class DatabaseHandle:
             self._database = config["database"]["database"]
             self._user = config["database"]["user"]
             self._password = config["database"]["password"]
-            self._clean = config["settings"]["clean_upload"]
+            
+            if config["settings"]["clean_upload"] == "true":
+                self._clean = True
+            else:
+                self._clean = False
 
             self._conn_string = "postgresql://" + self._user + ":" + self._password + "@" + self._host + "/" + self._database
 
