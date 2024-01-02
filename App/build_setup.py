@@ -24,7 +24,7 @@ build_exe_options = {
     'includes': ["sqlalchemy.dialects.postgresql",
                  "canmatrix.formats.dbc"],
     # include files
-    'include_files': [('src\media', 'src\media'), ('src\config.json', 'src\config.json')],
+    'include_files': [('src\media', 'src\media'), ('src\config-clean.json', 'src\config.json')],
 }
 
 setup(

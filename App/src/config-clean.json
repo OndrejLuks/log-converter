@@ -1,0 +1,22 @@
+{
+    "settings": {
+        "mf4_path": "",
+        "dbc_path": "",
+        "done_path": "",
+        "aggregate": "true",
+        "agg_max_skip_seconds": "3600",
+        "move_done_files": "true",
+        "write_time_info": "true",
+        "admin_pswd": "BoDoBobldr",
+        "_comment": "clean_upload means data will not append, OLD SCHEMA WILL BE DELETED",
+        "clean_upload": "false"
+    },
+    "database": {
+        "host": "127.0.0.1",
+        "port": "5432",
+        "database": "TestDB",
+        "user": "user_sandbox",
+        "password": "Hovno123-",
+        "schema_name": "new_schema"
+    }
+}
