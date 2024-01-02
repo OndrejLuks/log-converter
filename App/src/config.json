@@ -9,7 +9,7 @@
         "write_time_info": "true",
         "admin_pswd": "BoDoBobldr",
         "_comment": "clean_upload means data will not append, OLD SCHEMA WILL BE DELETED",
-        "clean_upload": "true"
+        "clean_upload": "false"
     },
     "database": {
         "host": "127.0.0.1",

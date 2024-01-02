@@ -433,9 +433,12 @@ class ManualFrame(customtkinter.CTkFrame):
             "    - [Move done files] option",
             "        - Moves processed MF4 files from root directory into the chosen folder.",
             "    - [Write time info into MF4-info.csv] option",
+            "        - [admin]",
+            "        - Default as true.",
             "        - Extracts first and last time stamp of data record in each MF4 file that is being processed.",
             "    - [Clean database upload] option",
             "        - [admin]",
+            "        - Default as false.",
             "        - Deletes given schema from the database with all its contents and creates a new one.",
             "    - [Seconds to skip when value is consistent] entry",
             "        - Visible only if [Aggregate raw data] is selected.",
@@ -939,9 +942,9 @@ class ConversionFrame(customtkinter.CTkFrame):
             self._switches = []
             self._swch_aggregate = self._create_switch(1, 0, "Aggregate raw data", ("settings", "aggregate"), self._agg_seconds_grid)
             self._swch_move = self._create_switch(2, 0, "Move done files", ("settings", "move_done_files"), self._move_done_dest_grid)
-            self._swch_write_info = self._create_switch(3, 0, "Write time info into MF4-info.csv", ("settings", "write_time_info"))
-
+            
             if self.master.admin_mode:
+                self._swch_write_info = self._create_switch(3, 0, "Write time info into MF4-info.csv", ("settings", "write_time_info"))
                 self._swch_clean_up = self._create_switch(4, 0, "Clean database upload", ("settings", "clean_upload"))
 
             # create entries
