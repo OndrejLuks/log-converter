@@ -339,15 +339,19 @@ class FolderSelectorFrame(customtkinter.CTkFrame):
         self.grid_columnconfigure(1, weight=5)
         self.grid_columnconfigure(2, weight=5)
 
+        # Selection label
         self._select_label = customtkinter.CTkLabel(self, text=(str_label + ":"), fg_color="transparent")
         self._select_label.grid(row=0, column=0, columnspan=2, padx=10, pady=5, sticky="w")
 
+        # Selection button
         self._btn = customtkinter.CTkButton(self, text=str_btn, text_color=self.master.master.col_btn_tx, text_color_disabled=self.master.master.col_btn_dis_tx, command=self._btn_callback)
         self._btn.grid(row=0, column=2, padx=10, pady=10, sticky="we")
 
+        # Current folder label
         self._current_label = customtkinter.CTkLabel(self, text=(str_current + ":"), fg_color="transparent")
         self._current_label.grid(row=1, column=0, padx=10, pady=10, sticky="w")
 
+        # Current folder selected 
         self._current = customtkinter.CTkEntry(self, placeholder_text="Current directory here")
         self._current.grid(row=1, column=1, columnspan=2, padx=10, pady=10, sticky="we")
 
@@ -558,24 +562,24 @@ class TimeSelectorFrame(customtkinter.CTkFrame):
             self._entry_width = 30
             self._entries = []
 
-            # hh
+            # hours
             hh = customtkinter.CTkEntry(self, placeholder_text="hh", width=self._entry_width)
             hh.grid(row=0, column=0, padx=0, pady=0, sticky="nswe")
-            self._entries.append((hh, "hours"))
+            self._entries.append(hh)
             # :
             self._col1 = customtkinter.CTkLabel(self, text=":", fg_color="transparent")
             self._col1.grid(row=0, column=1, padx=5, pady=0, sticky="nswe")
-            # mm
+            # minutes
             mm = customtkinter.CTkEntry(self, placeholder_text="mm", width=self._entry_width)
             mm.grid(row=0, column=2, padx=0, pady=0, sticky="nswe")
-            self._entries.append((mm, "minutes"))
+            self._entries.append(mm)
             # :
             self._col2 = customtkinter.CTkLabel(self, text=":", fg_color="transparent")
             self._col2.grid(row=0, column=3, padx=5, pady=0, sticky="nswe")
-            # ss
+            # seconds
             ss = customtkinter.CTkEntry(self, placeholder_text="ss", width=self._entry_width)
             ss.grid(row=0, column=4, padx=0, pady=0, sticky="nswe")
-            self._entries.append((ss, "seconds"))
+            self._entries.append(ss)
 
         except Exception as e:
             self.master.master.master.error_handle("ERROR", f"Unable to create GUI - time entry:\n{e}", terminate=True)
@@ -586,7 +590,7 @@ class TimeSelectorFrame(customtkinter.CTkFrame):
         output = []
 
         for entry in self._entries:
-            val = str(entry[0].get())
+            val = str(entry.get())
             if not len(val) == 0:
                 output.append(val)
             else:
@@ -627,6 +631,7 @@ class DateTimePickerFrame(customtkinter.CTkFrame):
         try:
             time_val = self._time_entry.get_values()
             date_val = self._calendar.get_date().split("-")
+            # format output into a dictionary
             output = {"date" : {"y" : date_val[0], "m" : date_val[1], "d" : date_val[2]},
                       "time" : {"h" : time_val[0], "m" : time_val[1], "s" : time_val[2]}}
             
@@ -671,7 +676,7 @@ class DownloadFrame(customtkinter.CTkFrame):
             self._label_btn_select = customtkinter.CTkLabel(self, text="2)  Select signals to download")
             self._label_btn_select.grid(row=2, column=0, padx=10, pady=5, sticky="nsw")
 
-            # signal selection
+            # btn signal selection
             self._btn_select_signals = customtkinter.CTkButton(self, text="Select signals", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self._btn_callback_select_sig, width=200)
             self._btn_select_signals.grid(row=2, column=1, padx=10, pady=5, sticky="nse")
             self._btn_select_signals.configure(state="disabled")
@@ -707,13 +712,14 @@ class DownloadFrame(customtkinter.CTkFrame):
         self._signals.clear()
         # fetch signals from the database
         self.master.comm.send_command("FETCH-SIG")
-        # print current selection
+        # print current selection (will be blank)
         self._print_current_selection()
         return
 
 # --------------------------------------------------------------------------------------------------------------------------------
 
     def _btn_callback_time_filter(self) -> None:
+        # open a pop-up with datetime selection
         self.master.open_toplevel_date_time(self._time_filter_update)
         return
 
@@ -721,6 +727,7 @@ class DownloadFrame(customtkinter.CTkFrame):
 
     def _time_filter_update(self) -> None:
         if isinstance(self.master.toplevel_window, TopWindowDateTime):
+            # fetch datetime values and kill the pop-up
             time_values = self.master.toplevel_window.get_values()
             self.master.kill_toplevel()
 
@@ -752,6 +759,7 @@ class DownloadFrame(customtkinter.CTkFrame):
 # --------------------------------------------------------------------------------------------------------------------------------
 
     def _btn_callback_select_sig(self) -> None:
+        # open a new thread with signal selection
         self.master.spawn_working_thread(fc=self.master.open_toplevel_signal_select, args=(self._signals, self._selected_signals_update))
         return
 
@@ -767,15 +775,19 @@ class DownloadFrame(customtkinter.CTkFrame):
             return
 
         try:
+            # ask for destination to save the file
             file_path = filedialog.asksaveasfile(defaultextension=".csv", filetypes=[("CSV files", "*.csv")])
 
-            signals_str = ""
-            for idx, sig in enumerate(self._selected_signals):
-                signals_str = signals_str + sig
-                if idx < len(self._selected_signals) - 1:
-                    signals_str = signals_str + ";"
-
+            # file path was provided
             if file_path:
+                # merge signals into semicolumn-separated string
+                signals_str = ""
+                for idx, sig in enumerate(self._selected_signals):
+                    signals_str = signals_str + sig
+                    if idx < len(self._selected_signals) - 1:
+                        signals_str = signals_str + ";"
+
+                # send string command
                 self.master.comm.send_command(f"DOWNL#{signals_str}#{self._from_str}#{self._to_str}#{file_path.name}")
 
         except Exception as e:
@@ -857,7 +869,7 @@ class DatabaseFrame(customtkinter.CTkFrame):
             self._title = customtkinter.CTkLabel(self, text="Database configuration", fg_color=self.master.col_frame_title_bg, text_color=self.master.col_frame_title_tx, corner_radius=6)
             self._title.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="we")
             
-            # define entry names
+            # define entry names and their permissions
             self.entry_names = [("Host", "host", "admin"),
                         ("Port", "port", "admin"),
                         ("Database", "database", "admin"),
@@ -873,7 +885,7 @@ class DatabaseFrame(customtkinter.CTkFrame):
                 self._entries.append((entry, name[1]))
 
                 if name[2] == "admin" and not self.master.admin_mode:
-                    # don't display created entry
+                    # don't display created entry if it requires admin permission
                     continue
 
                 label.grid(row=i+1, column=0, padx=15, pady=10, sticky="w")
@@ -894,7 +906,7 @@ class DatabaseFrame(customtkinter.CTkFrame):
 # --------------------------------------------------------------------------------------------------------------------------------
     
     def save_locally(self) -> bool:
-        """Saves database settings changes into the config.json file"""
+        """Saves database settings changes into the config file in memory"""
 
         for entry in self._entries:
             val = str(entry[0].get())
@@ -938,16 +950,17 @@ class ConversionFrame(customtkinter.CTkFrame):
             self._title = customtkinter.CTkLabel(self, text="Conversion configuration", fg_color=self.master.col_frame_title_bg, text_color=self.master.col_frame_title_tx, corner_radius=6)
             self._title.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="we")
 
-            # create switches
+            # create and show switches
             self._switches = []
             self._swch_aggregate = self._create_switch(1, 0, "Aggregate raw data", ("settings", "aggregate"), self._agg_seconds_grid)
             self._swch_move = self._create_switch(2, 0, "Move done files", ("settings", "move_done_files"), self._move_done_dest_grid)
             
             if self.master.admin_mode:
+                # show these only if admin mode is on
                 self._swch_write_info = self._create_switch(3, 0, "Write time info into MF4-info.csv", ("settings", "write_time_info"))
                 self._swch_clean_up = self._create_switch(4, 0, "Clean database upload", ("settings", "clean_upload"))
 
-            # create entries
+            # create and show entries
             self._entries = []
             self._entry_agg_frame = self._create_entry(5, 0, "Seconds to skip when value is consistent", ("settings", "agg_max_skip_seconds"))
 
@@ -955,7 +968,7 @@ class ConversionFrame(customtkinter.CTkFrame):
             self._done_dest_select = FolderSelectorFrame(self, "Select destination folder for done files", "Select destination", "Current destination")
             self._done_dest_select.change_curr_dir(self.master.get_config_value("settings", "done_path"))
 
-            # decide wether or not to display the agg seconds entry
+            # display additional frames according to current settings
             self._agg_seconds_grid()
             self._move_done_dest_grid()
         
@@ -974,6 +987,7 @@ class ConversionFrame(customtkinter.CTkFrame):
 # --------------------------------------------------------------------------------------------------------------------------------
 
     def _agg_seconds_grid(self) -> None:
+        # aggregation seconds skip is displayed only if aggregation switch is on
         val = self._swch_aggregate.get()
 
         if val == 1:
@@ -987,6 +1001,7 @@ class ConversionFrame(customtkinter.CTkFrame):
 # --------------------------------------------------------------------------------------------------------------------------------
 
     def _move_done_dest_grid(self) -> None:
+        # move to destinaton selection is displayed only if move switch is on
         val = self._swch_move.get()
 
         if val == 1:
@@ -1023,6 +1038,7 @@ class ConversionFrame(customtkinter.CTkFrame):
         new_entry = customtkinter.CTkEntry(entry_frame, placeholder_text=self.master.get_config_value(config[0], config[1]))
         new_entry.grid(row=0, column=1, padx=10, pady=10, sticky="we")
 
+        # saving entry in a tuple together with config (also a tuple)
         self._entries.append((new_entry, config))
 
         return (entry_frame, (r_id, col_id))
@@ -1030,19 +1046,18 @@ class ConversionFrame(customtkinter.CTkFrame):
 # --------------------------------------------------------------------------------------------------------------------------------
 
     def save_locally(self) -> bool:
-        """Saves process settings changes into the config.json file"""
-        # update config
+        """Saves process settings changes into the config file in memory"""
+        # update local config - current status of switches 
         for switch in self._switches:
             val = int(switch[0].get())
             if val == 1:
-                # save
                 if not self.master.update_local_config(switch[1][0], switch[1][1], "true"):
                     return False
             if val == 0:
-                # save
                 if not self.master.update_local_config(switch[1][0], switch[1][1], "false"):
                     return False
 
+        # update local config - current status of entries
         for entry in self._entries:
             val = str(entry[0].get())
             if not len(val) == 0:
@@ -1058,6 +1073,7 @@ class ConversionFrame(customtkinter.CTkFrame):
                 if not self.master.update_local_config(entry[1][0], entry[1][1], val):
                     return False
         
+        # save move to destination if move switch is on
         if self._swch_move.get() == 1:
             done_dest_dir = self._done_dest_select.get_curr_dir()
 
@@ -1359,11 +1375,11 @@ class NavigationFooterFrame(customtkinter.CTkFrame):
         self.btn_admin = customtkinter.CTkButton(self, corner_radius=0, height=40, border_spacing=10, text="Admin mode", fg_color="transparent", command=self.btn_callback_admin, text_color=("gray10", "gray90"), anchor="w", image=self._ic_admin)
         self.btn_admin.grid(row=1, column=0, pady=(0, 5), columnspan=2, sticky="we")
 
-        # title
+        # appearance mode title
         self.label = customtkinter.CTkLabel(self, text="Theme", fg_color="transparent")
         self.label.grid(row=2, column=0, padx=(15, 10), pady=(5, 20), sticky="w")
 
-        # appearance mode
+        # appearance mode selection
         self.appearance = customtkinter.CTkOptionMenu(self, values=["Light", "Dark", "System"], command=self.change_appearance_mode)
         self.appearance.set("System")
         self.appearance.grid(row=2, column=1, padx=(0, 20), pady=(5, 20), sticky="w")
@@ -1433,9 +1449,7 @@ class NavigationFrame(customtkinter.CTkFrame):
         self._ic_download = customtkinter.CTkImage(light_image=Image.open(os.path.join("src", "media", "ic-dwn-l.png")),
                                                    dark_image=Image.open(os.path.join("src", "media", "ic-dwn-d.png")), size=(20, 20))
 
-        # title
-        # self.label = customtkinter.CTkLabel(self, text="TITLE LOGO", fg_color="transparent")
-
+        # header logo
         self.label = customtkinter.CTkLabel(self, text="", image=self._logo)
         self.label.grid(row=0, column=0, padx=0, pady=0)
 
@@ -1472,6 +1486,7 @@ class NavigationFrame(customtkinter.CTkFrame):
 # --------------------------------------------------------------------------------------------------------------------------------
     
     def set_default(self) -> None:
+        # default frame is set to be te first one - Before Start
         self._btn_callback_before_start()
         return
 
@@ -1479,7 +1494,9 @@ class NavigationFrame(customtkinter.CTkFrame):
     
     def _btn_callback_before_start(self) -> None:
         self._deselect_btns()
+        # visually select before start button
         self.btn_before_start.configure(fg_color=("gray75", "gray25"))
+        # load before start frame
         self.master.load_frame("before-start")
         return
 
@@ -1487,7 +1504,9 @@ class NavigationFrame(customtkinter.CTkFrame):
     
     def _btn_callback_db_config(self) -> None:
         self._deselect_btns()
+        # visually select database config button
         self.btn_db_config.configure(fg_color=("gray75", "gray25"))
+        # load database config frame
         self.master.load_frame("db-config")
         return
 
@@ -1495,7 +1514,9 @@ class NavigationFrame(customtkinter.CTkFrame):
     
     def _btn_callback_conv_config(self) -> None:
         self._deselect_btns()
+        # visually select conversion config button
         self.btn_conv_config.configure(fg_color=("gray75", "gray25"))
+        # load conversion config frame
         self.master.load_frame("conv-config")
         return
 
@@ -1503,7 +1524,9 @@ class NavigationFrame(customtkinter.CTkFrame):
     
     def _btn_callback_download(self) -> None:
         self._deselect_btns()
+        # visually select download button
         self.btn_download.configure(fg_color=("gray75", "gray25"))
+        # load download frame
         self.master.load_frame("download")
         return
 
@@ -1511,19 +1534,23 @@ class NavigationFrame(customtkinter.CTkFrame):
     
     def _btn_callback_manual(self) -> None:
         self._deselect_btns()
+        # visually select manual button
         self.footer.select_manual()
+        # load manual frame
         self.master.load_frame("manual")
         return
     
 # --------------------------------------------------------------------------------------------------------------------------------
 
     def _btn_callback_admin(self) -> None:
+        # prompt for password and pass admin handle function
         self.master.open_toplevel_entry("Enter the password", "Enter the admin password below:", self.master.handle_admin_mode)
         return
 
 # --------------------------------------------------------------------------------------------------------------------------------
 
     def disable_admin(self) -> None:
+        # disables admin mode button
         self.footer.disable_admin()
         return
 
@@ -1610,6 +1637,7 @@ class App(customtkinter.CTk):
 # --------------------------------------------------------------------------------------------------------------------------------
 
     def spawn_working_thread(self, fc: callable, args: set=()) -> None:
+        # spawns a new thread with assigned function
         new_thr = threading.Thread(target=fc, args=args)
         new_thr.start()
         self.threads.append(new_thr)
@@ -1780,14 +1808,14 @@ class App(customtkinter.CTk):
                 self.title(f"{self.title()} - ADMIN MODE")
                 self.navigation.disable_admin()
 
-                # reset database frame and conversion frame
+                # reset database frame and conversion frame, so that values are updated
                 self.database_frame = DatabaseFrame(self)
                 self.conversion_frame = ConversionFrame(self)
                 # change current view to startup screen
-                self.navigation._btn_callback_before_start()
+                self.navigation.set_default()
 
             else:
-                self.text_box.write("Incorrect password.\n")
+                self.text_box.write("\n!!! Incorrect password.\n")
         
         self.kill_toplevel()
         return
@@ -1825,7 +1853,7 @@ class App(customtkinter.CTk):
 
     def update_local_config(self, domain: str, field: str, content: str) -> bool:
         
-        # Update local will send particular parametres to backend and update local backend config
+        # Update local sends particular parametres to backend and updates local backend config
         
         try:
             self.comm.send_command(f"U-CONF#{domain}#{field}#{content}")
@@ -1840,7 +1868,7 @@ class App(customtkinter.CTk):
 
     def flush_config_to_file(self) -> bool:
 
-        # write config to file will send command to backend to dump config into file
+        # write config to file sends command to backend to dump config into file
 
         try:
             self.comm.send_command("FLUSH-CONF")
@@ -1857,11 +1885,14 @@ class App(customtkinter.CTk):
         value = ""
 
         try:
+            # fetching config values from config file stored in backend
             self.comm.send_command(f"FETCH-CONF#{domain}#{field}")
 
-            # wait for a signal that the new config info is really fetched
+            # wait for a flag that the new value is really fetched
             self.thr_event.wait(timeout=3)
             self.thr_event.clear()
+
+            # backend function writes fetched value into self.corr_conf_val
 
             value = self.curr_conf_val
             self.curr_conf_val = None
