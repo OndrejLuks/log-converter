@@ -10,7 +10,7 @@ executables = (
         Executable(
             "MF4toGrafana_v3.py",
             base=base,
-            uac_admin=True,
+            uac_admin=False,
             icon="src\media\icon-logo.ico",
             target_name="BobLoader MF4"
         )

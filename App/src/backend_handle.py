@@ -24,7 +24,6 @@ class BackendHandle():
         self._comm = PipeCommunication(connection, self._stop_event)
         self._utils = Utils(self._comm)
         
-
         self._config = self._utils.open_config("src/config.json")
         if self._config == None:
             self._fault = True
@@ -40,6 +39,7 @@ class BackendHandle():
         if not self._fault:
             self._comm.send_command("INIT")
         
+        # read commands comming from pipe 
         while True:
             try:
                 event = self._comm.receive()
@@ -49,33 +49,40 @@ class BackendHandle():
 
                 match messages[0]:
                     case "RUN-PROP":
+                        # proposition to run the conversion
                         self._conv.check_db_override()
 
                     case "RUN-ACK":
+                        # acknowledge of conversion run, start the process handle
                         thr_proc = threading.Thread(target=self._conv.process_handle)
                         thr_proc.start()
                         self._threads.append(thr_proc)
 
                     case "U-CONF":
+                        # update local (in memory) config value
                         if len(messages) == 4:
                             self._update_config_value(messages[1], messages[2], messages[3])
                         else:
                             self._comm.send_error("WARNING", "Blank config update requested!", False)
 
                     case "FETCH-CONF":
+                        # retrieve local (in memory) config value
                         if len(messages) == 3:
                             self._fetch_conf_value(messages[1], messages[2])
                         else:
                             self._comm.send_error("WARNING", "Blank config fetch requested!", False)
 
                     case "FLUSH-CONF":
+                        # write local (in memory) config into the file
                         self._utils.flush_config("src/config.json", self._config)
                         self._update_configs()
 
                     case "FETCH-SIG":
+                        # fetch all signal names from the db
                         self._fetch_signals()
 
                     case "DOWNL":
+                        # download signals from db
                         if len(messages) == 5:
                             self._download_signal(sigs=messages[1], from_str=messages[2], to_str=messages[3], file_name=messages[4])
                         else:
@@ -110,6 +117,7 @@ class BackendHandle():
 # --------------------------------------------------------------------------------------------------------------------------------
 
     def _update_configs(self) -> None:
+        # update configs held in different objects
         self._config = self._utils.open_config("src/config.json")
         self._db.update_config(self._config)
         self._conv.update_config(self._config)
@@ -121,6 +129,7 @@ class BackendHandle():
 
     def _update_config_value(self, domain: str, field: str, content: str) -> None:
         try:
+            # update local (in memory) config value
             self._config[domain][field] = str(content)
 
         except Exception as e:
@@ -165,13 +174,16 @@ class BackendHandle():
 
     def _download_signal(self, sigs: str, from_str: str, to_str: str, file_name: str) -> None:
 
+        # check if time stamps are valid
         if not (self._utils.time_valid(from_str) and self._utils.time_valid(to_str)):
             self._comm.send_error("WARNING", "Entered time values are not real.", "F")
             return
         
+        # check if FROM time stamp comes before TO time stamp
         if not self._utils.time_date_follow_check(from_str, to_str):
             self._comm.send_error("WARNING", "FROM time is set after TO time.", "F")
             return
 
+        # begin signal download
         self._threads.append(self._utils.spawn_working_thread(fc=self._db.save_data, args=(sigs, from_str, to_str, file_name)))
         return
