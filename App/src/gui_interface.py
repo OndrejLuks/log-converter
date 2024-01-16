@@ -79,10 +79,12 @@ class AppInterface():
 
             match messages[0]:
                 case "INIT":
+                    # start initializaton process of the GUI
                     init_thr = threading.Thread(target=self.app.init)
                     init_thr.start()
 
                 case "FINISH":
+                    # conversion proces finished
                     self.enable_buttons()
                     self.hide_progress_bar()
                 

@@ -36,7 +36,7 @@ class DatabaseHandle:
             self._comm.send_error("ERROR", f"Problem with creating db object:\n{e}", "T")
             return
 
-        self._conn_string = "postgresql://" + self._user + ":" + self._password + "@" + self._host + "/" + self._database
+        self._conn_string = "postgresql://" + self._user + ":" + self._password + "@" + self._host + ":" + self._port + "/" + self._database
         
 # --------------------------------------------------------------------------------------------------------------------------------
 
@@ -187,19 +187,26 @@ class DatabaseHandle:
         self._comm.send_to_print("Downloading data ...")
         self.connect()
 
+        # get tabels to save
         tables = tables_str.split(";")
+        # initialize output dataframe
         combined_data_frame = pd.DataFrame(columns=["time_stamp"])
 
         try:
             for tbl in tables:
+                # fetch each table from the database
                 qry = f"SELECT * FROM {self._schema_name}.\"{tbl}\" WHERE time_stamp >= '{from_time}' AND time_stamp <= '{to_time}'"
 
                 result = self.querry(qry, True)
+                # convert query result into a dataframe
                 data_frame = pd.DataFrame(result)
+
                 if not data_frame.empty:
+                    # combine current signal dataframe with other downloading signals
                     combined_data_frame = combined_data_frame.merge(data_frame, on="time_stamp", how="outer")
 
             self.finish()
+            # sort and save output dataframe
             combined_data_frame.sort_values(by="time_stamp", inplace=True)
             combined_data_frame.to_csv(file_path, index=False)
 
