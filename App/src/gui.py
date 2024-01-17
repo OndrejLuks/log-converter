@@ -943,11 +943,12 @@ class ConversionFrame(customtkinter.CTkFrame):
 
         try:
             self.grid_columnconfigure(0, weight=1)
-            self.grid_columnconfigure(1, weight=3)
+            self.grid_columnconfigure(1, weight=1)
+            self.grid_rowconfigure(5, weight=1)
             self.configure(fg_color="transparent")
 
             # Frame title
-            self._title = customtkinter.CTkLabel(self, text="Conversion configuration", fg_color=self.master.col_frame_title_bg, text_color=self.master.col_frame_title_tx, corner_radius=6)
+            self._title = customtkinter.CTkLabel(self, text="Conversion & Upload", fg_color=self.master.col_frame_title_bg, text_color=self.master.col_frame_title_tx, corner_radius=6)
             self._title.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="we")
 
             # create and show switches
@@ -957,12 +958,12 @@ class ConversionFrame(customtkinter.CTkFrame):
             
             if self.master.admin_mode:
                 # show these only if admin mode is on
-                self._swch_write_info = self._create_switch(3, 0, "Write time info into MF4-info.csv", ("settings", "write_time_info"))
-                self._swch_clean_up = self._create_switch(4, 0, "Clean database upload", ("settings", "clean_upload"))
+                self._swch_write_info = self._create_switch(1, 1, "Write time info into MF4-info.csv", ("settings", "write_time_info"))
+                self._swch_clean_up = self._create_switch(2, 1, "Clean database upload", ("settings", "clean_upload"))
 
             # create and show entries
             self._entries = []
-            self._entry_agg_frame = self._create_entry(5, 0, "Seconds to skip when value is consistent", ("settings", "agg_max_skip_seconds"))
+            self._entry_agg_frame = self._create_entry(3, 0, "Seconds to skip when value is consistent", ("settings", "agg_max_skip_seconds"))
 
             # ask for done destination
             self._done_dest_select = FolderSelectorFrame(self, "Select destination folder for done files", "Select destination", "Current destination")
@@ -971,9 +972,31 @@ class ConversionFrame(customtkinter.CTkFrame):
             # display additional frames according to current settings
             self._agg_seconds_grid()
             self._move_done_dest_grid()
+
+            # convert button
+            self._btn_start_conv = customtkinter.CTkButton(self, text="Start conversion & upload", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self._btn_callback_start, width=200)
+            self._btn_start_conv.grid(row=5, column=0, columnspan=2, padx=10, pady=(10, 0), sticky="s")
         
         except Exception as e:
             self.master.error_handle("ERROR", f"Unable to create GUI - process\n{e}", terminate=True)
+
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def _btn_callback_start(self) -> None:
+        self.master.comm.send_command("RUN-PROP")
+        return
+
+# --------------------------------------------------------------------------------------------------------------------------------
+    
+    def disable_start_btn(self) -> None:
+        self._btn_start_conv.configure(state="disabled")
+        return
+
+# --------------------------------------------------------------------------------------------------------------------------------
+    
+    def enable_start_btn(self) -> None:
+        self._btn_start_conv.configure(state="normal")
+        return
 
 # --------------------------------------------------------------------------------------------------------------------------------
 
@@ -1005,7 +1028,7 @@ class ConversionFrame(customtkinter.CTkFrame):
         val = self._swch_move.get()
 
         if val == 1:
-            self._done_dest_select.grid(row=6, column=0, columnspan=3, padx=0, pady=(20, 40), sticky="we")
+            self._done_dest_select.grid(row=4, column=0, columnspan=2, padx=0, pady=(20, 40), sticky="we")
 
         if val == 0:
             self._done_dest_select.grid_forget()
@@ -1016,7 +1039,7 @@ class ConversionFrame(customtkinter.CTkFrame):
 
     def _create_switch(self, r_id: int, col_id: int, label: str, config: tuple, callback: callable = None) -> customtkinter.CTkSwitch:
         new_switch = customtkinter.CTkSwitch(self, text=label, command=callback)
-        new_switch.grid(row=r_id, column=col_id, columnspan=2, padx=10, pady=10, sticky="w")
+        new_switch.grid(row=r_id, column=col_id, padx=10, pady=10, sticky="w")
 
         # saving switch in a tuple together with config (also a tuple)
         self._switches.append((new_switch, config))
@@ -1272,19 +1295,11 @@ class ButtonsFrame(customtkinter.CTkFrame):
             
             # define Discard changes button
             self._btn_discard = customtkinter.CTkButton(self, text="Discard changes", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self._btn_callback_discard)
-            self._btn_discard.grid(row=0, column=0, padx=5, pady=5, sticky="nswe")
-
-            # define Start button
-            self._btn_start = customtkinter.CTkButton(self, text="Start", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self._btn_callback_start)
-            self._btn_start.grid(row=0, column=1, padx=5, pady=5, sticky="nswe")
+            self._btn_discard.grid(row=0, column=1, padx=5, pady=5, sticky="ns")
 
             # define Save button
-            self._btn_save = customtkinter.CTkButton(self, text="Save", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self._btn_callback_save)
-            self._btn_save.grid(row=0, column=2, padx=5, pady=5, sticky="nswe")
-
-            # define Save and Start button
-            self._btn_save_start = customtkinter.CTkButton(self, text="Save and Start", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self._btn_callback_save_start)
-            self._btn_save_start.grid(row=0, column=3, padx=5, pady=5, sticky="nswe")
+            self._btn_save = customtkinter.CTkButton(self, text="Save changes", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self._btn_callback_save)
+            self._btn_save.grid(row=0, column=2, padx=5, pady=5, sticky="ns")
 
         except Exception as e:
             self.master.error_handle("ERROR", f"Unable to create GUI - buttons:\n{e}", terminate=True)
@@ -1301,33 +1316,17 @@ class ButtonsFrame(customtkinter.CTkFrame):
 
 # --------------------------------------------------------------------------------------------------------------------------------
 
-    def _btn_callback_start(self) -> None:
-        """Callback function for the start button."""
-        self.master.comm.send_command("RUN-PROP")
-        return
-
-# --------------------------------------------------------------------------------------------------------------------------------
-
     def _btn_callback_save(self) -> None:
         self.master.save()
         return
 
 # --------------------------------------------------------------------------------------------------------------------------------
 
-    def _btn_callback_save_start(self) -> None:
-        """Callback function for the Save and Start button. Defined via AppInterface."""
-        self.master.save()
-        self.master.comm.send_command("RUN-PROP")
-        return
-
-# --------------------------------------------------------------------------------------------------------------------------------
-
-    def disable_buttons(self) -> None:
+    def disable_bottom_buttons(self) -> None:
         """Makes several buttons unclickable"""
         try:
             self._btn_discard.configure(state="disabled")
-            self._btn_start.configure(state="disabled")
-            self._btn_save_start.configure(state="disabled")
+            self._btn_save.configure(state="disabled")
 
         except Exception:
             self.master.error_handle("WARNING", "Unable to disable buttos", terminate=False)
@@ -1336,12 +1335,11 @@ class ButtonsFrame(customtkinter.CTkFrame):
 
 # --------------------------------------------------------------------------------------------------------------------------------
 
-    def enable_buttons(self) -> None:
+    def enable_bottom_buttons(self) -> None:
         """Restores buttons to be clickable again"""
         try:
             self._btn_discard.configure(state="normal")
-            self._btn_start.configure(state="normal")
-            self._btn_save_start.configure(state="normal")
+            self._btn_save.configure(state="normal")
 
         except Exception:
             self.master.error_handle("WARNING", "Unable to enable buttos", terminate=False)
@@ -1420,6 +1418,24 @@ class NavigationFooterFrame(customtkinter.CTkFrame):
     def disable_admin(self) -> None:
         self.btn_admin.configure(state="disabled")
         return
+    
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def enable_admin(self) -> None:
+        self.btn_admin.configure(state="normal")
+        return
+    
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def disable_manual(self) -> None:
+        self.btn_manual.configure(state="disabled")
+        return
+    
+# --------------------------------------------------------------------------------------------------------------------------------
+
+    def enable_manual(self) -> None:
+        self.btn_manual.configure(state="normal")
+        return
 
 
 # ================================================================================================================================
@@ -1464,7 +1480,7 @@ class NavigationFrame(customtkinter.CTkFrame):
         self.btns.append(self.btn_db_config)
 
         # button Conversion config
-        self.btn_conv_config = customtkinter.CTkButton(self, corner_radius=0, height=40, border_spacing=10, text="Conversion config", fg_color="transparent", command=self._btn_callback_conv_config, text_color=("gray10", "gray90"), anchor="w", image=self._ic_conv)
+        self.btn_conv_config = customtkinter.CTkButton(self, corner_radius=0, height=40, border_spacing=10, text="Conversion & Upload", fg_color="transparent", command=self._btn_callback_conv_config, text_color=("gray10", "gray90"), anchor="w", image=self._ic_conv)
         self.btn_conv_config.grid(row=3, column=0, sticky="we")
         self.btns.append(self.btn_conv_config)
 
@@ -1562,7 +1578,32 @@ class NavigationFrame(customtkinter.CTkFrame):
             btn.configure(fg_color="transparent")
 
         return
+    
+# --------------------------------------------------------------------------------------------------------------------------------
+    
+    def disable_btns(self) -> None:
+        self.btn_before_start.configure(state="disabled")
+        self.btn_db_config.configure(state="disabled")
+        self.btn_conv_config.configure(state="disabled")
+        self.btn_download.configure(state="disabled")
+        self.footer.disable_admin()
+        self.footer.disable_manual()
+        return
+
+# --------------------------------------------------------------------------------------------------------------------------------
+    
+    def enable_btns(self) -> None:
+        self.btn_before_start.configure(state="normal")
+        self.btn_db_config.configure(state="normal")
+        self.btn_conv_config.configure(state="normal")
+        self.btn_download.configure(state="normal")
+        self.footer.enable_manual()
+
+        # if admin mode is already turned on, don't enable the admin mode button
+        if not self.master.admin_mode:
+            self.footer.enable_admin()
         
+        return
 
 # ================================================================================================================================
 

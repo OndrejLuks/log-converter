@@ -248,7 +248,9 @@ class AppInterface():
         -------
         None"""
 
-        self.app.button_frame.disable_buttons()
+        self.app.button_frame.disable_bottom_buttons()
+        self.app.conversion_frame.disable_start_btn()
+        self.app.navigation.disable_btns()
         return
 
 # --------------------------------------------------------------------------------------------------------------------------------
@@ -260,7 +262,9 @@ class AppInterface():
         -------
         None"""
 
-        self.app.button_frame.enable_buttons()
+        self.app.button_frame.enable_bottom_buttons()
+        self.app.conversion_frame.enable_start_btn()
+        self.app.navigation.enable_btns()
         return
 
 # --------------------------------------------------------------------------------------------------------------------------------

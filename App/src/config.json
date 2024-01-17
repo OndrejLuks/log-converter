@@ -5,7 +5,7 @@
         "done_path": "C:/Users/ondrejluks/Desktop",
         "aggregate": "true",
         "agg_max_skip_seconds": "3600",
-        "move_done_files": "true",
+        "move_done_files": "false",
         "write_time_info": "true",
         "admin_pswd": "BoDoBobldr",
         "_comment": "clean_upload means data will not append, OLD SCHEMA WILL BE DELETED",
