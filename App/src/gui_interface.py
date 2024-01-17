@@ -87,6 +87,7 @@ class AppInterface():
                     # conversion proces finished
                     self.enable_buttons()
                     self.hide_progress_bar()
+                    self.update_progress_bar(0)
                 
                 case "START":
                     self.disable_buttons()
