@@ -77,6 +77,8 @@ class AppInterface():
             # tolekize the message by '#'
             messages = event.split("#")
 
+            # print(messages)
+
             match messages[0]:
                 case "INIT":
                     # start initializaton process of the GUI

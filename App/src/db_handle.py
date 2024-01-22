@@ -106,9 +106,9 @@ class DatabaseHandle:
     
 # --------------------------------------------------------------------------------------------------------------------------------
 
-    def upload_data(self, data: list) -> None:
+    def upload_data(self, data: list, done_files: int, num_files: int) -> None:
         """Uploads given list of dataframes to the database"""
-        for df in data:
+        for df_count, df in enumerate(data):
              # thread end check
             if self._stop_event.is_set():
                 print("Database upload aborted.")
@@ -132,6 +132,10 @@ class DatabaseHandle:
             
             except Exception as e:
                 self._comm.send_error("WARNING", f"Problem with DB upload:\n{e}", "F")
+
+            # update progress bar
+            # adding 2/3 because database upload is the third part of the process
+            self._comm.send_command(f"PROG#{round(((done_files + 2/3 + ((1/3) * (df_count / len(data)))) / num_files), 3)}")
     
 # --------------------------------------------------------------------------------------------------------------------------------
 

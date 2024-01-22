@@ -37,6 +37,10 @@ class Conversion():
         self._stop_event = stop_ev
         self._db = database
         self._threads = thrs
+        self._num_of_files = 0
+        self._num_of_done_files = 0
+        self._num_of_signals = 0
+        self._num_of_agged_signals = 0
 
         self._config = config
         self._dbc_list = None
@@ -194,6 +198,9 @@ class Conversion():
             with lock:
                 dfs.append(result_df)
                 self._comm.send_to_print(f"     = finished agg. signal: {sig_name}")
+                # update the progress bar
+                self._num_of_agged_signals += 1
+                self._comm.send_command(f"PROG#{round(((self._num_of_done_files + 1/3 + ((1/3) * (self._num_of_agged_signals / self._num_of_signals))) / self._num_of_files), 3)}")
 
             return
 
@@ -205,10 +212,12 @@ class Conversion():
 
         if not 'Signal' in df.columns:
             # No signals were converted
+            # update progress bar
+            self._comm.send_command(f"PROG#{round(((self._num_of_done_files + 1/3) / self._num_of_files), 3)}")
             return column_df
         
         try:
-            for signal_name in df['Signal'].unique():
+            for sig_count, signal_name in enumerate(df['Signal'].unique()):
                 # thread end check
                 if self._stop_event.is_set():
                     print("Conversion aborted.")
@@ -217,6 +226,8 @@ class Conversion():
                 signal_df = df[df['Signal'] == signal_name][['Physical Value']].copy()
                 signal_df.rename(columns={'Physical Value': signal_name}, inplace=True)
                 column_df.append(signal_df)
+                # update progress bar
+                self._comm.send_command(f"PROG#{round(((self._num_of_done_files + ((1/3) * (sig_count / len(df['Signal'].unique())))) / self._num_of_files), 3)}")
 
         except Exception as e:
             self._comm.send_error("ERROR", f"Can't split df:\n{e}", "T")
@@ -260,8 +271,8 @@ class Conversion():
             return
 
         # load MF4 files
-        mf4_file_list, num_of_mf4_files = self._utils.get_MF4_files(self._config["settings"]["mf4_path"])
-        num_of_done_mf4_files = 0
+        mf4_file_list, self._num_of_files = self._utils.get_MF4_files(self._config["settings"]["mf4_path"])
+        self._num_of_done_files = 0
 
         try: 
             for file in mf4_file_list:
@@ -277,7 +288,9 @@ class Conversion():
                 self._comm.send_to_print(f" - Converting: {file}")
             
                 dfs_to_upload = []
-                converted_files = self._convert_mf4(file)
+                converted_signals = self._convert_mf4(file)
+                self._num_of_signals = len(converted_signals)
+                self._num_of_agged_signals = 0
 
                 # thread end check
                 if self._stop_event.is_set():
@@ -290,7 +303,7 @@ class Conversion():
                     self._comm.send_to_print("   - aggregating...")
                     # run each signal in a different thread
                     lock = Lock()
-                    for signal_df in converted_files:
+                    for signal_df in converted_signals:
                         # thread end check
                         if self._stop_event.is_set():
                             print("Process thread stopped.")
@@ -306,7 +319,10 @@ class Conversion():
                         thr.join()
                 
                 else:
-                    dfs_to_upload = converted_files
+                    # update progress bar
+                    self._comm.send_command(f"PROG#{round(((self._num_of_done_files + 2/3) / self._num_of_files), 3)}")
+                    # assign dataframes to upload
+                    dfs_to_upload = converted_signals
 
                 # thread end check
                 if self._stop_event.is_set():
@@ -315,7 +331,7 @@ class Conversion():
 
                 # UPLOAD TO DB
                 self._comm.send_to_print("   - uploading...")
-                self._db.upload_data(dfs_to_upload)
+                self._db.upload_data(dfs_to_upload, self._num_of_done_files, self._num_of_files)
 
                 # thread end check
                 if self._stop_event.is_set():
@@ -327,10 +343,11 @@ class Conversion():
                     self._comm.send_to_print("   - moving the file...")
                     self._utils.move_done_file(file, self._config["settings"]["mf4_path"], self._config["settings"]["done_path"])
 
-                num_of_done_mf4_files += 1
-                self._comm.send_command(f"PROG#{round((num_of_done_mf4_files / num_of_mf4_files), 2)}")
-                self._comm.send_to_print(f"   - DONE!     Overall progress:  {round((num_of_done_mf4_files / num_of_mf4_files)*100, 2)} %")
+                self._comm.send_to_print(f"   - DONE!")
                 self._comm.send_to_print()
+
+                # update the number of done files
+                self._num_of_done_files += 1
 
         except Exception as e:
             self._comm.send_error("ERROR", f"Process error:\n{e}", "T")
