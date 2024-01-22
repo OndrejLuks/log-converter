@@ -83,8 +83,8 @@ class BackendHandle():
 
                     case "DOWNL":
                         # download signals from db
-                        if len(messages) == 5:
-                            self._download_signal(sigs=messages[1], from_str=messages[2], to_str=messages[3], file_name=messages[4])
+                        if len(messages) == 6:
+                            self._download_signal(sigs=messages[1], from_str=messages[2], to_str=messages[3], file_name=messages[4], file_type=messages[5])
                         else:
                             self._comm.send_error("WARNING", "Blank download requested!", False)
 
@@ -172,7 +172,7 @@ class BackendHandle():
 
 # --------------------------------------------------------------------------------------------------------------------------------
 
-    def _download_signal(self, sigs: str, from_str: str, to_str: str, file_name: str) -> None:
+    def _download_signal(self, sigs: str, from_str: str, to_str: str, file_name: str, file_type: str) -> None:
 
         # check if time stamps are valid
         if not (self._utils.time_valid(from_str) and self._utils.time_valid(to_str)):
@@ -185,5 +185,5 @@ class BackendHandle():
             return
 
         # begin signal download
-        self._threads.append(self._utils.spawn_working_thread(fc=self._db.save_data, args=(sigs, from_str, to_str, file_name)))
+        self._threads.append(self._utils.spawn_working_thread(fc=self._db.save_data, args=(sigs, from_str, to_str, file_name, file_type)))
         return

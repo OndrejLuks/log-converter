@@ -187,7 +187,7 @@ class DatabaseHandle:
     
 # --------------------------------------------------------------------------------------------------------------------------------
 
-    def save_data(self, tables_str: str, from_time: str, to_time: str, file_path: str) -> None:
+    def save_data(self, tables_str: str, from_time: str, to_time: str, file_path: str, file_type: str) -> None:
         self._comm.send_to_print("Downloading data ...")
         self.connect()
 
@@ -210,11 +210,30 @@ class DatabaseHandle:
                     combined_data_frame = combined_data_frame.merge(data_frame, on="time_stamp", how="outer")
 
             self.finish()
+
+            # find out if dataframe is empty
+            if combined_data_frame.empty:
+                self._comm.send_error("WARNING", "Current selection doesn't conatin any data!", "F")
+                return
+
             # sort and save output dataframe
             combined_data_frame.sort_values(by="time_stamp", inplace=True)
-            combined_data_frame.to_csv(file_path, index=False)
 
-            self._comm.send_to_print(f"SUCCESS: Selected data saved to {file_path}")
+            self._comm.send_to_print("Saving ...")
+
+            if file_type == "csv":
+                combined_data_frame.to_csv(file_path, index=False)
+            
+            if file_type == "xlsx":
+                # check excel sheet limitations
+                if len(combined_data_frame) > 1048576:
+                    self._comm.send_error("WARNING", f"Excel supports max 1 048 576 rows!\nYou tried to save {len(combined_data_frame)} rows.", "F")
+                    return
+
+                combined_data_frame["time_stamp"] = combined_data_frame["time_stamp"].dt.tz_localize(None)
+                combined_data_frame.to_excel(file_path, index=False)
+
+            self._comm.send_to_print(f"\nSUCCESS: {len(combined_data_frame)} rows of data saved to {file_path}")
 
         except Exception as e:
             self._comm.send_error("WARNING", f"Problem with data download:\n{e}", "F")

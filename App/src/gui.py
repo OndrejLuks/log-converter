@@ -652,6 +652,7 @@ class DownloadFrame(customtkinter.CTkFrame):
         try:
             self.grid_columnconfigure(0, weight=1)
             self.grid_columnconfigure(1, weight=1)
+            self.grid_rowconfigure(5, weight=10)
             self.grid_rowconfigure(6, weight=1)
             self.configure(fg_color="transparent")
 
@@ -696,12 +697,16 @@ class DownloadFrame(customtkinter.CTkFrame):
             
             # textbox
             self._textbox = customtkinter.CTkTextbox(self, activate_scrollbars=True, wrap="word", height=100)
-            self._textbox.grid(row=5, column=0, columnspan=2, padx=50, pady=0, sticky="nsew")
+            self._textbox.grid(row=5, column=0, columnspan=2, padx=50, pady=(0, 10), sticky="nsew")
             self._textbox.configure(state="disabled", font=("Courier New", 12))
 
-            # download button
-            self._btn_download = customtkinter.CTkButton(self, text="Download as csv", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=self._btn_callback_download, width=200)
-            self._btn_download.grid(row=6, column=0, columnspan=2, padx=10, pady=(10, 0), sticky="s")
+            # csv download button
+            self._btn_download_csv = customtkinter.CTkButton(self, text="Download as CSV", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=lambda: self._btn_callback_download("csv"), width=200)
+            self._btn_download_csv.grid(row=6, column=0, padx=(0, 20), pady=(10, 0), sticky="se")
+
+            # Excel download button
+            self._btn_download_xlsx = customtkinter.CTkButton(self, text="Download as Excel", text_color=self.master.col_btn_tx, text_color_disabled=self.master.col_btn_dis_tx, command=lambda: self._btn_callback_download("xlsx"), width=200)
+            self._btn_download_xlsx.grid(row=6, column=1, padx=0, pady=(10, 0), sticky="sw")
 
         except Exception as e:
             self.master.error_handle("ERROR", f"Unable to create GUI - download:\n{e}", terminate=True)
@@ -765,7 +770,7 @@ class DownloadFrame(customtkinter.CTkFrame):
 
 # --------------------------------------------------------------------------------------------------------------------------------
 
-    def _btn_callback_download(self) -> None:
+    def _btn_callback_download(self, file_type: str) -> None:
         if len(self._selected_signals) == 0:
             self.master.error_handle("WARNING", "Signal not selected!", False)
             return
@@ -776,8 +781,15 @@ class DownloadFrame(customtkinter.CTkFrame):
 
         try:
             # ask for destination to save the file
-            file_path = filedialog.asksaveasfile(defaultextension=".csv", filetypes=[("CSV files", "*.csv")])
+            if file_type == "csv":
+                file_path = filedialog.asksaveasfile(defaultextension=".csv", filetypes=[("CSV files", "*.csv")])
 
+            elif file_type == "xlsx":
+                file_path = filedialog.asksaveasfile(defaultextension=".xlsx", filetypes=[("Excel files", "*.xlsx")])
+            
+            else:
+                file_path = None
+            
             # file path was provided
             if file_path:
                 # merge signals into semicolumn-separated string
@@ -788,7 +800,7 @@ class DownloadFrame(customtkinter.CTkFrame):
                         signals_str = signals_str + ";"
 
                 # send string command
-                self.master.comm.send_command(f"DOWNL#{signals_str}#{self._from_str}#{self._to_str}#{file_path.name}")
+                self.master.comm.send_command(f"DOWNL#{signals_str}#{self._from_str}#{self._to_str}#{file_path.name}#{file_type}")
 
         except Exception as e:
             self.master.error_handle("ERROR", f"Unable to download data:\n{e}", terminate=True)
