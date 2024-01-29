@@ -277,7 +277,7 @@ class TopWindowSignalSelect(customtkinter.CTkToplevel):
             self._sig_checkboxes = []
 
             # Loading
-            self._msg = customtkinter.CTkLabel(self, text="Loading...", fg_color=self.master.col_frame_title_bg, text_color=self.master.col_frame_title_tx, corner_radius=6)
+            self._msg = customtkinter.CTkLabel(self, text="Loading, please wait ...", fg_color=self.master.col_frame_title_bg, text_color=self.master.col_frame_title_tx, corner_radius=6)
             self._msg.grid(row=0, column=0, columnspan=2, padx=10, pady=(20, 10), sticky="nswe")
 
             # Signal choices
@@ -1661,10 +1661,10 @@ class App(customtkinter.CTk):
             customtkinter.set_appearance_mode("system")
             self.col_frame_title_bg = "#5e5e5e"
             self.col_frame_title_tx = "white"
-            self.col_popup_yn_bg = "orange"
+            self.col_popup_yn_bg = "#ffd6ad"
             self.col_popup_yn_lab = "white"
             self.col_popup_yn_tx = "black"
-            self.col_popup_ok_bg = "orange"
+            self.col_popup_ok_bg = "#ffd6ad"
             self.col_popup_ok_lab = "white"
             self.col_popup_ok_tx = "black"
             self.col_progress_bg = "#dbdbdb"
@@ -1842,8 +1842,6 @@ class App(customtkinter.CTk):
 
             # create toplevel window
             self.toplevel_window = TopWindowSignalSelect(self, signals, callback_ok, callback_cancel)
-            # position the toplevel window relatively to the main window
-            self.toplevel_window.geometry("+%d+%d" %(self.winfo_x()+200, self.winfo_y()+200))
 
         return
 
