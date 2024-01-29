@@ -406,10 +406,9 @@ class ManualFrame(customtkinter.CTkFrame):
         # IMPORTANT INFORMATION
         self._ii_lines = []
         ii_source_notes = [
-            "    - Any changes will not be considered unless [Save] or [Save and Start] button is pressed.",
+            "    - Any changes will not be considered unless [Save changes] button is pressed.",
             "    - Loaded text in entry elements represents the current configuration. No need to rewrite it.",
-            "    - Some features are available only in ADMIN MODE. Look out for [admin] label in this guide.",
-            "    - [Start] button will start the MF4 conversion and upload process"
+            "    - Some features are available only in ADMIN MODE. Look out for [admin] label in this guide."
         ]
         self._h_ii = self._add_heading("IMPORTANT INFORMATION")
         for source_note in ii_source_notes:
@@ -448,12 +447,15 @@ class ManualFrame(customtkinter.CTkFrame):
             "        - Visible only if [Aggregate raw data] is selected.",
             "        - Represents maximum amount of seconds of data to remove when aggregating.",
             "        - E. g. if set to 10 and data have duplicite values over more than 10 seconds,",
-            "          aggregation will not remove every 10th sec record of those data",
+            "          aggregation will not remove every 10th sec record of those data.",
             "    - [Select destination folder for done files] button",
             "        - Visible only if [Move done files] is selected.",
-            "        - Sets destination where processed MF4 files will be moved"
+            "        - Sets destination where processed MF4 files will be moved.",
+            "    - [Start conversion & upload] button",
+            "        - Starts the process of converting MF4 files and uploading them to the database.",
+            "        - Progress bar will appear."
         ]
-        self._h_conv = self._add_heading("Conversion configuration")
+        self._h_conv = self._add_heading("Conversion & Upload")
         for source_note in conversion_source_notes:
             self._conversion_lines.append(self._add_note(source_note))
 
@@ -461,15 +463,15 @@ class ManualFrame(customtkinter.CTkFrame):
         self._download_lines = []
         download_source_notes = [
             "    - Selected data are fetched right from the database.",
-            "    - Multiple signals can be downloaded at once",
-            "    - Only CSV format is supported.",
+            "    - Multiple signals can be downloaded at once.",
+            "    - Only CSV and Excel file types are supported.",
             "    - [Update signal names] button",
-            "        - updates internal record of signals stored in the database",
+            "        - updates internal record of signals stored in the database.",
             "    - [Select signals] button",
-            "        - lets you pick desired signals to download",
+            "        - lets you pick desired signals to download.",
             "    - [Set time filter] button",
-            "        - lets you pick time filter for selected signals",
-            "    - Both Signals and Time filter must be chosen in order to download"
+            "        - lets you pick time filter for selected signals.",
+            "    - Both Signals and Time filter must be chosen in order to download."
         ]
         self._h_down = self._add_heading("Data download")
         for source_note in download_source_notes:
